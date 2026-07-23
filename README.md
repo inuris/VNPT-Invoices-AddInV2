@@ -14,7 +14,7 @@ The add-in checks this file on startup:
 
 | Field | Meaning |
 |-------|---------|
-| `latestVersion` | Newest published version (must equal the release build's AssemblyVersion, e.g. `1.0.1.0`). |
+| `latestVersion` | Newest published version in short `x.y` form, e.g. `1.1` (matches the release build's major.minor). |
 | `downloadUrl` | Where the add-in opens when the user chooses to update (defaults to the latest release page). |
 | `notes` | Short change summary shown to the user. |
 | `mandatory` | `true` to re-notify even if the user dismissed this version. |
