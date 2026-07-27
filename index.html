@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VNPT Invoices Add-in — Cài đặt</title>
+<style>
+  :root{--bg:#0f172a;--card:#1e293b;--line:#334155;--txt:#e2e8f0;--muted:#94a3b8;--accent:#0ea5e9;--accent2:#38bdf8;--chip:#0b1220}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.6 "Segoe UI",Roboto,Arial,sans-serif;display:flex;min-height:100vh;align-items:center;justify-content:center;padding:24px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;max-width:620px;width:100%;padding:30px 32px}
+  h1{margin:0 0 4px;font-size:22px}
+  .ver{color:var(--muted);font-size:13px;margin:0 0 20px}
+  .cta{display:inline-flex;align-items:center;gap:10px;background:var(--accent);color:#04121e;font-weight:800;
+    text-decoration:none;padding:13px 22px;border-radius:10px;font-size:16px;transition:.12s}
+  .cta:hover{background:var(--accent2)}
+  ol{margin:22px 0 0;padding-left:20px}
+  ol li{margin:0 0 8px}
+  .note{margin-top:22px;padding:14px 16px;background:var(--chip);border:1px solid var(--line);border-radius:10px;color:var(--muted);font-size:13px}
+  code{background:var(--chip);border:1px solid var(--line);padding:1px 6px;border-radius:5px;color:#bae6fd;font-size:13px}
+  a{color:var(--accent2)}
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:6px}
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>VNPT Invoices Add-in cho Excel</h1>
+    <p class="ver">Trình cài đặt trực tuyến (ClickOnce) — tự động cập nhật khi có bản mới.</p>
+
+    <div class="row">
+      <a class="cta" href="setup.exe">⬇️ Cài đặt / Cập nhật</a>
+      <span class="muted" style="color:var(--muted);font-size:13px">hoặc mở <code>VNPT.Invoices.AddInV2.vsto</code></span>
+    </div>
+
+    <ol>
+      <li>Bấm <b>Cài đặt / Cập nhật</b> ở trên, tải <code>setup.exe</code> rồi chạy.</li>
+      <li>Nếu Windows cảnh báo SmartScreen: <b>More info → Run anyway</b> (do file chưa ký EV).</li>
+      <li>Mở <b>Excel</b> — tab <b>VNPT</b> xuất hiện trên ribbon là xong.</li>
+      <li>Các bản sau <b>tự cập nhật</b> khi mở Excel — không cần tải lại trang này.</li>
+    </ol>
+
+    <div class="note">
+      Yêu cầu: Windows + Microsoft Office (Excel) 2010 trở lên, .NET Framework 4.x và VSTO Runtime
+      (thường đã kèm Office). Cài theo từng người dùng — không cần quyền Administrator.
+    </div>
+  </div>
+</body>
+</html>
