@@ -134,10 +134,16 @@ function addConn(data){
     </div>
 
     <div class="sec">
-      <div class="st"><h4>Tài khoản</h4></div>
+      <div class="st"><h4>Tài khoản CAdmin</h4></div>
       <div class="grid two">
         <div><label>CAdmin User<span class="req">*</span></label><input class="f-uca" placeholder="tài khoản CAdmin" value="${esc(gp(data,'account','userCAdmin'))}"></div>
         <div><label>CAdmin Password<span class="req">*</span></label><input class="f-pca" placeholder="mật khẩu CAdmin" value="${esc(gp(data,'account','passwordCAdmin'))}"></div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="st"><h4>Tài khoản WebService</h4></div>
+      <div class="grid two">
         <div><label>WebService User<span class="req">*</span></label><input class="f-uws" placeholder="tài khoản Service" value="${esc(gp(data,'account','userWebService'))}"></div>
         <div><label>WebService Password<span class="req">*</span></label><input class="f-pws" placeholder="mật khẩu Service" value="${esc(gp(data,'account','passwordWebService'))}"></div>
       </div>
@@ -247,8 +253,10 @@ function validate(data){
     if(!c.displayName) errs.push(w+': thiếu Tên hiển thị.');
     if(!c.mst) errs.push(w+': thiếu MST.');
     if(!c.domain) errs.push(w+': thiếu Domain.');
-    if(!c.account||!c.account.userCAdmin) errs.push(w+': thiếu UserCAdmin.');
-    if(!c.account||!c.account.passwordCAdmin) errs.push(w+': thiếu Mật khẩu CAdmin.');
+    if(!c.account||!c.account.userCAdmin) errs.push(w+': thiếu CAdmin User.');
+    if(!c.account||!c.account.passwordCAdmin) errs.push(w+': thiếu CAdmin Password.');
+    if(!c.account||!c.account.userWebService) errs.push(w+': thiếu WebService User.');
+    if(!c.account||!c.account.passwordWebService) errs.push(w+': thiếu WebService Password.');
   });
   return errs;
 }
