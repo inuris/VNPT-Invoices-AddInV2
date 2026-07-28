@@ -17,7 +17,7 @@ Application Files/…             ← các bản build theo phiên bản (.deplo
 **KHÔNG sửa tay** các file ClickOnce ở đây. Mỗi lần phát hành, chạy từ repo **source**:
 
 ```powershell
-pwsh tools/deploy-to-pages.ps1 -PublishDir "C:\Code\VNPT-Invoices-Cursor\publish"
+powershell -ExecutionPolicy Bypass -File tools\deploy-to-pages.ps1 -PublishDir "C:\Code\VNPT-Invoices-Cursor\publish"
 ```
 
 Script sẽ đồng bộ đầu ra Publish vào nhánh này (giữ `index.html` + `.nojekyll`) rồi push → Pages tự cập nhật.
