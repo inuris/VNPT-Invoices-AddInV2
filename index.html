@@ -5,17 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VNPT Invoices Add-in</title>
 <style>
-  :root{--bg:#0f172a;--card:#1e293b;--line:#334155;--txt:#e2e8f0;--muted:#94a3b8;--accent:#0ea5e9;--accent2:#38bdf8;--chip:#0b1220}
+  :root{--bg:#f1f5f9;--card:#ffffff;--line:#e2e8f0;--txt:#0f172a;--muted:#64748b;--accent:#0284c7;--accent2:#0ea5e9;--chip:#f8fafc}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--txt);
     font-family:system-ui,"Segoe UI",Roboto,Arial,sans-serif;
     display:flex;min-height:100vh;align-items:center;justify-content:center;padding:24px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;max-width:460px;width:100%;padding:32px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;max-width:460px;width:100%;padding:32px;
+    box-shadow:0 6px 24px rgba(15,23,42,.06)}
   h1{margin:0 0 24px;font-size:22px;text-align:center}
   .btns{display:flex;flex-direction:column;gap:12px}
   a.btn{display:block;text-align:center;text-decoration:none;padding:14px 20px;border-radius:10px;
     font-size:16px;font-weight:700;border:1px solid var(--line);transition:.12s}
-  a.primary{background:var(--accent);color:#04121e;border-color:var(--accent)}
+  a.primary{background:var(--accent);color:#ffffff;border-color:var(--accent)}
   a.primary:hover{background:var(--accent2)}
   a.ghost{background:var(--chip);color:var(--txt)}
   a.ghost:hover{border-color:var(--accent2)}
