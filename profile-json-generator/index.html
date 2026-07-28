@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VNPT — Tạo JSON cấu hình kết nối (import)</title>
+<style>
+  :root{
+    --bg:#f1f5f9; --card:#ffffff; --card2:#f8fafc; --line:#e2e8f0;
+    --txt:#0f172a; --muted:#64748b; --accent:#0284c7; --accent2:#0ea5e9;
+    --ok:#16a34a; --warn:#d97706; --danger:#dc2626; --chip:#f8fafc;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.5 "Segoe UI",Roboto,Arial,sans-serif;}
+  header{padding:18px 22px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#ffffff,#f8fafc);position:sticky;top:0;z-index:5}
+  header h1{margin:0;font-size:18px}
+  header p{margin:4px 0 0;color:var(--muted);font-size:12.5px}
+  .wrap{max-width:1200px;margin:0 auto;padding:18px 22px 60px;display:grid;grid-template-columns:1fr 440px;gap:18px}
+  @media(max-width:960px){.wrap{grid-template-columns:1fr}}
+  .left{min-width:0}
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+  button{cursor:pointer;border:1px solid var(--line);background:var(--card2);color:var(--txt);
+    padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;transition:.12s}
+  button:hover{border-color:var(--accent)}
+  button.primary{background:var(--accent2);border-color:var(--accent2);color:#ffffff}
+  button.primary:hover{background:var(--accent)}
+  button.ghost{background:transparent}
+  button.danger{color:#b91c1c;border-color:#fecaca;background:#fef2f2}
+  button.danger:hover{border-color:var(--danger)}
+  button.mini{padding:4px 9px;font-size:12px;font-weight:600}
+  .conn{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin:0 0 16px;position:relative}
+  .conn > .head{display:flex;align-items:center;gap:10px;margin:0 0 12px}
+  .conn > .head .idx{width:26px;height:26px;border-radius:50%;background:var(--accent2);color:#ffffff;
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex:0 0 auto}
+  .conn > .head .name{font-weight:700;font-size:15px;color:#0f172a}
+  .conn > .head .spacer{flex:1}
+  .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .grid.two{grid-template-columns:1fr 1fr}
+  @media(max-width:720px){.grid,.grid.two{grid-template-columns:1fr}}
+  label{display:block;font-size:12px;color:var(--muted);margin:0 0 3px;font-weight:600}
+  label .req{color:var(--warn)}
+  input,select,textarea{width:100%;background:var(--chip);border:1px solid var(--line);color:var(--txt);
+    border-radius:7px;padding:7px 9px;font:13px/1.4 inherit;outline:none}
+  input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+  .sec{margin:14px 0 0;border-top:1px dashed var(--line);padding-top:12px}
+  .sec > .st{display:flex;align-items:center;gap:8px;margin:0 0 8px}
+  .sec > .st h4{margin:0;font-size:13px;color:var(--accent)}
+  .sec > .st .hint{color:var(--muted);font-size:11.5px}
+  .row{display:grid;gap:8px;align-items:end;margin:0 0 8px}
+  .row.pat{grid-template-columns:1fr 1fr 130px 34px}
+  .row.ext{grid-template-columns:110px 1.3fr 130px 120px 1fr 34px}
+  @media(max-width:720px){.row.pat,.row.ext{grid-template-columns:1fr}}
+  .row .del{padding:7px 0}
+  .field-note{color:var(--muted);font-size:11px;margin-top:2px}
+  .out{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;position:sticky;top:86px}
+  .out .oh{display:flex;align-items:center;gap:8px;margin:0 0 10px}
+  .out h3{margin:0;font-size:14px}
+  .out .oh .spacer{flex:1}
+  textarea#json{width:100%;min-height:440px;font-family:ui-monospace,Consolas,"Courier New",monospace;font-size:12.5px;white-space:pre;tab-size:2}
+  .msg{font-size:12.5px;margin:8px 0 0;min-height:18px}
+  .msg.ok{color:var(--ok)} .msg.err{color:var(--danger)}
+  .pill{display:inline-block;background:var(--chip);border:1px solid var(--line);border-radius:999px;
+    padding:2px 9px;font-size:11px;color:var(--muted)}
+  code{background:var(--chip);border:1px solid var(--line);padding:1px 5px;border-radius:4px;font-size:11.5px;color:#0369a1}
+  details{margin-top:6px}
+  summary{cursor:pointer;color:var(--muted);font-size:12px}
+</style>
+</head>
+<body>
+<header>
+  <h1>VNPT — Tạo JSON cấu hình kết nối</h1>
+  <p>Nhập nhanh kết nối (Account/WebService, mẫu ký hiệu, cột mở rộng)</p>
+</header>
+
+<div class="wrap">
+  <div class="left">
+    <div class="toolbar">
+      <button class="primary" onclick="addConn();formToJson()">➕ Thêm kết nối</button>
+    </div>
+    <div id="conns"></div>
+  </div>
+
+  <div>
+    <div class="out">
+      <div class="oh">
+        <h3>JSON</h3>
+        <span class="pill">đồng bộ 2 chiều</span>
+        <span class="spacer"></span>
+        <button class="mini ghost" onclick="copyJson()">📋 Sao chép</button>
+        <button class="mini ghost" onclick="downloadJson()">⬇️ Tải .json</button>
+      </div>
+      <textarea id="json" spellcheck="false" placeholder='[]'></textarea>
+      <div id="msg" class="msg"></div>
+      <details>
+        <summary>Ghi chú các trường</summary>
+        <div class="field-note" style="margin-top:8px">
+          <b>Account (CAdmin)</b>: tài khoản gọi PublishService (phát hành). <b>WebService</b>: tài khoản đăng nhập portal/admin.<br>
+          <b>Loại chứng từ</b>: <code>CTT</code> / <code>GTGT</code> / <code>PXK</code>.<br>
+          <b>Domain</b>: tự bỏ <code>http(s)://</code> và dấu <code>/</code> ở cuối.<br>
+          <b>Cột mở rộng</b> (tùy chọn): map cột Excel → khe <code>Extra1</code>…<code>Extra11</code> (cấp hóa đơn) hoặc <code>SP_Extra1</code>/<code>SP_Extra2</code> (cấp dòng). Kiểu: <code>string</code>/<code>numeric</code>/<code>datetime</code>.
+        </div>
+      </details>
+    </div>
+  </div>
+</div>
+
+<script>
+const DOC_TYPES = ["CTT","GTGT","PXK"];
+const SLOTS = ["Extra1","Extra2","Extra3","Extra4","Extra5","Extra6","Extra7","Extra8","Extra9","Extra10","Extra11","SP_Extra1","SP_Extra2"];
+const DTYPES = ["string","numeric","datetime"];
+let seq = 0;
+let syncing = false; // chặn vòng lặp form <-> json
+
+function el(html){ const t=document.createElement('template'); t.innerHTML=html.trim(); return t.content.firstChild; }
+function opts(arr, sel){ return arr.map(v=>`<option value="${v}" ${v===sel?'selected':''}>${v}</option>`).join(''); }
+function cleanDomain(s){ return (s==null?'':String(s)).trim().replace(/^https?:\/\//i,'').replace(/\/+$/,'').trim(); }
+
+function addConn(data){
+  data = data || {};
+  const id = 'c'+(++seq);
+  const node = el(`
+  <div class="conn" id="${id}">
+    <div class="head">
+      <div class="idx"></div>
+      <div class="name">Kết nối</div>
+      <div class="spacer"></div>
+      <button class="mini danger" onclick="this.closest('.conn').remove();renumber();formToJson()">✕ Xóa kết nối</button>
+    </div>
+
+    <div class="grid">
+      <div><label>Tên hiển thị <span class="req">*</span></label><input class="f-name" placeholder="VD: Công ty ABC — HN" value="${esc(data.displayName)}"></div>
+      <div><label>Mã số thuế (MST) <span class="req">*</span></label><input class="f-mst" placeholder="VD: 0315890356" value="${esc(data.mst)}"></div>
+      <div><label>Domain <span class="req">*</span></label><input class="f-domain" placeholder="vd: abc.vnpt-invoice.com.vn" value="${esc(cleanDomain(data.domain))}"></div>
+    </div>
+
+    <div class="sec">
+      <div class="st"><h4>Tài khoản CAdmin</h4></div>
+      <div class="grid two">
+        <div><label>CAdmin User<span class="req">*</span></label><input class="f-uca" placeholder="tài khoản CAdmin" value="${esc(gp(data,'account','userCAdmin'))}"></div>
+        <div><label>CAdmin Password<span class="req">*</span></label><input class="f-pca" placeholder="mật khẩu CAdmin" value="${esc(gp(data,'account','passwordCAdmin'))}"></div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="st"><h4>Tài khoản WebService</h4></div>
+      <div class="grid two">
+        <div><label>WebService User<span class="req">*</span></label><input class="f-uws" placeholder="tài khoản Service" value="${esc(gp(data,'account','userWebService'))}"></div>
+        <div><label>WebService Password<span class="req">*</span></label><input class="f-pws" placeholder="mật khẩu Service" value="${esc(gp(data,'account','passwordWebService'))}"></div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="st"><h4>Mẫu / Ký hiệu</h4>
+        <button class="mini" onclick="addPat('${id}');formToJson()">➕ Thêm mẫu</button></div>
+      <div class="pats"></div>
+    </div>
+
+    <div class="sec">
+      <div class="st"><h4>Cột mở rộng (tùy chọn)</h4><span class="spacer" style="flex:1"></span>
+        <button class="mini" onclick="addExt('${id}');formToJson()">➕ Thêm cột</button></div>
+      <div class="exts"></div>
+    </div>
+  </div>`);
+  document.getElementById('conns').appendChild(node);
+
+  const pats = (data.patterns && data.patterns.length) ? data.patterns : [{}];
+  pats.forEach(p=>addPat(id,p));
+  (data.customColumns||[]).forEach(c=>addExt(id,c));
+  renumber();
+}
+
+function addPat(id, p){
+  p = p || {};
+  const box = document.getElementById(id).querySelector('.pats');
+  const row = el(`
+    <div class="row pat">
+      <div><label>Mẫu số (Pattern)</label><input class="p-pat" placeholder="VD: 1/001" value="${esc(p.pattern)}"></div>
+      <div><label>Ký hiệu (Serial)</label><input class="p-ser" placeholder="VD: C25TAA" value="${esc(p.serial)}"></div>
+      <div><label>Loại</label><select class="p-type">${opts(DOC_TYPES, p.type||'CTT')}</select></div>
+      <div class="del"><button class="mini danger" onclick="this.closest('.row').remove();formToJson()">✕</button></div>
+    </div>`);
+  box.appendChild(row);
+}
+
+function addExt(id, c){
+  c = c || {};
+  const box = document.getElementById(id).querySelector('.exts');
+  const row = el(`
+    <div class="row ext">
+      <div><label>Loại CT</label><select class="e-type">${opts(DOC_TYPES, c.type||'GTGT')}</select></div>
+      <div><label>Tên cột Excel</label><input class="e-header" placeholder="VD: SoHopDong" value="${esc(c.header)}"></div>
+      <div><label>Khe Extra</label><select class="e-slot">${opts(SLOTS, c.extraSlot||'Extra9')}</select></div>
+      <div><label>Kiểu</label><select class="e-dtype">${opts(DTYPES, c.dataType||'string')}</select></div>
+      <div><label>Ghi chú</label><input class="e-note" placeholder="tùy chọn" value="${esc(c.note)}"></div>
+      <div class="del"><button class="mini danger" onclick="this.closest('.row').remove();formToJson()">✕</button></div>
+    </div>`);
+  box.appendChild(row);
+}
+
+function renumber(){
+  const cs = [...document.querySelectorAll('.conn')];
+  cs.forEach((c,i)=>{
+    c.querySelector('.idx').textContent = i+1;
+    const nm = c.querySelector('.f-name').value.trim();
+    c.querySelector('.name').textContent = nm || ('Kết nối '+(i+1));
+  });
+}
+
+function val(root,sel){ const n=root.querySelector(sel); return n?n.value.trim():''; }
+
+function collect(){
+  const out=[];
+  for(const c of document.querySelectorAll('.conn')){
+    const conn={
+      displayName: val(c,'.f-name'),
+      mst: val(c,'.f-mst'),
+      domain: cleanDomain(val(c,'.f-domain')),
+      account:{
+        userCAdmin: val(c,'.f-uca'),
+        passwordCAdmin: val(c,'.f-pca'),
+        userWebService: val(c,'.f-uws'),
+        passwordWebService: val(c,'.f-pws')
+      },
+      patterns: [],
+      customColumns: []
+    };
+    for(const r of c.querySelectorAll('.row.pat')){
+      const pat=val(r,'.p-pat'), ser=val(r,'.p-ser'), ty=val(r,'.p-type')||'CTT';
+      if(pat||ser) conn.patterns.push({pattern:pat, serial:ser, type:ty});
+    }
+    if(conn.patterns.length===0) conn.patterns.push({pattern:'', serial:'', type:'CTT'});
+    for(const r of c.querySelectorAll('.row.ext')){
+      const h=val(r,'.e-header');
+      if(!h) continue;
+      conn.customColumns.push({
+        type: val(r,'.e-type')||'GTGT',
+        header: h,
+        extraSlot: val(r,'.e-slot'),
+        dataType: val(r,'.e-dtype')||'string',
+        note: val(r,'.e-note')
+      });
+    }
+    if(conn.customColumns.length===0) delete conn.customColumns;
+    out.push(conn);
+  }
+  return out;
+}
+
+function validate(data){
+  const errs=[];
+  data.forEach((c,i)=>{
+    const w='Kết nối '+(i+1);
+    if(!c.displayName) errs.push(w+': thiếu Tên hiển thị.');
+    if(!c.mst) errs.push(w+': thiếu MST.');
+    if(!c.domain) errs.push(w+': thiếu Domain.');
+    if(!c.account||!c.account.userCAdmin) errs.push(w+': thiếu CAdmin User.');
+    if(!c.account||!c.account.passwordCAdmin) errs.push(w+': thiếu CAdmin Password.');
+    if(!c.account||!c.account.userWebService) errs.push(w+': thiếu WebService User.');
+    if(!c.account||!c.account.passwordWebService) errs.push(w+': thiếu WebService Password.');
+  });
+  return errs;
+}
+
+function showValidity(data){
+  const msg=document.getElementById('msg');
+  if(!Array.isArray(data)||data.length===0){ msg.className='msg'; msg.textContent='Chưa có kết nối nào.'; return; }
+  const errs=validate(data);
+  if(errs.length){ msg.className='msg err'; msg.innerHTML='⚠️ '+errs.join('<br>⚠️ '); }
+  else { msg.className='msg ok'; msg.textContent='✅ '+data.length+' kết nối hợp lệ — sao chép/tải để gửi khách Import.'; }
+}
+
+// form -> json
+function formToJson(){
+  if(syncing) return;
+  const data=collect();
+  syncing=true;
+  document.getElementById('json').value=JSON.stringify(data,null,2);
+  syncing=false;
+  showValidity(data);
+}
+
+// json -> form
+function jsonToForm(){
+  if(syncing) return;
+  const raw=document.getElementById('json').value.trim();
+  let arr;
+  try{
+    arr = raw==='' ? [] : JSON.parse(raw);
+    if(!Array.isArray(arr)) arr=[arr];
+  }catch(e){
+    const msg=document.getElementById('msg');
+    msg.className='msg err'; msg.textContent='JSON chưa hợp lệ: '+e.message+' (form giữ nguyên)';
+    return;
+  }
+  syncing=true;
+  document.getElementById('conns').innerHTML=''; seq=0;
+  arr.forEach(addConn);
+  syncing=false;
+  showValidity(arr);
+}
+
+// đồng bộ tức thời
+document.addEventListener('input', e=>{
+  if(e.target.id==='json'){ jsonToForm(); return; }
+  if(e.target.closest('.conn')){
+    if(e.target.classList.contains('f-name')) renumber();
+    formToJson();
+  }
+});
+// rời ô Domain -> chuẩn hóa (bỏ http(s):// và '/')
+document.addEventListener('focusout', e=>{
+  if(e.target.classList && e.target.classList.contains('f-domain')){
+    const c=cleanDomain(e.target.value);
+    if(c!==e.target.value){ e.target.value=c; formToJson(); }
+  }
+});
+
+function copyJson(){
+  const t=document.getElementById('json'); formToJson();
+  t.select(); t.setSelectionRange(0,999999);
+  navigator.clipboard.writeText(t.value).then(()=>flash('✅ Đã sao chép JSON.')).catch(()=>flash('Hãy chọn và Ctrl+C.'));
+}
+function downloadJson(){
+  formToJson();
+  const json=document.getElementById('json').value;
+  const blob=new Blob([json],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='vnpt-connections.json'; a.click(); URL.revokeObjectURL(a.href);
+  flash('⬇️ Đã tải vnpt-connections.json');
+}
+function flash(t){ const m=document.getElementById('msg'); m.className='msg ok'; m.textContent=t; }
+
+function esc(s){ return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+function gp(o,a,b){ return (o&&o[a]&&o[a][b])||''; }
+
+// khởi tạo 1 kết nối mẫu + JSON ban đầu
+addConn();
+formToJson();
+</script>
+</body>
+</html>
