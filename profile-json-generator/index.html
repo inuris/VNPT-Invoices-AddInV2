@@ -69,7 +69,7 @@
 <body>
 <header>
   <h1>VNPT — Tạo JSON cấu hình kết nối</h1>
-  <p>Nhập nhanh kết nối (Account/WebService, mẫu ký hiệu, cột mở rộng). JSON <b>đồng bộ 2 chiều tức thời</b>: gõ form → JSON cập nhật; sửa/dán JSON → form cập nhật lại. Chạy hoàn toàn trong trình duyệt.</p>
+  <p>Nhập nhanh kết nối (Account/WebService, mẫu ký hiệu, cột mở rộng)</p>
 </header>
 
 <div class="wrap">
@@ -134,23 +134,23 @@ function addConn(data){
     </div>
 
     <div class="sec">
-      <div class="st"><h4>Tài khoản</h4><span class="hint">CAdmin = phát hành · WebService = đăng nhập portal</span></div>
+      <div class="st"><h4>Tài khoản</h4></div>
       <div class="grid two">
-        <div><label>Account (UserCAdmin) <span class="req">*</span></label><input class="f-uca" placeholder="tài khoản CAdmin" value="${esc(gp(data,'account','userCAdmin'))}"></div>
-        <div><label>Mật khẩu CAdmin <span class="req">*</span></label><input class="f-pca" placeholder="mật khẩu CAdmin" value="${esc(gp(data,'account','passwordCAdmin'))}"></div>
-        <div><label>User WebService</label><input class="f-uws" placeholder="username portal (tùy chọn)" value="${esc(gp(data,'account','userWebService'))}"></div>
-        <div><label>Mật khẩu WebService</label><input class="f-pws" placeholder="mật khẩu portal (tùy chọn)" value="${esc(gp(data,'account','passwordWebService'))}"></div>
+        <div><label>CAdmin User<span class="req">*</span></label><input class="f-uca" placeholder="tài khoản CAdmin" value="${esc(gp(data,'account','userCAdmin'))}"></div>
+        <div><label>CAdmin Password<span class="req">*</span></label><input class="f-pca" placeholder="mật khẩu CAdmin" value="${esc(gp(data,'account','passwordCAdmin'))}"></div>
+        <div><label>WebService User<span class="req">*</span></label><input class="f-uws" placeholder="tài khoản Service" value="${esc(gp(data,'account','userWebService'))}"></div>
+        <div><label>WebService Password<span class="req">*</span></label><input class="f-pws" placeholder="mật khẩu Service" value="${esc(gp(data,'account','passwordWebService'))}"></div>
       </div>
     </div>
 
     <div class="sec">
-      <div class="st"><h4>Mẫu / Ký hiệu</h4><span class="hint">ít nhất 1 mẫu</span><span class="spacer" style="flex:1"></span>
+      <div class="st"><h4>Mẫu / Ký hiệu</h4>
         <button class="mini" onclick="addPat('${id}');formToJson()">➕ Thêm mẫu</button></div>
       <div class="pats"></div>
     </div>
 
     <div class="sec">
-      <div class="st"><h4>Cột mở rộng (tùy chọn)</h4><span class="hint">map cột Excel của khách → khe Extra</span><span class="spacer" style="flex:1"></span>
+      <div class="st"><h4>Cột mở rộng (tùy chọn)</h4><span class="spacer" style="flex:1"></span>
         <button class="mini" onclick="addExt('${id}');formToJson()">➕ Thêm cột</button></div>
       <div class="exts"></div>
     </div>
