@@ -20,6 +20,7 @@ index.html                      ← trang tải (giữ nguyên)
 setup.exe                       ← bootstrapper cài đặt
 VNPT.Invoices.AddInV2.vsto      ← deployment manifest
 Application Files/…             ← các bản build theo phiên bản (.deploy)
+VNPT.Invoices.AddInV2.zip       ← trọn bộ publish, zip tự động (nút "Tải bộ cài")
 update.json                     ← auto-update manifest (add-in đọc khi khởi động)
 profile-json-generator/…        ← công cụ phụ trợ
 ```
@@ -57,33 +58,27 @@ The add-in checks this file on startup:
 
 ## Install button on `index.html`
 
-**"Tải bộ cài"** is the only button, and it's the only one needed: it always
-resolves to
-`https://github.com/inuris/VNPT-Invoices-AddInV2/releases/latest/download/VNPT.Invoices.AddInV2.zip`.
+**"Tải bộ cài"** is the only button, and it's the only one needed: it links
+to `VNPT.Invoices.AddInV2.zip` right next to `index.html` on this same site.
 Unzip and run `setup.exe` from inside the extracted folder — that performs a
 normal ClickOnce install pointed at this same Pages URL, so **later versions
 auto-update inside the add-in itself** (no need to come back to this page).
-`setup.exe`/`Application Files\` are still hosted here directly too (that's
-what the zip is built from and what ClickOnce reads from for the
-auto-update check), just not linked from a separate button anymore.
 
-**The Release asset must always be named exactly
-`VNPT.Invoices.AddInV2.zip`** (no version in the filename) — GitHub's
-`.../releases/latest/download/<name>` link only works if every release uses
-the same asset name. Put the version in the release **tag** (`vX.Y.Z.W`)
-instead.
+This zip is **not** a GitHub Release asset (that was tried and it broke —
+GitHub's `releases/latest/download/<name>` link 404s the moment one release's
+asset filename doesn't match exactly, and nothing enforces that). It's just a
+regular file on `main`, rebuilt automatically by `deploy-to-pages.ps1` on
+every publish — same mechanism as `setup.exe`, no manual step, nothing to
+misname.
 
 ## Publishing a new version
 
-1. Run `tools\deploy-to-pages.ps1` from the source repo to push the new
-   ClickOnce build to `main`.
-2. Zip the full publish folder (the same folder `deploy-to-pages.ps1` reads
-   from — `setup.exe` + `.vsto` + `Application Files\`) as
-   `VNPT.Invoices.AddInV2.zip`.
-3. Create a GitHub Release here (tag `vX.Y.Z.W`) and attach that zip —
-   **keep the asset filename `VNPT.Invoices.AddInV2.zip`** on every release
-   (see above).
-4. Update `update.json` → set `latestVersion` to that version, refresh
+1. Run `tools\deploy-to-pages.ps1` from the source repo — pushes the new
+   ClickOnce build **and** rebuilds `VNPT.Invoices.AddInV2.zip` to `main` in
+   one step.
+2. Update `update.json` → set `latestVersion` to that version, refresh
    `notes`, commit to `main`.
 
 Clients running an older build will see the update prompt on next Excel open.
+GitHub Releases are still fine to use for changelog/tag history if you want,
+just not required for either download button.
