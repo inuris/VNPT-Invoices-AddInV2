@@ -55,25 +55,23 @@ The add-in checks this file on startup:
 | `notes` | Short change summary shown to the user. |
 | `mandatory` | `true` to re-notify even if the user dismissed this version. |
 
-## Two install paths from `index.html`
+## Install button on `index.html`
 
-- **"Cài đặt / Cập nhật (ClickOnce)"** → `setup.exe`. Standard online install:
-  ClickOnce pulls everything it needs (the `.vsto` manifest + `Application
-  Files\`) over the network from this same site, and on later launches
-  checks this same URL for updates automatically. This is the path most
-  users should use — no manual folder download involved.
-- **"Tải trọn bộ (cài offline)"** → always resolves to
-  `https://github.com/inuris/VNPT-Invoices-AddInV2/releases/latest/download/VNPT.Invoices.AddInV2.zip`.
-  For machines that can't reach this Pages URL directly (firewalled/offline
-  install): unzip and run `setup.exe` from inside the extracted folder.
-  ClickOnce will still check the online URL for updates once the machine is
-  back online.
+**"Tải bộ cài"** is the only button, and it's the only one needed: it always
+resolves to
+`https://github.com/inuris/VNPT-Invoices-AddInV2/releases/latest/download/VNPT.Invoices.AddInV2.zip`.
+Unzip and run `setup.exe` from inside the extracted folder — that performs a
+normal ClickOnce install pointed at this same Pages URL, so **later versions
+auto-update inside the add-in itself** (no need to come back to this page).
+`setup.exe`/`Application Files\` are still hosted here directly too (that's
+what the zip is built from and what ClickOnce reads from for the
+auto-update check), just not linked from a separate button anymore.
 
-  **The Release asset must always be named exactly
-  `VNPT.Invoices.AddInV2.zip`** (no version in the filename) — GitHub's
-  `.../releases/latest/download/<name>` link only works if every release
-  uses the same asset name. Put the version in the release **tag**
-  (`vX.Y.Z.W`) instead.
+**The Release asset must always be named exactly
+`VNPT.Invoices.AddInV2.zip`** (no version in the filename) — GitHub's
+`.../releases/latest/download/<name>` link only works if every release uses
+the same asset name. Put the version in the release **tag** (`vX.Y.Z.W`)
+instead.
 
 ## Publishing a new version
 
