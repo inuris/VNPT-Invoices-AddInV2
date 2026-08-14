@@ -20,6 +20,8 @@
   a.primary:hover{background:var(--accent2)}
   a.ghost{background:var(--chip);color:var(--txt)}
   a.ghost:hover{border-color:var(--accent2)}
+  .note{margin:14px 2px 0;font-size:13px;line-height:1.5;color:var(--muted)}
+  .note b{color:var(--txt)}
 </style>
 </head>
 <body>
@@ -30,6 +32,13 @@
       <a class="btn ghost" href="profile-json-generator/">Tạo JSON cấu hình kết nối</a>
       <a class="btn ghost" href="https://vnpt-invoice-addin.gitbook.io/vnpt-invoice-addin-v2" target="_blank" rel="noopener">Hướng dẫn sử dụng</a>
     </div>
+    <p class="note">
+      Sau khi tải: <b>giải nén toàn bộ</b> vào một thư mục cố định (vd <code>C:\VNPT-AddIn\</code>),
+      rồi chạy <code>setup.exe</code> <b>từ thư mục đó</b> — không chạy trực tiếp trong cửa sổ xem
+      file nén. Lần cập nhật sau, giải nén đè vào <b>đúng thư mục này</b> rồi chạy lại
+      <code>setup.exe</code>. (Giữ cùng thư mục để bản cài nhận ra đây là nâng cấp, không phải bản
+      cài khác.)
+    </p>
   </div>
 </body>
 </html>

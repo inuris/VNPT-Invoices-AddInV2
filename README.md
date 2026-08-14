@@ -58,11 +58,9 @@ The add-in checks this file on startup:
 
 ## Install button on `index.html`
 
-**"Tải bộ cài"** is the only button, and it's the only one needed: it links
-to `VNPT.Invoices.AddInV2.zip` right next to `index.html` on this same site.
-Unzip and run `setup.exe` from inside the extracted folder — that performs a
-normal ClickOnce install pointed at this same Pages URL, so **later versions
-auto-update inside the add-in itself** (no need to come back to this page).
+**"Tải bộ cài"** is the only button, and it's the primary/required install
+path for both new installs and updates — it links to
+`VNPT.Invoices.AddInV2.zip` right next to `index.html` on this same site.
 
 This zip is **not** a GitHub Release asset (that was tried and it broke —
 GitHub's `releases/latest/download/<name>` link 404s the moment one release's
@@ -70,6 +68,36 @@ asset filename doesn't match exactly, and nothing enforces that). It's just a
 regular file on `main`, rebuilt automatically by `deploy-to-pages.ps1` on
 every publish — same mechanism as `setup.exe`, no manual step, nothing to
 misname.
+
+**Why not just link `setup.exe`/the `.vsto` directly and skip the zip?**
+Tried that too — modern browsers download ClickOnce manifests instead of
+invoking them, which breaks ClickOnce's security-zone check
+(`file://` vs the `https://` the manifest expects). And a signed-but-untrusted
+manifest (see below) hits a hard, non-interactive `SecurityException` when
+activated that way. Running `setup.exe` **interactively** after unzipping
+sidesteps both: it goes through the normal "publisher can't be verified,
+install anyway?" prompt instead.
+
+**The one rule that matters for updates to work via this path**: unzip to
+the **same fixed folder every time** (e.g. `C:\VNPT-AddIn\`, overwrite in
+place) and run `setup.exe` from there — never straight out of a zip/RAR
+viewer's temp extraction folder. ClickOnce identifies a local install by the
+path `setup.exe` ran from; a different path each time looks like a
+conflicting install rather than an upgrade, and blocks with
+`AddInAlreadyInstalledException` until the old one is manually uninstalled.
+This is called out on the download page itself now.
+
+**Signing**: the manifest is currently signed with Visual Studio's
+auto-generated temporary dev certificate — self-signed, not trusted on any
+machine but the one that created it. That's why the interactive "install
+anyway" prompt matters (an actual trusted CA cert wouldn't need it). Fine for
+this scale of internal rollout; a real code-signing certificate would remove
+the warning if that's ever worth the cost.
+
+ClickOnce's own **silent in-app auto-update** (checking the fixed
+`Installation Folder URL` in the background, no page visit needed) still
+works on top of this for machines that already got a clean first install —
+it's just not the primary distribution path being relied on here.
 
 ## Publishing a new version
 
