@@ -1,6 +1,6 @@
 {
-  "latestVersion": "1.2",
+  "latestVersion": "1.3",
   "downloadUrl": "https://github.com/inuris/VNPT-Invoices-AddInV2/releases/latest",
-  "notes": "Phiên bản hiện tại.",
+  "notes": "Đổi icon nút Đăng ký sử dụng theo trạng thái khoá/mở khoá.",
   "mandatory": false
 }
