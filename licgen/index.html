@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VNPT Invoice — License Generator</title>
+<style>
+  :root{
+    --bg:#f5f6f8; --card:#ffffff; --line:#e3e6ea; --text:#1b1f24; --muted:#6b7280;
+    --accent:#0b57d0; --accent2:#0842a0; --ok:#188038; --warn:#c5221f; --mono-bg:#f2f4f7;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#15171a; --card:#1d2024; --line:#2c3036; --text:#e7e9ec; --muted:#9aa1ac;
+      --accent:#5b9bff; --accent2:#7fb0ff; --ok:#3ddc84; --warn:#ff6b6b; --mono-bg:#101214;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+  .wrap{max-width:640px;margin:0 auto;padding:32px 20px 60px}
+  header{margin-bottom:22px}
+  h1{font-size:19px;font-weight:700;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:13px;margin:0}
+
+  .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:20px}
+  .tab{appearance:none;background:none;border:0;padding:9px 4px;margin-right:18px;
+    font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;
+    border-bottom:2px solid transparent;transition:.12s}
+  .tab:hover{color:var(--text)}
+  .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+  .panel{display:none}
+  .panel.active{display:block}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:18px;margin-bottom:14px}
+
+  label{display:block;font-size:12.5px;font-weight:600;margin:0 0 6px;color:var(--text)}
+  label.sub-label{font-weight:500;color:var(--muted);margin-top:14px}
+  input,textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;
+    font-size:13px;font-family:inherit;background:var(--bg);color:var(--text)}
+  input:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:-1px}
+  textarea{resize:vertical;font-family:Consolas,Menlo,monospace;font-size:12px}
+
+  .hint{color:var(--muted);font-size:11.5px;margin:6px 0 0;line-height:1.5}
+  .mono{font-family:Consolas,Menlo,monospace;font-size:12px;word-break:break-all;
+    background:var(--mono-bg);border:1px dashed var(--line);border-radius:8px;
+    padding:10px;white-space:pre-wrap;color:var(--text)}
+
+  button{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:9px 16px;
+    font-size:13px;font-weight:600;cursor:pointer}
+  button:hover{background:var(--accent2)}
+  button.sec{background:var(--mono-bg);color:var(--text);border:1px solid var(--line)}
+  button.sec:hover{background:var(--line)}
+  button.link{background:none;color:var(--muted);padding:0;font-weight:500;
+    text-decoration:underline;font-size:11.5px}
+  button.link:hover{color:var(--text);background:none}
+  .btn-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px}
+
+  .checkbox-row{display:flex;align-items:center;gap:7px;margin-top:16px}
+  .checkbox-row input{width:auto}
+  .checkbox-row label{margin:0;font-weight:500;cursor:pointer}
+  .exp-box{margin-top:8px;max-width:200px;display:none}
+  .exp-box.show{display:block}
+
+  .warn{color:var(--warn);font-size:12.5px}
+  .ok{color:var(--ok)}
+  .callout{background:var(--mono-bg);border:1px solid var(--line);border-radius:8px;
+    padding:10px 12px;font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:14px}
+
+  .result{margin-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>License Generator</h1>
+    <p class="sub">Runs entirely in this browser — nothing is sent anywhere.</p>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="license" type="button">Generate License</button>
+    <button class="tab" data-tab="keys" type="button">Key Pair</button>
+  </nav>
+
+  <!-- ===== Tab: Generate License ===== -->
+  <section id="tab-license" class="panel active">
+    <div class="card">
+      <label>Private Key (JWK)</label>
+      <textarea id="priv" rows="3" placeholder="Paste your private key JWK here..." spellcheck="false"></textarea>
+      <p class="hint">Saved in this browser's local storage — you won't need to paste it again on
+        this computer. <button class="link" type="button" onclick="clearSavedKey()">Clear saved key</button></p>
+    </div>
+
+    <div class="card">
+      <label>Tax IDs (MST) — one per line, or comma/semicolon separated</label>
+      <textarea id="msts" rows="3" placeholder="0315890356&#10;0301234567" spellcheck="false"></textarea>
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="expToggle" onchange="toggleExp()">
+        <label for="expToggle">Set expiration date</label>
+      </div>
+      <div id="expBox" class="exp-box">
+        <input id="exp" type="date">
+      </div>
+
+      <div class="btn-row">
+        <button type="button" onclick="genLicense()">Generate License</button>
+      </div>
+      <div id="err" class="warn" style="margin-top:8px"></div>
+    </div>
+
+    <div class="card result" id="resultCard" style="display:none">
+      <label>License Key</label>
+      <div id="lic" class="mono">—</div>
+      <div class="btn-row">
+        <button class="sec" type="button" onclick="copyLic()">Copy</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Tab: Key Pair ===== -->
+  <section id="tab-keys" class="panel">
+    <div class="callout">
+      Only needed once — a key pair is meant to be reused for every license. Generating a new
+      pair does <b>not</b> invalidate licenses already issued with the old one, but any
+      <i>new</i> license you generate afterward will only verify against the new Public Key —
+      make sure it's updated in the add-in's config before distributing new licenses.
+    </div>
+    <div class="card">
+      <button type="button" onclick="genKeys()">Generate New Key Pair</button>
+
+      <label class="sub-label">Public Key — paste into the add-in's config
+        (<code>appSettings.licensePublicKeyX</code> / <code>licensePublicKeyY</code>):</label>
+      <div id="pub" class="mono">—</div>
+
+      <label class="sub-label">Private Key (JWK) — keep this secret:</label>
+      <div id="newPriv" class="mono">—</div>
+
+      <div class="btn-row">
+        <button class="sec" type="button" onclick="useGeneratedKey()">Use this key on the Generate License tab</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const subtle = crypto.subtle;
+const STORAGE_KEY = 'vnpt-licgen-privkey';
+const b64u = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+
+// ---- tabs ----
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ---- expiration toggle ----
+function toggleExp(){
+  document.getElementById('expBox').classList.toggle('show', document.getElementById('expToggle').checked);
+}
+
+// ---- private key: load/save to localStorage ----
+const privEl = document.getElementById('priv');
+(function loadSavedKey(){
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) privEl.value = saved;
+})();
+privEl.addEventListener('input', () => {
+  const v = privEl.value.trim();
+  if (v) localStorage.setItem(STORAGE_KEY, v);
+  else localStorage.removeItem(STORAGE_KEY);
+});
+function clearSavedKey(){
+  localStorage.removeItem(STORAGE_KEY);
+  privEl.value = '';
+}
+
+// ---- key pair generation (Keys tab) ----
+let lastGeneratedPriv = '';
+async function genKeys(){
+  const kp = await subtle.generateKey({name:'ECDSA',namedCurve:'P-256'}, true, ['sign','verify']);
+  const pub = await subtle.exportKey('jwk', kp.publicKey);
+  const prv = await subtle.exportKey('jwk', kp.privateKey);
+  document.getElementById('pub').textContent =
+    '"licensePublicKeyX": "'+pub.x+'",\n"licensePublicKeyY": "'+pub.y+'"';
+  lastGeneratedPriv = JSON.stringify(prv);
+  document.getElementById('newPriv').textContent = lastGeneratedPriv;
+}
+function useGeneratedKey(){
+  if (!lastGeneratedPriv) return;
+  privEl.value = lastGeneratedPriv;
+  localStorage.setItem(STORAGE_KEY, lastGeneratedPriv);
+  document.querySelector('.tab[data-tab="license"]').click();
+}
+
+// ---- license generation (Generate License tab) ----
+async function loadPriv(){
+  const raw = privEl.value.trim();
+  if(!raw) throw new Error('No private key set. Paste it above, or generate a new pair on the Key Pair tab.');
+  const jwk = JSON.parse(raw);
+  return subtle.importKey('jwk', jwk, {name:'ECDSA',namedCurve:'P-256'}, false, ['sign']);
+}
+
+async function genLicense(){
+  const err = document.getElementById('err'); err.textContent = '';
+  document.getElementById('resultCard').style.display = 'none';
+  try{
+    const key = await loadPriv();
+    const exp = document.getElementById('expToggle').checked
+      ? document.getElementById('exp').value.trim() : '';
+    const msts = document.getElementById('msts').value.split(/[\n,;]+/).map(s=>s.trim()).filter(Boolean);
+    if (msts.length === 0) throw new Error('Enter at least one tax ID (MST).');
+    if (document.getElementById('expToggle').checked && !exp) throw new Error('Pick an expiration date, or uncheck "Set expiration date" for a permanent license.');
+    const payload = {msts:msts};
+    if (exp) payload.exp = exp; // omitted => permanent
+    const data = new TextEncoder().encode(JSON.stringify(payload));
+    const sig  = await subtle.sign({name:'ECDSA',hash:'SHA-256'}, key, data);
+    document.getElementById('lic').textContent = b64u(data)+'.'+b64u(sig);
+    document.getElementById('resultCard').style.display = '';
+  }catch(e){ err.textContent = e.message; }
+}
+function copyLic(){
+  const t = document.getElementById('lic').textContent;
+  if (t && t !== '—') navigator.clipboard.writeText(t);
+}
+</script>
+</body>
+</html>
