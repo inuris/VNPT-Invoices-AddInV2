@@ -1,6 +1,6 @@
 {
   "latestVersion": "1.4",
   "downloadUrl": "https://inuris.github.io/VNPT-Invoices-AddInV2/",
-  "notes": "Sửa link \"Tải bộ cài\" trong nút thông báo bản mới (trước trỏ nhầm sang GitHub Releases).",
+  "notes": "",
   "mandatory": false
 }
