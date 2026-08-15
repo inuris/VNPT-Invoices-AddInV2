@@ -134,10 +134,11 @@
       <details>
         <summary>Ghi chú các trường</summary>
         <div class="field-note" style="margin-top:8px">
-          <b>Account (CAdmin)</b>: tài khoản gọi PublishService (phát hành). <b>WebService</b>: tài khoản đăng nhập portal/admin.<br>
+          <b>Tài khoản CAdmin</b>: tài khoản đăng nhập link cadmin.<br>
+          <b>Tài khoản WebService</b>: tài khoản Service tạo ở menu Phân Quyền.<br>
           <b>Loại chứng từ</b>: <code>CTT</code> / <code>GTGT</code> / <code>PXK</code>.<br>
-          <b>Domain</b>: tự bỏ <code>http(s)://</code> và dấu <code>/</code> ở cuối.<br>
-          <b>Cột mở rộng</b> (tùy chọn): map cột Excel → khe <code>Extra1</code>…<code>Extra11</code> (cấp hóa đơn) hoặc <code>SP_Extra1</code>/<code>SP_Extra2</code> (cấp dòng). Kiểu: <code>string</code>/<code>numeric</code>/<code>datetime</code>.
+          <b>Domain</b>: không cần nhập <code>http(s)</code>.<br>
+          <b>Cột mở rộng</b> (tùy chọn): map cột Excel → thẻ <code>Extra1</code>…<code>Extra11</code> (cấp hóa đơn) hoặc <code>SP_Extra1</code>/<code>SP_Extra2</code> (cấp dòng). Kiểu: <code>string</code>/<code>numeric</code>/<code>datetime</code>.
         </div>
       </details>
     </div>
@@ -229,9 +230,9 @@ function addExt(id, c){
     <div class="row ext">
       <div><label>Loại CT</label><select class="e-type">${opts(DOC_TYPES, c.type||'GTGT')}</select></div>
       <div><label>Tên cột Excel</label><input class="e-header" placeholder="VD: SoHopDong" value="${esc(c.header)}"></div>
-      <div><label>Khe Extra</label><select class="e-slot">${opts(SLOTS, c.extraSlot||'Extra9')}</select></div>
+      <div><label>Thẻ Extra</label><select class="e-slot">${opts(SLOTS, c.extraSlot||'Extra9')}</select></div>
       <div><label>Kiểu</label><select class="e-dtype">${opts(DTYPES, c.dataType||'string')}</select></div>
-      <div><label>Ghi chú</label><input class="e-note" placeholder="tùy chọn" value="${esc(c.note)}"></div>
+      <div><label>Ghi chú</label><input class="e-note" placeholder="VD: Nhập số hợp đồng 0-9" value="${esc(c.note)}"></div>
       <div class="del"><button class="mini danger icon" title="Xóa cột" aria-label="Xóa cột" onclick="this.closest('.row').remove();formToJson()">✕</button></div>
     </div>`);
   box.appendChild(row);
