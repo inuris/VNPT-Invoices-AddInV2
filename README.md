@@ -15,14 +15,14 @@ Served at:
 ## Layout
 
 ```
-index.html                      ← trang tải (giữ nguyên)
-.nojekyll                       ← tắt Jekyll (BẮT BUỘC để phục vụ mọi file)
-setup.exe                       ← bootstrapper cài đặt
-VNPT.Invoices.AddInV2.vsto      ← deployment manifest
-Application Files/…             ← các bản build theo phiên bản (.deploy)
-VNPT.Invoices.AddInV2.zip       ← trọn bộ publish, zip tự động (nút "Tải bộ cài")
-update.json                     ← auto-update manifest (add-in đọc khi khởi động)
-profile-json-generator/…        ← công cụ phụ trợ
+index.html                          ← trang tải (giữ nguyên)
+.nojekyll                           ← tắt Jekyll (BẮT BUỘC để phục vụ mọi file)
+setup.exe                           ← bootstrapper cài đặt
+VNPT.Invoices.AddInV2.vsto          ← deployment manifest
+Application Files/…                 ← các bản build theo phiên bản (.deploy)
+VNPT.Invoices.AddInV2-Setup.exe     ← self-extracting installer, tự động (nút "Tải bộ cài")
+update.json                         ← auto-update manifest (add-in đọc khi khởi động)
+profile-json-generator/…            ← công cụ phụ trợ
 ```
 
 **KHÔNG sửa tay** các file ClickOnce ở đây. Mỗi lần phát hành, chạy từ repo
@@ -60,39 +60,44 @@ The add-in checks this file on startup:
 
 **"Tải bộ cài"** is the only button, and it's the primary/required install
 path for both new installs and updates — it links to
-`VNPT.Invoices.AddInV2.zip` right next to `index.html` on this same site.
+`VNPT.Invoices.AddInV2-Setup.exe`, a **self-extracting installer (7-Zip SFX)**,
+right next to `index.html` on this same site.
 
-This zip is **not** a GitHub Release asset (that was tried and it broke —
-GitHub's `releases/latest/download/<name>` link 404s the moment one release's
-asset filename doesn't match exactly, and nothing enforces that). It's just a
-regular file on `main`, rebuilt automatically by `deploy-to-pages.ps1` on
-every publish — same mechanism as `setup.exe`, no manual step, nothing to
-misname.
+### Why SFX instead of a plain zip (tried first, replaced)
 
-**Why not just link `setup.exe`/the `.vsto` directly and skip the zip?**
-Tried that too — modern browsers download ClickOnce manifests instead of
-invoking them, which breaks ClickOnce's security-zone check
-(`file://` vs the `https://` the manifest expects). And a signed-but-untrusted
-manifest (see below) hits a hard, non-interactive `SecurityException` when
-activated that way. Running `setup.exe` **interactively** after unzipping
-sidesteps both: it goes through the normal "publisher can't be verified,
-install anyway?" prompt instead.
+A plain zip needs the user to extract it correctly before running
+`setup.exe`. In practice people ran `setup.exe` straight out of the zip/RAR
+viewer's temp extraction view instead — a different random temp path every
+single time. ClickOnce identifies a local install by the path `setup.exe`
+ran from, so each of those looked like a *conflicting* install rather than
+an upgrade, and blocked with `AddInAlreadyInstalledException` until the old
+one was manually uninstalled. Telling users "always extract to the same
+fixed folder" didn't hold up in practice.
 
-**The one rule that matters for updates to work via this path**: unzip to
-the **same fixed folder every time** (e.g. `C:\VNPT-AddIn\`, overwrite in
-place) and run `setup.exe` from there — never straight out of a zip/RAR
-viewer's temp extraction folder. ClickOnce identifies a local install by the
-path `setup.exe` ran from; a different path each time looks like a
-conflicting install rather than an upgrade, and blocks with
-`AddInAlreadyInstalledException` until the old one is manually uninstalled.
-This is called out on the download page itself now.
+The SFX removes the failure mode instead of documenting around it: the
+install path (`%LocalAppData%\VNPT-AddIn` by default) is baked into the
+`.exe` itself via `tools/make-sfx.ps1` (source repo) — nothing for the user
+to choose or get wrong. Running the `.exe` extracts to that fixed path and
+launches `setup.exe` from there automatically, every time.
+
+**Why not just link `setup.exe`/the `.vsto` directly and skip packaging
+entirely?** Also tried — modern browsers download ClickOnce manifests
+instead of invoking them, which breaks ClickOnce's security-zone check
+(`file://` vs the `https://` the manifest expects). And a
+signed-but-untrusted manifest (see below) hits a hard, non-interactive
+`SecurityException` when activated that way. `setup.exe` run interactively
+(which is what the SFX does after extracting) sidesteps both — it goes
+through the normal "publisher can't be verified, install anyway?" prompt
+instead.
 
 **Signing**: the manifest is currently signed with Visual Studio's
 auto-generated temporary dev certificate — self-signed, not trusted on any
 machine but the one that created it. That's why the interactive "install
-anyway" prompt matters (an actual trusted CA cert wouldn't need it). Fine for
-this scale of internal rollout; a real code-signing certificate would remove
-the warning if that's ever worth the cost.
+anyway" prompt matters (an actual trusted CA cert wouldn't need it, and the
+SFX can't skip it either — that's ClickOnce's own trust check, not a
+packaging problem). Fine for this scale of internal rollout; a real
+code-signing certificate would remove the warning if that's ever worth the
+cost.
 
 ClickOnce's own **silent in-app auto-update** (checking the fixed
 `Installation Folder URL` in the background, no page visit needed) still
@@ -102,8 +107,10 @@ it's just not the primary distribution path being relied on here.
 ## Publishing a new version
 
 1. Run `tools\deploy-to-pages.ps1` from the source repo — pushes the new
-   ClickOnce build **and** rebuilds `VNPT.Invoices.AddInV2.zip` to `main` in
-   one step.
+   ClickOnce build **and** rebuilds `VNPT.Invoices.AddInV2-Setup.exe` to
+   `main` in one step (needs `7zSD.sfx` from the **LZMA SDK** package —
+   *not* "7-Zip Extra", which stopped including it in 2014 — see
+   `tools/make-sfx.ps1`).
 2. Update `update.json` → set `latestVersion` to that version, refresh
    `notes`, commit to `main`.
 
