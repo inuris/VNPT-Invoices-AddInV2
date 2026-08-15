@@ -43,6 +43,7 @@
   .field-note{color:var(--muted);font-size:11.5px;margin-top:2px;line-height:1.6}
 
   .out{position:sticky;top:20px}
+  .out.card{border-color:rgba(91,107,245,.35)}
   @media(max-width:960px){.out{position:static}}
   .out .oh{display:flex;align-items:center;gap:8px;margin:0 0 10px}
   .out h3{margin:0;font-size:14px}
@@ -59,6 +60,8 @@
       <button class="primary icon btn-add-conn" title="Thêm kết nối" aria-label="Thêm kết nối" onclick="addConn();formToJson()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       </button>
+      <span class="spacer" style="flex:1"></span>
+      <button class="danger" onclick="clearAll()">🗑️ Xóa tất cả</button>
     </div>
     <div id="conns"></div>
   </div>
@@ -252,13 +255,28 @@ function showValidity(data){
   else { msg.className='msg ok'; msg.textContent='✅ '+data.length+' kết nối hợp lệ.'; }
 }
 
-// form -> json (đồng bộ JSON preview ngay khi gõ; KHÔNG hiện cảnh báo ở đây — chỉ hiện khi bấm Sao chép/Tải)
+// --- Lưu tự động vào localStorage (đến khi bấm "Xóa tất cả") ---
+const STORAGE_KEY='vnpt-jsongen-connections';
+function saveToStorage(data){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }catch(e){}
+}
+function loadFromStorage(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(!raw) return null;
+    const arr=JSON.parse(raw);
+    return Array.isArray(arr) && arr.length ? arr : null;
+  }catch(e){ return null; }
+}
+
+// form -> json (đồng bộ JSON preview + localStorage ngay khi gõ; KHÔNG hiện cảnh báo ở đây — chỉ hiện khi bấm Sao chép/Tải)
 function formToJson(){
   if(syncing) return;
   const data=collect();
   syncing=true;
   document.getElementById('json').value=JSON.stringify(data,null,2);
   syncing=false;
+  saveToStorage(data);
 }
 
 // json -> form
@@ -276,6 +294,16 @@ function jsonToForm(){
   document.getElementById('conns').innerHTML=''; seq=0;
   arr.forEach(addConn);
   syncing=false;
+  saveToStorage(arr);
+}
+
+// Xóa tất cả kết nối (form + JSON + localStorage)
+function clearAll(){
+  if(!confirm('Xóa tất cả kết nối? Không thể hoàn tác.')) return;
+  document.getElementById('conns').innerHTML=''; seq=0;
+  localStorage.removeItem(STORAGE_KEY);
+  document.getElementById('json').value='[]';
+  const msg=document.getElementById('msg'); msg.className='msg'; msg.textContent='Đã xóa tất cả kết nối.';
 }
 
 // đồng bộ tức thời
@@ -319,8 +347,10 @@ function flash(t){ const m=document.getElementById('msg'); m.className='msg ok';
 function esc(s){ return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
 function gp(o,a,b){ return (o&&o[a]&&o[a][b])||''; }
 
-// khởi tạo 1 kết nối mẫu + JSON ban đầu
-addConn();
+// khởi tạo: khôi phục từ localStorage nếu có, không thì 1 kết nối mẫu
+const restored = loadFromStorage();
+if (restored) { restored.forEach(addConn); }
+else { addConn(); }
 formToJson();
 </script>
 </body>
