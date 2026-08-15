@@ -256,17 +256,13 @@ function showValidity(data){
 }
 
 // --- Lưu tự động vào localStorage (đến khi bấm "Xóa tất cả") ---
+// JSON textarea đã đồng bộ 2 chiều với form, nên chỉ cần lưu đúng 1 chuỗi này.
 const STORAGE_KEY='vnpt-jsongen-connections';
-function saveToStorage(data){
-  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }catch(e){}
+function persist(){
+  try{ localStorage.setItem(STORAGE_KEY, document.getElementById('json').value); }catch(e){}
 }
 function loadFromStorage(){
-  try{
-    const raw=localStorage.getItem(STORAGE_KEY);
-    if(!raw) return null;
-    const arr=JSON.parse(raw);
-    return Array.isArray(arr) && arr.length ? arr : null;
-  }catch(e){ return null; }
+  try{ return localStorage.getItem(STORAGE_KEY); }catch(e){ return null; }
 }
 
 // form -> json (đồng bộ JSON preview + localStorage ngay khi gõ; KHÔNG hiện cảnh báo ở đây — chỉ hiện khi bấm Sao chép/Tải)
@@ -276,7 +272,7 @@ function formToJson(){
   syncing=true;
   document.getElementById('json').value=JSON.stringify(data,null,2);
   syncing=false;
-  saveToStorage(data);
+  persist();
 }
 
 // json -> form
@@ -294,7 +290,6 @@ function jsonToForm(){
   document.getElementById('conns').innerHTML=''; seq=0;
   arr.forEach(addConn);
   syncing=false;
-  saveToStorage(arr);
 }
 
 // Xóa tất cả kết nối (form + JSON + localStorage)
@@ -308,7 +303,7 @@ function clearAll(){
 
 // đồng bộ tức thời
 document.addEventListener('input', e=>{
-  if(e.target.id==='json'){ jsonToForm(); return; }
+  if(e.target.id==='json'){ jsonToForm(); persist(); return; }
   if(e.target.closest('.conn')){
     if(e.target.classList.contains('f-name')) renumber();
     formToJson();
@@ -348,10 +343,14 @@ function esc(s){ return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/"/
 function gp(o,a,b){ return (o&&o[a]&&o[a][b])||''; }
 
 // khởi tạo: khôi phục từ localStorage nếu có, không thì 1 kết nối mẫu
-const restored = loadFromStorage();
-if (restored) { restored.forEach(addConn); }
-else { addConn(); }
-formToJson();
+const savedJson = loadFromStorage();
+if (savedJson && savedJson.trim() && savedJson.trim() !== '[]') {
+  document.getElementById('json').value = savedJson;
+  jsonToForm();
+} else {
+  addConn();
+  formToJson();
+}
 </script>
 </body>
 </html>
