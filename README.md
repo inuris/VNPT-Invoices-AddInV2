@@ -15,15 +15,23 @@ Served at:
 ## Layout
 
 ```
-index.html                          ← trang tải (giữ nguyên)
+index.html                          ← trang tải
+assets/theme.css                    ← thiết kế dùng chung (tokens + component) cho MỌI trang —
+                                       sửa 1 file này để đổi giao diện toàn site
 .nojekyll                           ← tắt Jekyll (BẮT BUỘC để phục vụ mọi file)
 setup.exe                           ← bootstrapper cài đặt
 VNPT.Invoices.AddInV2.vsto          ← deployment manifest
 Application Files/…                 ← các bản build theo phiên bản (.deploy)
 VNPT.Invoices.AddInV2-Setup.exe     ← self-extracting installer, tự động (nút "Tải bộ cài")
 update.json                         ← auto-update manifest (add-in đọc khi khởi động)
-profile-json-generator/…            ← công cụ phụ trợ
+profile-json-generator/…            ← công cụ phụ trợ (dùng assets/theme.css)
+licgen/…                            ← trình tạo license, chỉ nội bộ (dùng assets/theme.css)
 ```
+
+Mỗi trang chỉ giữ CSS đặc thù riêng của nó (bố cục/kích thước) trong `<style>` tại
+chỗ; màu sắc, card, button, form, tabs… đều lấy từ `assets/theme.css`. Site cố ý
+**chỉ dùng giao diện sáng** — không có `prefers-color-scheme: dark`, nên không phụ
+thuộc theme hệ điều hành của người xem.
 
 **KHÔNG sửa tay** các file ClickOnce ở đây. Mỗi lần phát hành, chạy từ repo
 **source**:

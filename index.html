@@ -4,61 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VNPT Invoices Add-in</title>
+<link rel="stylesheet" href="assets/theme.css">
 <style>
-  :root{
-    --bg1:#ded9f8; --bg2:#d3e1fb;
-    --card:#ffffff; --line:#eeeafb;
-    --text:#1c1f2e; --muted:#767b8c;
-    --accent:#5b6bf5; --accent2:#8b6df0;
-    --pill:#f2effc; --pill-text:#5b52c7;
-    --shadow-card: 0 24px 50px -22px rgba(76,63,163,.35), 0 2px 10px rgba(76,63,163,.08);
-    --shadow-btn: 0 10px 24px -8px rgba(91,107,245,.5);
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0;min-height:100vh;color:var(--text);
-    font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
-    background:
-      radial-gradient(circle at 12% 15%, var(--bg2), transparent 55%),
-      radial-gradient(circle at 88% 85%, var(--bg1), transparent 55%),
-      linear-gradient(160deg,#e4defb,#dce6fb);
-    display:flex;align-items:center;justify-content:center;padding:24px;
-  }
-  .card{
-    position:relative;overflow:hidden;
-    background:var(--card);border-radius:28px;box-shadow:var(--shadow-card);
-    max-width:420px;width:100%;padding:36px 32px 30px;
-  }
-  .card::before{
-    content:"";position:absolute;top:-70px;right:-70px;width:180px;height:180px;
-    border-radius:50%;background:radial-gradient(circle,var(--accent2),transparent 70%);opacity:.16;
-  }
-  .logo{
-    width:46px;height:46px;border-radius:14px;margin-bottom:18px;
-    background:linear-gradient(135deg,var(--accent),var(--accent2));
-    display:flex;align-items:center;justify-content:center;
-    box-shadow:0 10px 22px -8px rgba(91,107,245,.6);
-  }
-  .logo svg{width:24px;height:24px;color:#fff}
-  h1{font-size:21px;font-weight:800;letter-spacing:-.2px;margin:0 0 4px}
-  .sub{color:var(--muted);font-size:13.5px;margin:0 0 18px}
-  .ver-pill{
-    display:inline-flex;align-items:center;gap:7px;background:var(--pill);color:var(--pill-text);
-    font-size:11.5px;font-weight:700;padding:6px 12px;border-radius:999px;margin-bottom:24px;
-  }
-  .ver-pill .dot{width:6px;height:6px;border-radius:50%;background:#33c07f;flex:none}
-  .btns{display:flex;flex-direction:column;gap:10px;position:relative}
-  a.btn{
-    display:flex;align-items:center;gap:11px;text-decoration:none;
-    padding:14px 16px;border-radius:16px;font-size:14px;font-weight:700;
-    transition:transform .15s,box-shadow .15s,background .15s;
-    -webkit-tap-highlight-color:transparent;
-  }
-  a.btn svg{flex:none;width:19px;height:19px}
-  a.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:var(--shadow-btn)}
-  a.primary:hover{transform:translateY(-1px);box-shadow:0 16px 30px -8px rgba(91,107,245,.6)}
-  a.ghost{background:var(--pill);color:var(--text)}
-  a.ghost:hover{background:#e8e3fb;transform:translateY(-1px)}
+  body{display:flex;align-items:center;justify-content:center;padding:24px;min-height:100vh}
+  .card{max-width:420px;width:100%;padding:36px 32px 30px}
+  .btns{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+  .btns a.btn{width:100%}
   footer{margin-top:22px;text-align:center;color:var(--muted);font-size:11px}
 </style>
 </head>
@@ -67,21 +18,21 @@
     <div class="logo">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
     </div>
-    <h1>VNPT Invoices Add-in</h1>
+    <h1 style="margin-top:16px">VNPT Invoices Add-in</h1>
     <p class="sub">Excel add-in tạo &amp; phát hành chứng từ điện tử VNPT Invoice</p>
-    <div class="ver-pill" id="verPill"><span class="dot"></span><span id="verText">Đang tải phiên bản…</span></div>
+    <div class="pill-badge ok" id="verPill" style="margin:14px 0 22px"><span id="verText">Đang tải phiên bản…</span></div>
 
     <div class="btns">
       <a class="btn primary" href="VNPT.Invoices.AddInV2-Setup.exe">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Tải bộ cài
       </a>
-      <a class="btn ghost" href="profile-json-generator/">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+      <a class="btn sec" href="profile-json-generator/">
+        <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
         Tạo JSON cấu hình kết nối
       </a>
-      <a class="btn ghost" href="https://vnpt-invoice-addin.gitbook.io/vnpt-invoice-addin-v2" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      <a class="btn sec" href="https://vnpt-invoice-addin.gitbook.io/vnpt-invoice-addin-v2" target="_blank" rel="noopener">
+        <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
         Hướng dẫn sử dụng
       </a>
     </div>
