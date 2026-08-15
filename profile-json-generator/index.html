@@ -10,6 +10,12 @@
   @media(max-width:960px){.wrap{grid-template-columns:1fr;padding:16px 14px 48px}}
   .left{min-width:0}
   .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px;align-items:center}
+  .btn-add-conn{
+    width:48px;height:48px;min-height:48px;border-radius:14px;padding:0;
+    box-shadow:0 12px 24px -8px rgba(91,107,245,.65);
+  }
+  .btn-add-conn:hover{transform:translateY(-1px) scale(1.03)}
+  .btn-add-conn svg{width:24px;height:24px}
 
   .conn{margin:0 0 16px}
   .conn > .head{display:flex;align-items:center;gap:10px;margin:0 0 14px}
@@ -50,7 +56,9 @@
 <div class="wrap">
   <div class="left">
     <div class="toolbar">
-      <button class="primary icon" title="Thêm kết nối" aria-label="Thêm kết nối" onclick="addConn();formToJson()">➕</button>
+      <button class="primary icon btn-add-conn" title="Thêm kết nối" aria-label="Thêm kết nối" onclick="addConn();formToJson()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
     </div>
     <div id="conns"></div>
   </div>
