@@ -99,10 +99,16 @@ packaging problem). Fine for this scale of internal rollout; a real
 code-signing certificate would remove the warning if that's ever worth the
 cost.
 
-ClickOnce's own **silent in-app auto-update** (checking the fixed
-`Installation Folder URL` in the background, no page visit needed) still
-works on top of this for machines that already got a clean first install —
-it's just not the primary distribution path being relied on here.
+ClickOnce's own **silent background self-update is disabled entirely**
+(`UpdateEnabled=false` in the add-in's csproj) — deliberately, not just
+deprioritized. It's a non-interactive activation path, and non-interactive
+is exactly what throws the cert `SecurityException` above with no prompt to
+click through. Leaving it on would mean it either fails invisibly forever
+(worse than no auto-update — false sense that it's current) or, in the
+best case, works but was never verified to. The only update path is
+re-running "Tải bộ cài"; the in-app ribbon "v{new} 🔼" indicator (no popup)
+is the only notification, and it just opens this page — no ClickOnce or
+cert code involved in that click at all.
 
 ## Publishing a new version
 
