@@ -2,80 +2,121 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>VNPT — Tạo JSON cấu hình kết nối (import)</title>
 <style>
   :root{
-    --bg:#f1f5f9; --card:#ffffff; --card2:#f8fafc; --line:#e2e8f0;
-    --txt:#0f172a; --muted:#64748b; --accent:#0284c7; --accent2:#0ea5e9;
-    --ok:#16a34a; --warn:#d97706; --danger:#dc2626; --chip:#f8fafc;
+    --bg1:#ded9f8; --bg2:#d3e1fb;
+    --card:#ffffff; --card-alt:#f7f5fd; --line:#eeeafb;
+    --text:#1c1f2e; --muted:#767b8c;
+    --accent:#5b6bf5; --accent2:#8b6df0;
+    --pill:#f2effc; --pill-text:#5b52c7;
+    --ok:#1f9d5c; --warn:#d3453a; --req:#c07a1f;
+    --danger-bg:#fde9ea; --danger-text:#b3283a; --danger-bg-hover:#fad7d9;
+    --mono-bg:#f7f5fd;
+    --shadow-card: 0 20px 44px -22px rgba(76,63,163,.28), 0 2px 8px rgba(76,63,163,.06);
+    --shadow-btn: 0 10px 22px -8px rgba(91,107,245,.5);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg1:#221f3a; --bg2:#1c2440;
+      --card:#1c1e29; --card-alt:#20222f; --line:#2c2f3f;
+      --text:#eceef3; --muted:#9aa0b2;
+      --accent:#7c8bff; --accent2:#a68bff;
+      --pill:#262a3d; --pill-text:#b8beff;
+      --ok:#3ddc84; --warn:#ff7a70; --req:#e0a94f;
+      --danger-bg:#3a2229; --danger-text:#ff8b93; --danger-bg-hover:#472832;
+      --mono-bg:#16171f;
+      --shadow-card: 0 20px 44px -22px rgba(0,0,0,.5), 0 2px 8px rgba(0,0,0,.3);
+    }
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.5 "Segoe UI",Roboto,Arial,sans-serif;}
-  header{padding:18px 22px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#ffffff,#f8fafc);position:sticky;top:0;z-index:5}
-  header h1{margin:0;font-size:18px}
-  header p{margin:4px 0 0;color:var(--muted);font-size:12.5px}
-  .wrap{max-width:1200px;margin:0 auto;padding:18px 22px 60px;display:grid;grid-template-columns:1fr 440px;gap:18px}
-  @media(max-width:960px){.wrap{grid-template-columns:1fr}}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;min-height:100vh;color:var(--text);
+    font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:14px;line-height:1.5;
+    background:
+      radial-gradient(circle at 8% 5%, var(--bg2), transparent 45%),
+      radial-gradient(circle at 95% 100%, var(--bg1), transparent 45%),
+      linear-gradient(160deg,#e4defb,#dce6fb);
+  }
+  @media (prefers-color-scheme: dark){
+    body{ background: radial-gradient(circle at 8% 5%, var(--bg2), transparent 50%),
+                       radial-gradient(circle at 95% 100%, var(--bg1), transparent 50%),
+                       linear-gradient(160deg,#141625,#171a2c); }
+  }
+  .wrap{max-width:1200px;margin:0 auto;padding:24px 20px 60px;display:grid;grid-template-columns:1fr 420px;gap:18px}
+  @media(max-width:960px){.wrap{grid-template-columns:1fr;padding:16px 14px 48px}}
   .left{min-width:0}
-  .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
-  button{cursor:pointer;border:1px solid var(--line);background:var(--card2);color:var(--txt);
-    padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;transition:.12s}
-  button:hover{border-color:var(--accent)}
-  button.primary{background:var(--accent2);border-color:var(--accent2);color:#ffffff}
-  button.primary:hover{background:var(--accent)}
-  button.ghost{background:transparent}
-  button.danger{color:#b91c1c;border-color:#fecaca;background:#fef2f2}
-  button.danger:hover{border-color:var(--danger)}
-  button.mini{padding:4px 9px;font-size:12px;font-weight:600}
-  .conn{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin:0 0 16px;position:relative}
-  .conn > .head{display:flex;align-items:center;gap:10px;margin:0 0 12px}
-  .conn > .head .idx{width:26px;height:26px;border-radius:50%;background:var(--accent2);color:#ffffff;
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px;align-items:center}
+
+  button{cursor:pointer;border:0;background:var(--pill);color:var(--pill-text);
+    padding:10px 16px;border-radius:12px;font-size:13px;font-weight:700;transition:transform .12s,background .12s;
+    -webkit-tap-highlight-color:transparent}
+  button:hover{background:var(--line)}
+  button.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:var(--shadow-btn)}
+  button.primary:hover{transform:translateY(-1px)}
+  button.danger{color:var(--danger-text);background:var(--danger-bg)}
+  button.danger:hover{background:var(--danger-bg-hover)}
+  button.mini{padding:7px 11px;font-size:12px;min-height:36px}
+  button.icon{padding:0;width:36px;height:36px;min-height:36px;border-radius:10px;
+    display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex:none}
+
+  .conn{background:var(--card);border-radius:20px;box-shadow:var(--shadow-card);padding:18px;margin:0 0 16px;position:relative}
+  .conn > .head{display:flex;align-items:center;gap:10px;margin:0 0 14px}
+  .conn > .head .idx{width:28px;height:28px;border-radius:50%;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;
     display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex:0 0 auto}
-  .conn > .head .name{font-weight:700;font-size:15px;color:#0f172a}
+  .conn > .head .name{font-weight:700;font-size:15px;color:var(--text);min-height:1.2em}
   .conn > .head .spacer{flex:1}
+
   .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
   .grid.two{grid-template-columns:1fr 1fr}
   @media(max-width:720px){.grid,.grid.two{grid-template-columns:1fr}}
-  label{display:block;font-size:12px;color:var(--muted);margin:0 0 3px;font-weight:600}
-  label .req{color:var(--warn)}
-  input,select,textarea{width:100%;background:var(--chip);border:1px solid var(--line);color:var(--txt);
-    border-radius:7px;padding:7px 9px;font:13px/1.4 inherit;outline:none}
-  input:focus,select:focus,textarea:focus{border-color:var(--accent)}
-  .sec{margin:14px 0 0;border-top:1px dashed var(--line);padding-top:12px}
-  .sec > .st{display:flex;align-items:center;gap:8px;margin:0 0 8px}
-  .sec > .st h4{margin:0;font-size:13px;color:var(--accent)}
+
+  label{display:block;font-size:12px;color:var(--muted);margin:0 0 5px;font-weight:600}
+  label .req{color:var(--req)}
+  input,select,textarea{width:100%;background:var(--card-alt);border:1px solid var(--line);color:var(--text);
+    border-radius:10px;padding:10px 11px;font:16px/1.4 inherit;outline:none}
+  @media(min-width:600px){ input,select,textarea{font-size:13px} }
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:-1px}
+
+  .sec{margin:16px 0 0;border-top:1px dashed var(--line);padding-top:14px}
+  .sec > .st{display:flex;align-items:center;gap:8px;margin:0 0 10px;flex-wrap:wrap}
+  .sec > .st h4{margin:0;font-size:13px;color:var(--pill-text)}
   .sec > .st .hint{color:var(--muted);font-size:11.5px}
+
   .row{display:grid;gap:8px;align-items:end;margin:0 0 8px}
-  .row.pat{grid-template-columns:1fr 1fr 130px 34px}
-  .row.ext{grid-template-columns:110px 1.3fr 130px 120px 1fr 34px}
+  .row.pat{grid-template-columns:1fr 1fr 130px 36px}
+  .row.ext{grid-template-columns:110px 1.3fr 130px 120px 1fr 36px}
   @media(max-width:720px){.row.pat,.row.ext{grid-template-columns:1fr}}
-  .row .del{padding:7px 0}
-  .field-note{color:var(--muted);font-size:11px;margin-top:2px}
-  .out{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;position:sticky;top:86px}
+  .row .del{padding:0}
+
+  .field-note{color:var(--muted);font-size:11.5px;margin-top:2px;line-height:1.6}
+
+  .out{background:var(--card);border-radius:20px;box-shadow:var(--shadow-card);padding:18px;position:sticky;top:20px}
+  @media(max-width:960px){.out{position:static}}
   .out .oh{display:flex;align-items:center;gap:8px;margin:0 0 10px}
   .out h3{margin:0;font-size:14px}
   .out .oh .spacer{flex:1}
-  textarea#json{width:100%;min-height:440px;font-family:ui-monospace,Consolas,"Courier New",monospace;font-size:12.5px;white-space:pre;tab-size:2}
-  .msg{font-size:12.5px;margin:8px 0 0;min-height:18px}
-  .msg.ok{color:var(--ok)} .msg.err{color:var(--danger)}
-  .pill{display:inline-block;background:var(--chip);border:1px solid var(--line);border-radius:999px;
-    padding:2px 9px;font-size:11px;color:var(--muted)}
-  code{background:var(--chip);border:1px solid var(--line);padding:1px 5px;border-radius:4px;font-size:11.5px;color:#0369a1}
-  details{margin-top:6px}
+  textarea#json{width:100%;min-height:400px;font-family:ui-monospace,Consolas,"Courier New",monospace;
+    font-size:12.5px;white-space:pre;tab-size:2;background:var(--mono-bg)}
+
+  .msg{font-size:12.5px;margin:10px 0 0;min-height:18px;line-height:1.6}
+  .msg.ok{color:var(--ok)} .msg.err{color:var(--warn)}
+
+  code{background:var(--card-alt);border:1px solid var(--line);padding:1px 5px;border-radius:5px;
+    font-size:11.5px;color:var(--pill-text)}
+  details{margin-top:8px}
   summary{cursor:pointer;color:var(--muted);font-size:12px}
 </style>
 </head>
 <body>
-<header>
-  <h1>VNPT — Tạo JSON cấu hình kết nối</h1>
-  <p>Nhập nhanh kết nối (Account/WebService, mẫu ký hiệu, cột mở rộng)</p>
-</header>
 
 <div class="wrap">
   <div class="left">
     <div class="toolbar">
-      <button class="primary" onclick="addConn();formToJson()">➕ Thêm kết nối</button>
+      <button class="primary icon" title="Thêm kết nối" aria-label="Thêm kết nối" onclick="addConn();formToJson()">➕</button>
     </div>
     <div id="conns"></div>
   </div>
@@ -84,10 +125,9 @@
     <div class="out">
       <div class="oh">
         <h3>JSON</h3>
-        <span class="pill">đồng bộ 2 chiều</span>
         <span class="spacer"></span>
-        <button class="mini ghost" onclick="copyJson()">📋 Sao chép</button>
-        <button class="mini ghost" onclick="downloadJson()">⬇️ Tải .json</button>
+        <button class="mini" onclick="copyJson()">📋 Sao chép</button>
+        <button class="mini" onclick="downloadJson()">⬇️ Tải .json</button>
       </div>
       <textarea id="json" spellcheck="false" placeholder='[]'></textarea>
       <div id="msg" class="msg"></div>
@@ -122,9 +162,9 @@ function addConn(data){
   <div class="conn" id="${id}">
     <div class="head">
       <div class="idx"></div>
-      <div class="name">Kết nối</div>
+      <div class="name"></div>
       <div class="spacer"></div>
-      <button class="mini danger" onclick="this.closest('.conn').remove();renumber();formToJson()">✕ Xóa kết nối</button>
+      <button class="mini danger icon" title="Xóa kết nối" aria-label="Xóa kết nối" onclick="this.closest('.conn').remove();renumber();formToJson()">✕</button>
     </div>
 
     <div class="grid">
@@ -177,7 +217,7 @@ function addPat(id, p){
       <div><label>Mẫu số (Pattern)</label><input class="p-pat" placeholder="VD: 1/001" value="${esc(p.pattern)}"></div>
       <div><label>Ký hiệu (Serial)</label><input class="p-ser" placeholder="VD: C25TAA" value="${esc(p.serial)}"></div>
       <div><label>Loại</label><select class="p-type">${opts(DOC_TYPES, p.type||'CTT')}</select></div>
-      <div class="del"><button class="mini danger" onclick="this.closest('.row').remove();formToJson()">✕</button></div>
+      <div class="del"><button class="mini danger icon" title="Xóa mẫu" aria-label="Xóa mẫu" onclick="this.closest('.row').remove();formToJson()">✕</button></div>
     </div>`);
   box.appendChild(row);
 }
@@ -192,7 +232,7 @@ function addExt(id, c){
       <div><label>Khe Extra</label><select class="e-slot">${opts(SLOTS, c.extraSlot||'Extra9')}</select></div>
       <div><label>Kiểu</label><select class="e-dtype">${opts(DTYPES, c.dataType||'string')}</select></div>
       <div><label>Ghi chú</label><input class="e-note" placeholder="tùy chọn" value="${esc(c.note)}"></div>
-      <div class="del"><button class="mini danger" onclick="this.closest('.row').remove();formToJson()">✕</button></div>
+      <div class="del"><button class="mini danger icon" title="Xóa cột" aria-label="Xóa cột" onclick="this.closest('.row').remove();formToJson()">✕</button></div>
     </div>`);
   box.appendChild(row);
 }
@@ -202,7 +242,7 @@ function renumber(){
   cs.forEach((c,i)=>{
     c.querySelector('.idx').textContent = i+1;
     const nm = c.querySelector('.f-name').value.trim();
-    c.querySelector('.name').textContent = nm || ('Kết nối '+(i+1));
+    c.querySelector('.name').textContent = nm; // để trống nếu chưa nhập Tên hiển thị
   });
 }
 
@@ -249,7 +289,7 @@ function collect(){
 function validate(data){
   const errs=[];
   data.forEach((c,i)=>{
-    const w='Kết nối '+(i+1);
+    const w='Kết nối '+(i+1)+(c.displayName?' ('+c.displayName+')':'');
     if(!c.displayName) errs.push(w+': thiếu Tên hiển thị.');
     if(!c.mst) errs.push(w+': thiếu MST.');
     if(!c.domain) errs.push(w+': thiếu Domain.');
@@ -266,17 +306,16 @@ function showValidity(data){
   if(!Array.isArray(data)||data.length===0){ msg.className='msg'; msg.textContent='Chưa có kết nối nào.'; return; }
   const errs=validate(data);
   if(errs.length){ msg.className='msg err'; msg.innerHTML='⚠️ '+errs.join('<br>⚠️ '); }
-  else { msg.className='msg ok'; msg.textContent='✅ '+data.length+' kết nối hợp lệ — sao chép/tải để gửi khách Import.'; }
+  else { msg.className='msg ok'; msg.textContent='✅ '+data.length+' kết nối hợp lệ.'; }
 }
 
-// form -> json
+// form -> json (đồng bộ JSON preview ngay khi gõ; KHÔNG hiện cảnh báo ở đây — chỉ hiện khi bấm Sao chép/Tải)
 function formToJson(){
   if(syncing) return;
   const data=collect();
   syncing=true;
   document.getElementById('json').value=JSON.stringify(data,null,2);
   syncing=false;
-  showValidity(data);
 }
 
 // json -> form
@@ -288,15 +327,12 @@ function jsonToForm(){
     arr = raw==='' ? [] : JSON.parse(raw);
     if(!Array.isArray(arr)) arr=[arr];
   }catch(e){
-    const msg=document.getElementById('msg');
-    msg.className='msg err'; msg.textContent='JSON chưa hợp lệ: '+e.message+' (form giữ nguyên)';
-    return;
+    return; // JSON chưa hợp lệ khi đang gõ — giữ nguyên form, không hiện cảnh báo
   }
   syncing=true;
   document.getElementById('conns').innerHTML=''; seq=0;
   arr.forEach(addConn);
   syncing=false;
-  showValidity(arr);
 }
 
 // đồng bộ tức thời
@@ -316,17 +352,24 @@ document.addEventListener('focusout', e=>{
 });
 
 function copyJson(){
-  const t=document.getElementById('json'); formToJson();
+  formToJson();
+  const t=document.getElementById('json');
+  const data=collect();
+  const errs=validate(data);
   t.select(); t.setSelectionRange(0,999999);
-  navigator.clipboard.writeText(t.value).then(()=>flash('✅ Đã sao chép JSON.')).catch(()=>flash('Hãy chọn và Ctrl+C.'));
+  navigator.clipboard.writeText(t.value)
+    .then(()=>{ errs.length ? showValidity(data) : flash('✅ Đã sao chép JSON.'); })
+    .catch(()=>flash('Hãy chọn và Ctrl+C.'));
 }
 function downloadJson(){
   formToJson();
+  const data=collect();
+  const errs=validate(data);
   const json=document.getElementById('json').value;
   const blob=new Blob([json],{type:'application/json'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download='vnpt-connections.json'; a.click(); URL.revokeObjectURL(a.href);
-  flash('⬇️ Đã tải vnpt-connections.json');
+  errs.length ? showValidity(data) : flash('⬇️ Đã tải vnpt-connections.json');
 }
 function flash(t){ const m=document.getElementById('msg'); m.className='msg ok'; m.textContent=t; }
 
