@@ -1,52 +1,55 @@
 /* ==========================================================================
-   VNPT Invoices Add-in — Swiss Industrial Print theme
+   VNPT Invoices Add-in — Soft Structuralism theme
    Single source of truth for every page under this site (index.html, licgen/,
    profile-json-generator/). Edit tokens/components here to restyle globally;
    each page's own <style> block should only hold page-specific layout.
 
-   Rules: matte paper substrate, carbon-ink text, ONE accent (hazard red) used
-   only for the primary action / alerts. No gradients, no soft shadows, no
-   rounded corners. Structural black hairlines do the work color used to do.
+   Silver-grey substrate, bold grotesk display type, floating white panels on
+   diffused ambient shadows, one indigo accent for the primary action only.
+   Squircle radii, pill buttons, spring motion — never linear.
    ========================================================================== */
 
 :root{
   /* Substrate */
-  --bg:        #F4F4F0;   /* matte documentation paper */
+  --bg:        #F6F6F8;   /* silver-grey */
   --card:      #FFFFFF;   /* panel surface */
-  --card-alt:  #EAE8E3;   /* nested/inset panel (inputs, mono blocks) */
-  --line:      #0A0A0A;   /* structural hairline — solid, not soft */
+  --shell:     #EDEEF2;   /* double-bezel outer ring */
+  --card-alt:  #F1F1F4;   /* nested/inset panel (inputs, mono blocks) */
+  --line:      rgba(22,22,26,.08);   /* soft hairline */
 
   /* Text */
-  --text:      #0A0A0A;   /* carbon ink */
-  --muted:     #55534E;   /* secondary/help text */
+  --text:      #16161A;
+  --muted:     #6B6B76;
 
-  /* Accent — the ONLY color on the page. Primary action + alerts only. */
-  --accent:    #E61919;
+  /* Accent — the ONLY color on the page. Primary action + focus only. */
+  --accent:    #4F46E5;
+  --accent-ink:#3730A3;
 
   /* Neutral tag (secondary buttons, badges, section markers) */
   --pill:      #FFFFFF;
-  --pill-text: #0A0A0A;
+  --pill-text: #16161A;
 
-  /* Status — no green; black = normal/ok, red (accent) = alert */
-  --ok:        #0A0A0A;
+  /* Status */
+  --ok:        #16161A;
   --ok-bg:     #FFFFFF;
-  --warn:      #E61919;
+  --warn:      #D6432D;
   --warn-bg:   #FFFFFF;
-  --req:       #E61919;
+  --req:       #D6432D;
   --danger-bg:       #FFFFFF;
-  --danger-text:     #E61919;
-  --danger-bg-hover: #E61919;
+  --danger-text:     #D6432D;
+  --danger-bg-hover: #FDEDEA;
 
-  --mono-bg:   #EAE8E3;
+  --mono-bg:   #F1F1F4;
 
-  /* Elevation — hard offset only, never blurred */
-  --shadow-card: none;
-  --shadow-btn:  3px 3px 0 0 var(--text);
+  /* Elevation — soft, heavily diffused, never harsh */
+  --shadow-card: 0 1px 1px rgba(16,16,24,.03), 0 30px 60px -28px rgba(16,16,24,.18);
+  --shadow-btn:  0 14px 28px -12px rgba(79,70,229,.45);
+  --ease: cubic-bezier(.32,.72,0,1);
 
-  /* Radii — mechanical rigidity: exactly 90 degrees, always */
-  --r-lg: 0;
-  --r-md: 0;
-  --r-sm: 0;
+  /* Radii — exaggerated squircles */
+  --r-lg: 28px;
+  --r-md: 18px;
+  --r-sm: 12px;
 }
 
 /* Light theme only, deliberately — no prefers-color-scheme:dark override. */
@@ -55,152 +58,156 @@
 html{-webkit-text-size-adjust:100%}
 body{
   margin:0;color:var(--text);background:var(--bg);
-  font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  font-family:"Plus Jakarta Sans",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
   font-size:14px;line-height:1.5;
   position:relative;
 }
-/* Mechanical noise — low-opacity grain across the substrate */
-body::before{
-  content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.035;
-  mix-blend-mode:multiply;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
 
-h1{
-  font-size:26px;font-weight:900;letter-spacing:-.02em;line-height:.95;margin:0;
-  color:var(--text);text-transform:uppercase;
-}
-.sub{color:var(--muted);font-size:12.5px;margin:6px 0 0}
+h1{font-size:28px;font-weight:800;letter-spacing:-.01em;line-height:1.08;margin:0;color:var(--text)}
+.sub{color:var(--muted);font-size:13px;margin:6px 0 0}
 
 /* --- Header / logo badge (index.html, licgen) --- */
-header.site{display:flex;align-items:center;gap:14px;margin-bottom:20px;
-  border-bottom:2px solid var(--text);padding-bottom:18px}
+header.site{display:flex;align-items:center;gap:14px;margin-bottom:24px}
 .logo{
-  width:42px;height:42px;flex:none;
-  background:var(--text);
+  width:44px;height:44px;flex:none;border-radius:var(--r-sm);
+  background:linear-gradient(160deg,var(--accent),var(--accent-ink));
   display:flex;align-items:center;justify-content:center;
+  box-shadow:0 14px 24px -12px rgba(79,70,229,.5);
 }
-.logo svg{width:20px;height:20px;color:var(--bg)}
+.logo svg{width:20px;height:20px;color:#fff;stroke-width:1.5}
 
-/* --- Card --- */
+/* --- Card (double-bezel: outer shell ring + soft ambient shadow) --- */
 .card{
-  background:var(--card);border:2px solid var(--line);border-radius:0;
-  box-shadow:var(--shadow-card);padding:18px;
+  background:var(--card);border:0;border-radius:var(--r-lg);
+  box-shadow:
+    0 0 0 6px var(--shell),
+    inset 0 1px 0 rgba(255,255,255,.6),
+    var(--shadow-card);
+  padding:20px;
 }
 
-/* --- Buttons --- */
+/* --- Buttons (pill, spring motion) --- */
 button, a.btn{
-  cursor:pointer;border:2px solid var(--text);background:var(--pill);color:var(--pill-text);
-  padding:10px 16px;border-radius:0;font-size:12.5px;font-weight:700;
-  font-family:inherit;text-transform:uppercase;letter-spacing:.04em;
+  cursor:pointer;border:0;background:var(--pill);color:var(--pill-text);
+  padding:12px 20px;border-radius:999px;font-size:13px;font-weight:600;
+  font-family:inherit;letter-spacing:0;
   text-decoration:none;display:inline-flex;align-items:center;
-  justify-content:center;gap:8px;min-height:42px;
-  transition:background .08s linear,color .08s linear,transform .08s linear;
+  justify-content:center;gap:8px;min-height:44px;
+  box-shadow:0 1px 2px rgba(16,16,24,.06), 0 10px 20px -14px rgba(16,16,24,.25);
+  transition:transform .32s var(--ease),box-shadow .32s var(--ease),background .2s var(--ease),color .2s var(--ease);
   -webkit-tap-highlight-color:transparent;
 }
-button:hover, a.btn:hover{background:var(--text);color:var(--bg)}
+button:hover, a.btn:hover{transform:translateY(-1px);box-shadow:0 1px 2px rgba(16,16,24,.06), 0 16px 28px -14px rgba(16,16,24,.3)}
+button:active, a.btn:active{transform:scale(.98)}
 button:focus-visible, a.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 button.primary, a.btn.primary{
-  background:var(--accent);color:#fff;border-color:var(--text);box-shadow:var(--shadow-btn);
+  background:linear-gradient(160deg,var(--accent),var(--accent-ink));color:#fff;box-shadow:var(--shadow-btn);
 }
-button.primary:hover, a.btn.primary:hover{background:var(--text);color:var(--accent)}
-button.sec, a.btn.sec{background:var(--pill);color:var(--pill-text);box-shadow:none}
-button.sec:hover, a.btn.sec:hover{background:var(--text);color:var(--bg);transform:none}
-button.danger{color:var(--danger-text);background:var(--danger-bg);border-color:var(--accent)}
-button.danger:hover{background:var(--danger-bg-hover);color:#fff}
+button.primary:hover, a.btn.primary:hover{transform:translateY(-1px) scale(1.01);box-shadow:0 18px 34px -12px rgba(79,70,229,.55)}
+button.sec, a.btn.sec{background:var(--pill);color:var(--pill-text)}
+button.danger{color:var(--danger-text);background:var(--danger-bg)}
+button.danger:hover{background:var(--danger-bg-hover)}
 button.link{
-  background:none;border:0;color:var(--muted);padding:2px 0;font-weight:700;min-height:0;
-  text-decoration:underline;font-size:11px;box-shadow:none;
+  background:none;border:0;color:var(--muted);padding:2px 0;font-weight:600;min-height:0;
+  text-decoration:underline;font-size:12px;box-shadow:none;
 }
-button.link:hover{color:var(--accent);background:none;transform:none}
-button.mini{padding:7px 11px;font-size:11px;min-height:36px}
-button.icon{padding:0;width:36px;height:36px;min-height:36px;border-radius:0;
+button.link:hover{color:var(--accent);background:none;transform:none;box-shadow:none}
+button.mini{padding:8px 14px;font-size:12px;min-height:38px}
+button.icon{padding:0;width:38px;height:38px;min-height:38px;border-radius:999px;
   display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex:none}
-svg[data-icon]{width:19px;height:19px;flex:none}
+svg[data-icon]{width:18px;height:18px;flex:none;stroke-width:1.5}
 
 /* --- Form controls --- */
-label{display:block;font-size:11px;color:var(--text);margin:0 0 6px;font-weight:700;
-  font-family:inherit;text-transform:uppercase;letter-spacing:.04em}
+label{display:block;font-size:12px;color:var(--muted);margin:0 0 7px;font-weight:600}
 label .req{color:var(--req)}
-label.sub-label{font-weight:700;color:var(--muted);margin-top:16px}
+label.sub-label{font-weight:600;color:var(--muted);margin-top:18px}
 input, select, textarea{
-  width:100%;background:var(--card-alt);border:2px solid var(--line);color:var(--text);
-  border-radius:0;padding:10px 11px;font:16px/1.4 -apple-system,"Segoe UI",Roboto,Arial,sans-serif;outline:none;
+  width:100%;background:var(--card-alt);border:1px solid transparent;color:var(--text);
+  border-radius:var(--r-sm);padding:11px 13px;font:16px/1.4 inherit;outline:none;
+  transition:background .2s var(--ease),box-shadow .2s var(--ease);
 }
 @media(min-width:600px){ input, select, textarea{font-size:13px} }
-input:focus, select:focus, textarea:focus{outline:2px solid var(--accent);outline-offset:-2px}
+input:focus, select:focus, textarea:focus{background:#fff;box-shadow:0 0 0 2px var(--accent)}
 textarea{resize:vertical}
 
 /* --- Chips / status text / misc --- */
 .pill-badge{
   display:inline-flex;align-items:center;gap:7px;background:var(--pill);color:var(--pill-text);
-  border:1px solid var(--line);
-  font-family:inherit;text-transform:uppercase;letter-spacing:.04em;
-  font-size:11px;font-weight:700;padding:6px 12px;border-radius:0;
+  box-shadow:0 1px 2px rgba(16,16,24,.06), 0 8px 16px -10px rgba(16,16,24,.2);
+  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;
+  padding:7px 14px;border-radius:999px;
 }
 .pill-badge.ok{background:var(--ok-bg);color:var(--ok)}
 .hint{color:var(--muted);font-size:11.5px;margin:8px 0 0;line-height:1.6}
 .mono{
   font-family:Consolas,Menlo,monospace;font-size:12.5px;word-break:break-all;
-  background:var(--mono-bg);border:1px solid var(--line);border-radius:0;
-  padding:12px;white-space:pre-wrap;color:var(--text);
+  background:var(--mono-bg);border:0;border-radius:var(--r-sm);
+  padding:14px;white-space:pre-wrap;color:var(--text);
 }
 .msg{font-size:12px;margin:10px 0 0;min-height:18px;line-height:1.6}
 .msg.ok{color:var(--ok)} .msg.err{color:var(--warn)}
 .callout{
-  background:var(--card-alt);border:1px solid var(--line);border-radius:0;padding:12px 14px;font-size:12.5px;
+  background:var(--card-alt);border:0;border-radius:var(--r-md);padding:14px 16px;font-size:12.5px;
   color:var(--text);line-height:1.6;margin-bottom:14px;
 }
-code{background:var(--card-alt);border:1px solid var(--line);padding:1px 5px;border-radius:0;
+code{background:var(--card-alt);border:0;padding:2px 6px;border-radius:6px;
   font-size:11.5px;color:var(--text)}
 details{margin-top:8px}
 summary{cursor:pointer;color:var(--muted);font-size:12px}
 
-/* --- Breadcrumb back-link (licgen, profile-json-generator) --- */
+/* --- Breadcrumb back-link — floating pill, detached from content --- */
 .crumb{
-  display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:11px;
-  font-weight:700;text-decoration:none;margin-bottom:14px;
-  font-family:Consolas,Menlo,monospace;text-transform:uppercase;letter-spacing:.06em;
+  display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:12px;
+  font-weight:600;text-decoration:none;margin-bottom:18px;
+  background:var(--card);padding:8px 14px 8px 10px;border-radius:999px;
+  box-shadow:0 1px 2px rgba(16,16,24,.05), 0 10px 20px -14px rgba(16,16,24,.2);
+  transition:transform .32s var(--ease),color .2s var(--ease);
 }
-.crumb:hover{color:var(--accent)}
-.crumb svg{width:14px;height:14px;flex:none}
+.crumb:hover{color:var(--accent);transform:translateX(-2px)}
+.crumb svg{width:14px;height:14px;flex:none;stroke-width:1.5}
 
 /* --- Tool tiles (home) --- */
-.tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:6px;
-  background:var(--line)}
+.tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
 .tool-tile{
-  display:flex;flex-direction:column;align-items:flex-start;gap:9px;padding:14px 12px;
-  background:var(--card);border:0;border-radius:0;
+  display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:16px 14px;
+  background:var(--card-alt);border:0;border-radius:var(--r-md);
   text-decoration:none;color:var(--text);
-  transition:background .08s linear,border-color .08s linear;
+  transition:transform .32s var(--ease),box-shadow .32s var(--ease),background .2s var(--ease);
 }
-.tool-tile:hover{background:var(--text);border-color:var(--accent)}
-.tool-tile:hover .ti{background:var(--accent);color:#fff}
-.tool-tile:hover .tt{color:var(--bg)}
-.tool-tile:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.tool-tile:hover{transform:translateY(-3px);background:#fff;
+  box-shadow:0 1px 2px rgba(16,16,24,.04), 0 20px 32px -16px rgba(16,16,24,.22)}
+.tool-tile:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .tool-tile .ti{
-  width:32px;height:32px;border-radius:0;background:var(--card-alt);color:var(--pill-text);
-  border:1px solid var(--line);
+  width:34px;height:34px;border-radius:999px;background:#fff;color:var(--accent);
+  box-shadow:0 1px 2px rgba(16,16,24,.06), 0 8px 14px -8px rgba(16,16,24,.2);
   display:flex;align-items:center;justify-content:center;flex:none;
+  transition:transform .32s var(--ease);
 }
-.tool-tile .ti svg{width:17px;height:17px}
-.tool-tile .tt{font-size:12px;font-weight:700;line-height:1.35;text-transform:uppercase;letter-spacing:.02em}
+.tool-tile:hover .ti{transform:scale(1.08) translateY(-1px)}
+.tool-tile .ti svg{width:16px;height:16px;stroke-width:1.5}
+.tool-tile .tt{font-size:12.5px;font-weight:700;line-height:1.35}
 
 /* --- Tabs (licgen) --- */
-.tabs{display:flex;gap:2px;background:var(--line);border:2px solid var(--line);padding:0;margin-bottom:18px}
+.tabs{display:flex;gap:4px;background:var(--card-alt);border-radius:999px;padding:5px;margin-bottom:20px}
 .tab{
-  appearance:none;background:var(--card);border:0;flex:1;padding:11px 6px;
-  font-size:12px;font-weight:700;color:var(--text);cursor:pointer;border-radius:0;
-  font-family:Consolas,Menlo,monospace;text-transform:uppercase;letter-spacing:.06em;
-  transition:background .08s linear,color .08s linear;-webkit-tap-highlight-color:transparent;
+  appearance:none;background:none;border:0;flex:1;padding:11px 6px;
+  font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border-radius:999px;
+  transition:background .32s var(--ease),color .2s var(--ease);-webkit-tap-highlight-color:transparent;
 }
-.tab:hover{background:var(--text);color:var(--bg)}
-.tab.active{color:#fff;background:var(--accent)}
-.tab.active:hover{background:var(--accent);color:#fff}
+.tab.active{color:#fff;background:linear-gradient(160deg,var(--accent),var(--accent-ink));
+  box-shadow:0 10px 20px -10px rgba(79,70,229,.5)}
 .panel{display:none}
 .panel.active{display:block}
 
 /* --- Checkbox row (licgen expiration toggle) --- */
 .checkbox-row{display:flex;align-items:center;gap:9px;margin-top:18px;min-height:24px}
-.checkbox-row input{width:20px;height:20px;accent-color:var(--accent);flex:none;border-radius:0}
-.checkbox-row label{margin:0;font-weight:700;cursor:pointer;font-size:12px;text-transform:none;letter-spacing:normal;font-family:inherit}
+.checkbox-row input{width:20px;height:20px;accent-color:var(--accent);flex:none;border-radius:6px}
+.checkbox-row label{margin:0;font-weight:600;cursor:pointer;font-size:13px}
+
+/* --- Scroll-reveal (fade + blur up on entry) --- */
+.reveal{opacity:0;transform:translateY(16px);filter:blur(6px);
+  transition:opacity .8s var(--ease),transform .8s var(--ease),filter .8s var(--ease)}
+.reveal.in{opacity:1;transform:translateY(0);filter:blur(0)}
+@media (prefers-reduced-motion: reduce){
+  .reveal{opacity:1;transform:none;filter:none;transition:none}
+}

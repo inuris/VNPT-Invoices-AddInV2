@@ -4,47 +4,50 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VNPT Invoices Add-in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/theme.css">
 <style>
-  body{display:flex;align-items:center;justify-content:center;padding:24px;min-height:100vh}
-  .card{max-width:440px;width:100%;padding:36px 32px 30px}
-  a.btn.primary{width:100%;margin-top:20px}
+  body{display:flex;align-items:center;justify-content:center;padding:24px;min-height:100dvh}
+  .card{max-width:440px;width:100%;padding:36px 32px 32px}
+  a.btn.primary{width:100%;margin-top:22px}
   a.btn.sec{width:100%;margin-top:10px}
-  footer{margin-top:26px;text-align:center;color:var(--muted);font-size:11px;
-    text-transform:uppercase;letter-spacing:.04em}
-  .head-block{border-bottom:2px solid var(--text);padding-bottom:18px;margin-bottom:14px}
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:11px;
+    text-transform:uppercase;letter-spacing:.08em}
+  .head-block{margin-bottom:18px}
 </style>
 </head>
 <body>
   <div class="card">
-    <div class="head-block">
+    <div class="head-block reveal">
       <div class="logo">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
       </div>
       <h1 style="margin-top:16px">VNPT Invoices Add-in</h1>
       <p class="sub">Excel add-in tạo &amp; phát hành chứng từ điện tử VNPT Invoice</p>
     </div>
-    <div class="pill-badge ok" id="verPill" style="margin:0 0 22px"><span id="verText">Đang tải phiên bản…</span></div>
+    <div class="pill-badge ok reveal" id="verPill" style="margin:0 0 22px"><span id="verText">Đang tải phiên bản…</span></div>
 
-    <a class="btn primary" href="VNPT.Invoices.AddInV2-Setup.exe">
-      <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    <a class="btn primary reveal" href="VNPT.Invoices.AddInV2-Setup.exe">
+      <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Tải bộ cài
     </a>
 
     <label class="sub-label" style="margin-top:22px">Công cụ</label>
-    <div class="tool-grid">
+    <div class="tool-grid reveal">
       <a class="tool-tile" href="profile-json-generator/">
-        <div class="ti"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></div>
+        <div class="ti"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></div>
         <div class="tt">Tạo JSON cấu hình kết nối</div>
       </a>
       <a class="tool-tile" href="licgen/">
-        <div class="ti"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <div class="ti"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
         <div class="tt">License Generator</div>
       </a>
     </div>
 
-    <a class="btn sec" href="https://vnpt-invoice-addin.gitbook.io/vnpt-invoice-addin-v2" target="_blank" rel="noopener">
-      <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+    <a class="btn sec reveal" href="https://vnpt-invoice-addin.gitbook.io/vnpt-invoice-addin-v2" target="_blank" rel="noopener">
+      <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
       Hướng dẫn sử dụng
     </a>
 
@@ -56,6 +59,14 @@
     .then(function(r){ return r.json(); })
     .then(function(d){ document.getElementById('verText').textContent = 'Phiên bản ' + d.latestVersion; })
     .catch(function(){ document.getElementById('verPill').style.display = 'none'; });
+
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: .2 });
+  document.querySelectorAll('.reveal').forEach(function(el, i){
+    el.style.transitionDelay = (i * 60) + 'ms';
+    io.observe(el);
+  });
 </script>
 </body>
 </html>
