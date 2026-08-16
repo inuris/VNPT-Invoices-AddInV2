@@ -3,26 +3,30 @@
    Single source of truth for every page under this site (index.html, licgen/,
    profile-json-generator/). Edit tokens/components here to restyle globally;
    each page's own <style> block should only hold page-specific layout.
+
+   Minimalist / neutral: one flat accent color, reserved for the single most
+   important action per screen (primary button, active tab, focus ring). Every
+   other surface — cards, secondary buttons, badges, section labels — stays
+   neutral gray so the accent actually reads as a highlight, not wallpaper.
    ========================================================================== */
 
 :root{
   /* Page & surfaces */
-  --bg:        #f4f5f9;   /* page background */
+  --bg:        #fafafa;   /* page background */
   --card:      #ffffff;   /* card surface */
-  --card-alt:  #f7f8fb;   /* nested/inset panel (inputs, mono blocks) */
-  --line:      #e7e9f0;   /* borders/dividers */
+  --card-alt:  #f4f4f5;   /* nested/inset panel (inputs, mono blocks) */
+  --line:      #e4e4e7;   /* borders/dividers */
 
   /* Text */
-  --text:      #14161f;   /* headings, primary text */
-  --muted:     #6b7280;   /* secondary/help text */
+  --text:      #18181b;   /* headings, primary text */
+  --muted:     #71717a;   /* secondary/help text */
 
-  /* Brand accent (buttons, links, focus rings) */
-  --accent:    #5b6bf5;
-  --accent2:   #8b6df0;
+  /* Brand accent — used ONLY for the single primary action per screen */
+  --accent:    #2f6fed;
 
-  /* Soft accent chip (secondary buttons, badges) */
-  --pill:      #eef0fc;
-  --pill-text: #4c46c9;
+  /* Neutral chip (secondary buttons, badges, section labels) */
+  --pill:      #f4f4f5;
+  --pill-text: #3f3f46;
 
   /* Status */
   --ok:        #0f9d58;
@@ -34,16 +38,16 @@
   --danger-text:     #b3283a;
   --danger-bg-hover: #fadbdd;
 
-  --mono-bg:   #f7f8fb;
+  --mono-bg:   #f4f4f5;
 
   /* Elevation */
-  --shadow-card: 0 1px 2px rgba(20,22,34,.04), 0 16px 32px -20px rgba(20,22,34,.14);
-  --shadow-btn:  0 10px 20px -10px rgba(91,107,245,.55);
+  --shadow-card: 0 1px 2px rgba(24,24,27,.03), 0 12px 28px -20px rgba(24,24,27,.12);
+  --shadow-btn:  0 8px 16px -8px rgba(47,111,237,.45);
 
   /* Radii */
-  --r-lg: 22px;
-  --r-md: 14px;
-  --r-sm: 10px;
+  --r-lg: 18px;
+  --r-md: 12px;
+  --r-sm: 8px;
 }
 
 /* Light theme only, deliberately — no prefers-color-scheme:dark override.
@@ -64,9 +68,8 @@ h1{font-size:20px;font-weight:800;letter-spacing:-.2px;margin:0;color:var(--text
 header.site{display:flex;align-items:center;gap:12px;margin-bottom:20px}
 .logo{
   width:42px;height:42px;border-radius:var(--r-sm);flex:none;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  background:var(--text);
   display:flex;align-items:center;justify-content:center;
-  box-shadow:0 8px 18px -6px rgba(91,107,245,.5);
 }
 .logo svg{width:20px;height:20px;color:#fff}
 
@@ -78,25 +81,25 @@ header.site{display:flex;align-items:center;gap:12px;margin-bottom:20px}
 
 /* --- Buttons --- */
 button, a.btn{
-  cursor:pointer;border:0;background:var(--pill);color:var(--pill-text);
-  padding:11px 16px;border-radius:var(--r-sm);font-size:13px;font-weight:700;
+  cursor:pointer;border:1px solid transparent;background:var(--pill);color:var(--pill-text);
+  padding:10px 16px;border-radius:var(--r-sm);font-size:13px;font-weight:700;
   font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;
   justify-content:center;gap:8px;min-height:42px;
-  transition:transform .12s,background .12s,box-shadow .12s;
+  transition:transform .12s,background .12s,border-color .12s,box-shadow .12s;
   -webkit-tap-highlight-color:transparent;
 }
 button:hover, a.btn:hover{background:var(--line)}
 button:focus-visible, a.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 button.primary, a.btn.primary{
-  background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:var(--shadow-btn);
+  background:var(--accent);color:#fff;box-shadow:var(--shadow-btn);
 }
-button.primary:hover, a.btn.primary:hover{transform:translateY(-1px)}
+button.primary:hover, a.btn.primary:hover{transform:translateY(-1px);background:var(--accent)}
 button.sec, a.btn.sec{background:var(--pill);color:var(--pill-text);box-shadow:none}
 button.sec:hover, a.btn.sec:hover{background:var(--line);transform:none}
 button.danger{color:var(--danger-text);background:var(--danger-bg)}
 button.danger:hover{background:var(--danger-bg-hover)}
 button.link{
-  background:none;color:var(--muted);padding:2px 0;font-weight:600;min-height:0;
+  background:none;border-color:transparent;color:var(--muted);padding:2px 0;font-weight:600;min-height:0;
   text-decoration:underline;font-size:11.5px;box-shadow:none;
 }
 button.link:hover{color:var(--text);background:none;transform:none}
@@ -132,11 +135,11 @@ textarea{resize:vertical}
 .msg{font-size:12.5px;margin:10px 0 0;min-height:18px;line-height:1.6}
 .msg.ok{color:var(--ok)} .msg.err{color:var(--warn)}
 .callout{
-  background:var(--pill);border-radius:var(--r-md);padding:12px 14px;font-size:12.5px;
-  color:var(--pill-text);line-height:1.6;margin-bottom:14px;
+  background:var(--card-alt);border:1px solid var(--line);border-radius:var(--r-md);padding:12px 14px;font-size:12.5px;
+  color:var(--text);line-height:1.6;margin-bottom:14px;
 }
 code{background:var(--card-alt);border:1px solid var(--line);padding:1px 5px;border-radius:5px;
-  font-size:11.5px;color:var(--pill-text)}
+  font-size:11.5px;color:var(--text)}
 details{margin-top:8px}
 summary{cursor:pointer;color:var(--muted);font-size:12px}
 
@@ -152,7 +155,7 @@ summary{cursor:pointer;color:var(--muted);font-size:12px}
 .tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
 .tool-tile{
   display:flex;flex-direction:column;align-items:flex-start;gap:9px;padding:14px 12px;
-  background:var(--card-alt);border:1px solid var(--line);border-radius:var(--r-md);
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);
   text-decoration:none;color:var(--text);
   transition:transform .12s,border-color .12s,box-shadow .12s;
 }
@@ -166,14 +169,13 @@ summary{cursor:pointer;color:var(--muted);font-size:12px}
 .tool-tile .tt{font-size:12.5px;font-weight:700;line-height:1.35}
 
 /* --- Tabs (licgen) --- */
-.tabs{display:flex;gap:4px;background:var(--pill);border-radius:var(--r-md);padding:4px;margin-bottom:18px}
+.tabs{display:flex;gap:4px;background:var(--card-alt);border:1px solid var(--line);border-radius:var(--r-md);padding:4px;margin-bottom:18px}
 .tab{
   appearance:none;background:none;border:0;flex:1;padding:10px 6px;
   font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;border-radius:var(--r-sm);
   transition:.15s;-webkit-tap-highlight-color:transparent;
 }
-.tab.active{color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2));
-  box-shadow:0 6px 14px -6px rgba(91,107,245,.5)}
+.tab.active{color:#fff;background:var(--accent)}
 .panel{display:none}
 .panel.active{display:block}
 
