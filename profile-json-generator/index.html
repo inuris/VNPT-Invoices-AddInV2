@@ -6,8 +6,10 @@
 <title>VNPT — Tạo JSON cấu hình kết nối (import)</title>
 <link rel="stylesheet" href="../assets/theme.css">
 <style>
-  .wrap{max-width:1200px;margin:0 auto;padding:24px 20px 60px;display:grid;grid-template-columns:1fr 420px;gap:18px}
-  @media(max-width:960px){.wrap{grid-template-columns:1fr;padding:16px 14px 48px}}
+  .wrap{max-width:1200px;margin:0 auto;padding:24px 20px 60px}
+  header.site{margin-bottom:20px}
+  .cols{display:grid;grid-template-columns:1fr 420px;gap:18px}
+  @media(max-width:960px){.wrap{padding:16px 14px 48px}.cols{grid-template-columns:1fr}}
   .left{min-width:0}
   .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px;align-items:center}
   .btn-add-conn{
@@ -55,6 +57,21 @@
 <body>
 
 <div class="wrap">
+  <a class="crumb" href="../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    VNPT Invoices Add-in
+  </a>
+  <header class="site">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+    </div>
+    <div>
+      <h1>Tạo JSON cấu hình kết nối</h1>
+      <p class="sub">Nhập trực tiếp trên form hoặc dán JSON — hai bên đồng bộ hai chiều</p>
+    </div>
+  </header>
+
+  <div class="cols">
   <div class="left">
     <div class="toolbar">
       <button class="primary icon btn-add-conn" title="Thêm kết nối" aria-label="Thêm kết nối" onclick="addConn();formToJson()">
@@ -96,6 +113,7 @@
         </div>
       </details>
     </div>
+  </div>
   </div>
 </div>
 

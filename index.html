@@ -7,10 +7,10 @@
 <link rel="stylesheet" href="assets/theme.css">
 <style>
   body{display:flex;align-items:center;justify-content:center;padding:24px;min-height:100vh}
-  .card{max-width:420px;width:100%;padding:36px 32px 30px}
-  .btns{display:flex;flex-direction:column;gap:10px;margin-top:4px}
-  .btns a.btn{width:100%}
-  footer{margin-top:22px;text-align:center;color:var(--muted);font-size:11px}
+  .card{max-width:440px;width:100%;padding:36px 32px 30px}
+  a.btn.primary{width:100%;margin-top:20px}
+  a.btn.sec{width:100%;margin-top:10px}
+  footer{margin-top:26px;text-align:center;color:var(--muted);font-size:11px}
 </style>
 </head>
 <body>
@@ -22,20 +22,27 @@
     <p class="sub">Excel add-in tạo &amp; phát hành chứng từ điện tử VNPT Invoice</p>
     <div class="pill-badge ok" id="verPill" style="margin:14px 0 22px"><span id="verText">Đang tải phiên bản…</span></div>
 
-    <div class="btns">
-      <a class="btn primary" href="VNPT.Invoices.AddInV2-Setup.exe">
-        <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Tải bộ cài
+    <a class="btn primary" href="VNPT.Invoices.AddInV2-Setup.exe">
+      <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Tải bộ cài
+    </a>
+
+    <label class="sub-label" style="margin-top:22px">Công cụ</label>
+    <div class="tool-grid">
+      <a class="tool-tile" href="profile-json-generator/">
+        <div class="ti"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></div>
+        <div class="tt">Tạo JSON cấu hình kết nối</div>
       </a>
-      <a class="btn sec" href="profile-json-generator/">
-        <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
-        Tạo JSON cấu hình kết nối
-      </a>
-      <a class="btn sec" href="https://vnpt-invoice-addin.gitbook.io/vnpt-invoice-addin-v2" target="_blank" rel="noopener">
-        <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-        Hướng dẫn sử dụng
+      <a class="tool-tile" href="licgen/">
+        <div class="ti"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <div class="tt">License Generator</div>
       </a>
     </div>
+
+    <a class="btn sec" href="https://vnpt-invoice-addin.gitbook.io/vnpt-invoice-addin-v2" target="_blank" rel="noopener">
+      <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      Hướng dẫn sử dụng
+    </a>
 
     <footer>TTKDGP — Phòng Giải pháp số</footer>
   </div>
