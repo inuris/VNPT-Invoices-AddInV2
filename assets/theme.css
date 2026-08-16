@@ -1,57 +1,55 @@
 /* ==========================================================================
-   VNPT Invoices Add-in — shared light theme
+   VNPT Invoices Add-in — Swiss Industrial Print theme
    Single source of truth for every page under this site (index.html, licgen/,
    profile-json-generator/). Edit tokens/components here to restyle globally;
    each page's own <style> block should only hold page-specific layout.
 
-   Minimalist / neutral: one flat accent color, reserved for the single most
-   important action per screen (primary button, active tab, focus ring). Every
-   other surface — cards, secondary buttons, badges, section labels — stays
-   neutral gray so the accent actually reads as a highlight, not wallpaper.
+   Rules: matte paper substrate, carbon-ink text, ONE accent (hazard red) used
+   only for the primary action / alerts. No gradients, no soft shadows, no
+   rounded corners. Structural black hairlines do the work color used to do.
    ========================================================================== */
 
 :root{
-  /* Page & surfaces */
-  --bg:        #fafafa;   /* page background */
-  --card:      #ffffff;   /* card surface */
-  --card-alt:  #f4f4f5;   /* nested/inset panel (inputs, mono blocks) */
-  --line:      #e4e4e7;   /* borders/dividers */
+  /* Substrate */
+  --bg:        #F4F4F0;   /* matte documentation paper */
+  --card:      #FFFFFF;   /* panel surface */
+  --card-alt:  #EAE8E3;   /* nested/inset panel (inputs, mono blocks) */
+  --line:      #0A0A0A;   /* structural hairline — solid, not soft */
 
   /* Text */
-  --text:      #18181b;   /* headings, primary text */
-  --muted:     #71717a;   /* secondary/help text */
+  --text:      #0A0A0A;   /* carbon ink */
+  --muted:     #55534E;   /* secondary/help text */
 
-  /* Brand accent — used ONLY for the single primary action per screen */
-  --accent:    #2f6fed;
+  /* Accent — the ONLY color on the page. Primary action + alerts only. */
+  --accent:    #E61919;
 
-  /* Neutral chip (secondary buttons, badges, section labels) */
-  --pill:      #f4f4f5;
-  --pill-text: #3f3f46;
+  /* Neutral tag (secondary buttons, badges, section markers) */
+  --pill:      #FFFFFF;
+  --pill-text: #0A0A0A;
 
-  /* Status */
-  --ok:        #0f9d58;
-  --ok-bg:     #e6f7ee;
-  --warn:      #c8302a;
-  --warn-bg:   #fdecec;
-  --req:       #b06a12;
-  --danger-bg:       #fdecec;
-  --danger-text:     #b3283a;
-  --danger-bg-hover: #fadbdd;
+  /* Status — no green; black = normal/ok, red (accent) = alert */
+  --ok:        #0A0A0A;
+  --ok-bg:     #FFFFFF;
+  --warn:      #E61919;
+  --warn-bg:   #FFFFFF;
+  --req:       #E61919;
+  --danger-bg:       #FFFFFF;
+  --danger-text:     #E61919;
+  --danger-bg-hover: #E61919;
 
-  --mono-bg:   #f4f4f5;
+  --mono-bg:   #EAE8E3;
 
-  /* Elevation */
-  --shadow-card: 0 1px 2px rgba(24,24,27,.03), 0 12px 28px -20px rgba(24,24,27,.12);
-  --shadow-btn:  0 8px 16px -8px rgba(47,111,237,.45);
+  /* Elevation — hard offset only, never blurred */
+  --shadow-card: none;
+  --shadow-btn:  3px 3px 0 0 var(--text);
 
-  /* Radii */
-  --r-lg: 18px;
-  --r-md: 12px;
-  --r-sm: 8px;
+  /* Radii — mechanical rigidity: exactly 90 degrees, always */
+  --r-lg: 0;
+  --r-md: 0;
+  --r-sm: 0;
 }
 
-/* Light theme only, deliberately — no prefers-color-scheme:dark override.
-   Keeps every page consistently light regardless of the visitor's OS setting. */
+/* Light theme only, deliberately — no prefers-color-scheme:dark override. */
 
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -59,127 +57,150 @@ body{
   margin:0;color:var(--text);background:var(--bg);
   font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
   font-size:14px;line-height:1.5;
+  position:relative;
+}
+/* Mechanical noise — low-opacity grain across the substrate */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.035;
+  mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-h1{font-size:20px;font-weight:800;letter-spacing:-.2px;margin:0;color:var(--text)}
-.sub{color:var(--muted);font-size:12.5px;margin:2px 0 0}
+h1{
+  font-size:26px;font-weight:900;letter-spacing:-.02em;line-height:.95;margin:0;
+  color:var(--text);text-transform:uppercase;
+}
+.sub{color:var(--muted);font-size:12.5px;margin:6px 0 0}
 
 /* --- Header / logo badge (index.html, licgen) --- */
-header.site{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+header.site{display:flex;align-items:center;gap:14px;margin-bottom:20px;
+  border-bottom:2px solid var(--text);padding-bottom:18px}
 .logo{
-  width:42px;height:42px;border-radius:var(--r-sm);flex:none;
+  width:42px;height:42px;flex:none;
   background:var(--text);
   display:flex;align-items:center;justify-content:center;
 }
-.logo svg{width:20px;height:20px;color:#fff}
+.logo svg{width:20px;height:20px;color:var(--bg)}
 
 /* --- Card --- */
 .card{
-  background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);
+  background:var(--card);border:2px solid var(--line);border-radius:0;
   box-shadow:var(--shadow-card);padding:18px;
 }
 
 /* --- Buttons --- */
 button, a.btn{
-  cursor:pointer;border:1px solid transparent;background:var(--pill);color:var(--pill-text);
-  padding:10px 16px;border-radius:var(--r-sm);font-size:13px;font-weight:700;
-  font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;
+  cursor:pointer;border:2px solid var(--text);background:var(--pill);color:var(--pill-text);
+  padding:10px 16px;border-radius:0;font-size:12.5px;font-weight:700;
+  font-family:inherit;text-transform:uppercase;letter-spacing:.04em;
+  text-decoration:none;display:inline-flex;align-items:center;
   justify-content:center;gap:8px;min-height:42px;
-  transition:transform .12s,background .12s,border-color .12s,box-shadow .12s;
+  transition:background .08s linear,color .08s linear,transform .08s linear;
   -webkit-tap-highlight-color:transparent;
 }
-button:hover, a.btn:hover{background:var(--line)}
+button:hover, a.btn:hover{background:var(--text);color:var(--bg)}
 button:focus-visible, a.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 button.primary, a.btn.primary{
-  background:var(--accent);color:#fff;box-shadow:var(--shadow-btn);
+  background:var(--accent);color:#fff;border-color:var(--text);box-shadow:var(--shadow-btn);
 }
-button.primary:hover, a.btn.primary:hover{transform:translateY(-1px);background:var(--accent)}
+button.primary:hover, a.btn.primary:hover{background:var(--text);color:var(--accent)}
 button.sec, a.btn.sec{background:var(--pill);color:var(--pill-text);box-shadow:none}
-button.sec:hover, a.btn.sec:hover{background:var(--line);transform:none}
-button.danger{color:var(--danger-text);background:var(--danger-bg)}
-button.danger:hover{background:var(--danger-bg-hover)}
+button.sec:hover, a.btn.sec:hover{background:var(--text);color:var(--bg);transform:none}
+button.danger{color:var(--danger-text);background:var(--danger-bg);border-color:var(--accent)}
+button.danger:hover{background:var(--danger-bg-hover);color:#fff}
 button.link{
-  background:none;border-color:transparent;color:var(--muted);padding:2px 0;font-weight:600;min-height:0;
-  text-decoration:underline;font-size:11.5px;box-shadow:none;
+  background:none;border:0;color:var(--muted);padding:2px 0;font-weight:700;min-height:0;
+  text-decoration:underline;font-size:11px;box-shadow:none;
 }
-button.link:hover{color:var(--text);background:none;transform:none}
-button.mini{padding:7px 11px;font-size:12px;min-height:36px}
-button.icon{padding:0;width:36px;height:36px;min-height:36px;border-radius:var(--r-sm);
+button.link:hover{color:var(--accent);background:none;transform:none}
+button.mini{padding:7px 11px;font-size:11px;min-height:36px}
+button.icon{padding:0;width:36px;height:36px;min-height:36px;border-radius:0;
   display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex:none}
 svg[data-icon]{width:19px;height:19px;flex:none}
 
 /* --- Form controls --- */
-label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-weight:700}
+label{display:block;font-size:11px;color:var(--text);margin:0 0 6px;font-weight:700;
+  font-family:inherit;text-transform:uppercase;letter-spacing:.04em}
 label .req{color:var(--req)}
-label.sub-label{font-weight:600;color:var(--muted);margin-top:16px}
+label.sub-label{font-weight:700;color:var(--muted);margin-top:16px}
 input, select, textarea{
-  width:100%;background:var(--card-alt);border:1px solid var(--line);color:var(--text);
-  border-radius:var(--r-sm);padding:10px 11px;font:16px/1.4 inherit;outline:none;
+  width:100%;background:var(--card-alt);border:2px solid var(--line);color:var(--text);
+  border-radius:0;padding:10px 11px;font:16px/1.4 -apple-system,"Segoe UI",Roboto,Arial,sans-serif;outline:none;
 }
 @media(min-width:600px){ input, select, textarea{font-size:13px} }
-input:focus, select:focus, textarea:focus{outline:2px solid var(--accent);outline-offset:-1px}
+input:focus, select:focus, textarea:focus{outline:2px solid var(--accent);outline-offset:-2px}
 textarea{resize:vertical}
 
 /* --- Chips / status text / misc --- */
 .pill-badge{
   display:inline-flex;align-items:center;gap:7px;background:var(--pill);color:var(--pill-text);
-  font-size:11.5px;font-weight:700;padding:6px 12px;border-radius:999px;
+  border:1px solid var(--line);
+  font-family:inherit;text-transform:uppercase;letter-spacing:.04em;
+  font-size:11px;font-weight:700;padding:6px 12px;border-radius:0;
 }
 .pill-badge.ok{background:var(--ok-bg);color:var(--ok)}
 .hint{color:var(--muted);font-size:11.5px;margin:8px 0 0;line-height:1.6}
 .mono{
   font-family:Consolas,Menlo,monospace;font-size:12.5px;word-break:break-all;
-  background:var(--mono-bg);border:1px dashed var(--line);border-radius:var(--r-sm);
+  background:var(--mono-bg);border:1px solid var(--line);border-radius:0;
   padding:12px;white-space:pre-wrap;color:var(--text);
 }
-.msg{font-size:12.5px;margin:10px 0 0;min-height:18px;line-height:1.6}
+.msg{font-size:12px;margin:10px 0 0;min-height:18px;line-height:1.6}
 .msg.ok{color:var(--ok)} .msg.err{color:var(--warn)}
 .callout{
-  background:var(--card-alt);border:1px solid var(--line);border-radius:var(--r-md);padding:12px 14px;font-size:12.5px;
+  background:var(--card-alt);border:1px solid var(--line);border-radius:0;padding:12px 14px;font-size:12.5px;
   color:var(--text);line-height:1.6;margin-bottom:14px;
 }
-code{background:var(--card-alt);border:1px solid var(--line);padding:1px 5px;border-radius:5px;
+code{background:var(--card-alt);border:1px solid var(--line);padding:1px 5px;border-radius:0;
   font-size:11.5px;color:var(--text)}
 details{margin-top:8px}
 summary{cursor:pointer;color:var(--muted);font-size:12px}
 
 /* --- Breadcrumb back-link (licgen, profile-json-generator) --- */
 .crumb{
-  display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:12px;
-  font-weight:600;text-decoration:none;margin-bottom:14px;
+  display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:11px;
+  font-weight:700;text-decoration:none;margin-bottom:14px;
+  font-family:Consolas,Menlo,monospace;text-transform:uppercase;letter-spacing:.06em;
 }
-.crumb:hover{color:var(--text)}
+.crumb:hover{color:var(--accent)}
 .crumb svg{width:14px;height:14px;flex:none}
 
 /* --- Tool tiles (home) --- */
-.tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:6px;
+  background:var(--line)}
 .tool-tile{
   display:flex;flex-direction:column;align-items:flex-start;gap:9px;padding:14px 12px;
-  background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);
+  background:var(--card);border:0;border-radius:0;
   text-decoration:none;color:var(--text);
-  transition:transform .12s,border-color .12s,box-shadow .12s;
+  transition:background .08s linear,border-color .08s linear;
 }
-.tool-tile:hover{transform:translateY(-2px);border-color:var(--accent);box-shadow:var(--shadow-card)}
-.tool-tile:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tool-tile:hover{background:var(--text);border-color:var(--accent)}
+.tool-tile:hover .ti{background:var(--accent);color:#fff}
+.tool-tile:hover .tt{color:var(--bg)}
+.tool-tile:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
 .tool-tile .ti{
-  width:32px;height:32px;border-radius:var(--r-sm);background:var(--pill);color:var(--pill-text);
+  width:32px;height:32px;border-radius:0;background:var(--card-alt);color:var(--pill-text);
+  border:1px solid var(--line);
   display:flex;align-items:center;justify-content:center;flex:none;
 }
 .tool-tile .ti svg{width:17px;height:17px}
-.tool-tile .tt{font-size:12.5px;font-weight:700;line-height:1.35}
+.tool-tile .tt{font-size:12px;font-weight:700;line-height:1.35;text-transform:uppercase;letter-spacing:.02em}
 
 /* --- Tabs (licgen) --- */
-.tabs{display:flex;gap:4px;background:var(--card-alt);border:1px solid var(--line);border-radius:var(--r-md);padding:4px;margin-bottom:18px}
+.tabs{display:flex;gap:2px;background:var(--line);border:2px solid var(--line);padding:0;margin-bottom:18px}
 .tab{
-  appearance:none;background:none;border:0;flex:1;padding:10px 6px;
-  font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;border-radius:var(--r-sm);
-  transition:.15s;-webkit-tap-highlight-color:transparent;
+  appearance:none;background:var(--card);border:0;flex:1;padding:11px 6px;
+  font-size:12px;font-weight:700;color:var(--text);cursor:pointer;border-radius:0;
+  font-family:Consolas,Menlo,monospace;text-transform:uppercase;letter-spacing:.06em;
+  transition:background .08s linear,color .08s linear;-webkit-tap-highlight-color:transparent;
 }
+.tab:hover{background:var(--text);color:var(--bg)}
 .tab.active{color:#fff;background:var(--accent)}
+.tab.active:hover{background:var(--accent);color:#fff}
 .panel{display:none}
 .panel.active{display:block}
 
 /* --- Checkbox row (licgen expiration toggle) --- */
 .checkbox-row{display:flex;align-items:center;gap:9px;margin-top:18px;min-height:24px}
-.checkbox-row input{width:20px;height:20px;accent-color:var(--accent);flex:none}
-.checkbox-row label{margin:0;font-weight:600;cursor:pointer;font-size:13px}
+.checkbox-row input{width:20px;height:20px;accent-color:var(--accent);flex:none;border-radius:0}
+.checkbox-row label{margin:0;font-weight:700;cursor:pointer;font-size:12px;text-transform:none;letter-spacing:normal;font-family:inherit}
