@@ -111,7 +111,7 @@
           <b>Loại chứng từ</b>: <code>CTT</code> / <code>GTGT</code> / <code>PXK</code>.<br>
           <b>Domain</b>: không cần nhập <code>http(s)</code>.<br>
           <b>Cột mở rộng</b> (tùy chọn): map cột Excel → thẻ <code>Extra1</code>…<code>Extra11</code> (cấp hóa đơn) hoặc <code>SP_Extra1</code>/<code>SP_Extra2</code> (cấp dòng). Kiểu: <code>string</code>/<code>numeric</code>/<code>datetime</code>.<br>
-          <b>Cột chuẩn VNPT</b> (tùy chọn): tag XML chuẩn NĐ70 ít khách cần (<code>HDDThu</code>, <code>TCHDon</code>, <code>TTHHDTrung</code>) — không đi qua khe Extra, add-in tự lấy header/ghi chú theo <code>field</code>.
+          <b>Cột hóa đơn đặc thù</b> (tùy chọn): <code>HDDThu</code>, <code>TCHDon</code>, <code>TTHHDTrung</code> — add-in tự lấy header/ghi chú theo <code>field</code>.
         </div>
       </details>
     </div>
@@ -206,9 +206,8 @@ function addConn(data){
       <div class="exts"></div>
     </div>
 
-    <div class="sec">
-      <div class="st"><h4>Cột chuẩn VNPT (tùy chọn, GTGT)</h4></div>
-      <div class="field-note" style="margin:0 0 8px">Tag XML chuẩn NĐ70 ít khách cần — không đi qua khe Extra.</div>
+    <details class="sec" ${(fieldChecked(data,'HDDThu')||fieldChecked(data,'TCHDon')||fieldChecked(data,'LHHDTrung'))?'open':''}>
+      <summary class="st" style="cursor:pointer"><h4>Cột hóa đơn đặc thù</h4></summary>
       ${VNPT_SIMPLE_FIELDS.map(f=>`
       <div class="checkbox-row">
         <input type="checkbox" class="vf-simple" data-field="${f.key}" id="${id}-${f.key}" onchange="formToJson()" ${fieldChecked(data,f.key)?'checked':''}>
@@ -219,14 +218,13 @@ function addConn(data){
         <label for="${id}-special">Hàng hóa đặc trưng (<code>TTHHDTrung</code>, dòng có TinhChat = 5)</label>
       </div>
       <div class="specialgoods-fields" style="display:${fieldChecked(data,'LHHDTrung')?'block':'none'};padding-left:29px;margin-top:4px">
-        <div class="field-note" style="margin:0 0 6px">Tự thêm cột <code>LHHDTrung</code> (mã 1=xe ô tô/mô tô, 2=vận chuyển, 3=vận chuyển nền tảng số/TMĐT). Chọn thêm trường cần nhập trên dòng hàng:</div>
         ${SPECIAL_GOODS_FIELDS.map(f=>`
         <div class="checkbox-row">
           <input type="checkbox" class="vf-field" data-field="${f.key}" id="${id}-${f.key}" onchange="formToJson()" ${fieldChecked(data,f.key)?'checked':''}>
           <label for="${id}-${f.key}">${f.label} (<code>${f.key}</code>)</label>
         </div>`).join('')}
       </div>
-    </div>
+    </details>
   </div>`);
   document.getElementById('conns').appendChild(node);
   const pos = document.getElementById('conns').children.length - 1;
