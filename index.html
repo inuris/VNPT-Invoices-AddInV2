@@ -29,7 +29,7 @@
     </div>
     <div class="pill-badge ok reveal" id="verPill" style="margin:0 0 22px"><span id="verText">Đang tải phiên bản…</span></div>
 
-    <a class="btn primary reveal" href="VNPT.Invoices.AddInV2-Setup.exe">
+    <a class="btn primary reveal" id="setupLink" href="VNPT.Invoices.AddInV2-Setup.exe" download="VNPT.Invoices.AddInV2-Setup.exe">
       <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Tải bộ cài
     </a>
@@ -52,7 +52,10 @@
 <script>
   fetch('update.json?t=' + Date.now())
     .then(function(r){ return r.json(); })
-    .then(function(d){ document.getElementById('verText').textContent = 'Phiên bản ' + d.latestVersion; })
+    .then(function(d){
+      document.getElementById('verText').textContent = 'Phiên bản ' + d.latestVersion;
+      document.getElementById('setupLink').download = 'VNPT.Invoices.AddInV2-v' + d.latestVersion + '-Setup.exe';
+    })
     .catch(function(){ document.getElementById('verPill').style.display = 'none'; });
 
   var io = new IntersectionObserver(function(entries){
