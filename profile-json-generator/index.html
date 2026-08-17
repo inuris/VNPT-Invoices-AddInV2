@@ -116,7 +116,7 @@
           <b>Loại chứng từ</b>: <code>CTT</code> / <code>GTGT</code> / <code>PXK</code>.<br>
           <b>Domain</b>: không cần nhập <code>http(s)</code>.<br>
           <b>Cột mở rộng</b> (tùy chọn): map cột Excel → thẻ <code>Extra1</code>…<code>Extra11</code> (cấp hóa đơn) hoặc <code>SP_Extra1</code>/<code>SP_Extra2</code> (cấp dòng). Kiểu: <code>string</code>/<code>numeric</code>/<code>datetime</code>.<br>
-          <b>Cột hóa đơn đặc thù</b> (tùy chọn): <code>HDDThu</code>, <code>TCHDon</code>, <code>TTHHDTrung</code> — add-in tự lấy header/ghi chú theo <code>field</code>.
+          <b>Cột hóa đơn đặc thù</b> (tùy chọn): thuê tài chính (đổi Sample thuế suất), chiết khấu thương mại (thêm SBKe/NBKe), hàng hóa đặc trưng (<code>HDDThu</code> + cột dòng theo loại) — add-in tự lấy header/ghi chú theo <code>field</code>.
         </div>
       </details>
     </div>
@@ -131,24 +131,29 @@ const DTYPES = ["string","numeric","datetime"];
 
 // Cột chuẩn VNPT ngoài Extra — khớp OptionalFieldCatalog bên add-in (Data/Template/OptionalFieldCatalog.cs).
 // Xuất ra {type:'GTGT', field:'<key>'} thay vì header/extraSlot; add-in tự lấy header/note/tag XML theo key.
-const VNPT_SIMPLE_FIELDS = [
-  {key:'HDDThu', label:'Hóa đơn đặc thù'},
-  {key:'TCHDon', label:'Tính chất hóa đơn = chiết khấu thương mại'}
+
+// Checkbox độc lập, mỗi cái bật ra 1 hoặc nhiều field cùng lúc.
+const VNPT_CHECKBOXES = [
+  {id:'leasing', keys:['VATRate_Leasing'], label:'Hóa đơn cho thuê tài chính'},
+  {id:'discount', keys:['SBKe','NBKe'], label:'Hóa đơn chiết khấu thương mại'}
 ];
-// TTHHDTrung: cấp DÒNG (cùng cấp SP_Extra), bắt buộc khi TinhChat = 5. LHHDTrung tự thêm khi bật.
-const SPECIAL_GOODS_FIELDS = [
-  {key:'SKhung', label:'Số khung'},
-  {key:'SMay', label:'Số máy'},
-  {key:'BKSPTVChuyen', label:'Biển kiểm soát phương tiện vận chuyển'},
-  {key:'TNGHang', label:'Tên người gửi hàng'},
-  {key:'DCNGHang', label:'Địa chỉ người gửi hàng'},
-  {key:'MSTNGHang', label:'MST người gửi hàng'},
-  {key:'MDDNGHang', label:'Số định danh người gửi hàng'}
+
+// Hàng hóa đặc trưng: chọn 1 trong 3 loại (radio) — mỗi loại gắn cột HoaDonDacThu (Sample khác nhau)
+// cấp hóa đơn + các cột cấp dòng tương ứng (cùng cấp SP_Extra, bắt buộc khi TinhChat = 5).
+const SPECIAL_GOODS_TYPES = [
+  {id:'car', hddthuKey:'HDDThu_Car', label:'Hàng hóa là xe ô tô, xe mô tô', extraKeys:['SKhung','SMay']},
+  {id:'transport', hddthuKey:'HDDThu_Transport', label:'Dịch vụ vận chuyển', extraKeys:['BKSPTVChuyen']},
+  {id:'ecommerce', hddthuKey:'HDDThu_Ecommerce', label:'Dịch vụ vận chuyển trên nền tảng số, TMĐT', extraKeys:['TNGHang','DCNGHang','MSTNGHang','MDDNGHang']}
 ];
+
 const KNOWN_FIELD_KEYS = new Set([
-  ...VNPT_SIMPLE_FIELDS.map(f=>f.key), 'LHHDTrung', ...SPECIAL_GOODS_FIELDS.map(f=>f.key)
+  ...VNPT_CHECKBOXES.reduce((a,f)=>a.concat(f.keys),[]),
+  ...SPECIAL_GOODS_TYPES.reduce((a,t)=>a.concat([t.hddthuKey], t.extraKeys),[])
 ]);
 function fieldChecked(data, key){ return !!(data.customColumns||[]).some(c=>c && c.field===key); }
+function anyFieldChecked(data, keys){ return keys.some(k=>fieldChecked(data,k)); }
+function selectedGoodsType(data){ return SPECIAL_GOODS_TYPES.find(t=>fieldChecked(data,t.hddthuKey)); }
+function specialSectionOpen(data){ return VNPT_CHECKBOXES.some(f=>anyFieldChecked(data,f.keys)) || !!selectedGoodsType(data); }
 let seq = 0;
 let syncing = false; // chặn vòng lặp form <-> json
 
@@ -211,22 +216,22 @@ function addConn(data){
       <div class="exts"></div>
     </div>
 
-    <details class="sec" ${(fieldChecked(data,'HDDThu')||fieldChecked(data,'TCHDon')||fieldChecked(data,'LHHDTrung'))?'open':''}>
+    <details class="sec" ${specialSectionOpen(data)?'open':''}>
       <summary class="st" style="cursor:pointer"><h4>Cột hóa đơn đặc thù</h4><svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
-      ${VNPT_SIMPLE_FIELDS.map(f=>`
+      ${VNPT_CHECKBOXES.map(f=>`
       <div class="checkbox-row">
-        <input type="checkbox" class="vf-simple" data-field="${f.key}" id="${id}-${f.key}" onchange="formToJson()" ${fieldChecked(data,f.key)?'checked':''}>
-        <label for="${id}-${f.key}">${f.label} (<code>${f.key}</code>)</label>
+        <input type="checkbox" class="vf-multi" data-id="${f.id}" id="${id}-${f.id}" onchange="formToJson()" ${anyFieldChecked(data,f.keys)?'checked':''}>
+        <label for="${id}-${f.id}">${f.label}</label>
       </div>`).join('')}
       <div class="checkbox-row">
-        <input type="checkbox" class="vf-special-toggle" id="${id}-special" onchange="toggleSpecialGoods('${id}')" ${fieldChecked(data,'LHHDTrung')?'checked':''}>
-        <label for="${id}-special">Hàng hóa đặc trưng (<code>TTHHDTrung</code>, dòng có TinhChat = 5)</label>
+        <input type="checkbox" class="vf-special-toggle" id="${id}-special" onchange="toggleSpecialGoods('${id}')" ${selectedGoodsType(data)?'checked':''}>
+        <label for="${id}-special">Hàng hóa đặc trưng</label>
       </div>
-      <div class="specialgoods-fields" style="display:${fieldChecked(data,'LHHDTrung')?'block':'none'};padding-left:29px;margin-top:4px">
-        ${SPECIAL_GOODS_FIELDS.map(f=>`
+      <div class="specialgoods-fields" style="display:${selectedGoodsType(data)?'block':'none'};padding-left:29px;margin-top:4px">
+        ${SPECIAL_GOODS_TYPES.map(t=>`
         <div class="checkbox-row">
-          <input type="checkbox" class="vf-field" data-field="${f.key}" id="${id}-${f.key}" onchange="formToJson()" ${fieldChecked(data,f.key)?'checked':''}>
-          <label for="${id}-${f.key}">${f.label} (<code>${f.key}</code>)</label>
+          <input type="radio" name="${id}-goods-type" class="vf-goods-type" value="${t.id}" id="${id}-${t.id}" onchange="formToJson()" ${(selectedGoodsType(data)||{}).id===t.id?'checked':''}>
+          <label for="${id}-${t.id}">${t.label}</label>
         </div>`).join('')}
       </div>
     </details>
@@ -322,16 +327,18 @@ function collect(){
         note: val(r,'.e-note')
       });
     }
-    for(const f of VNPT_SIMPLE_FIELDS){
-      const cb = c.querySelector('.vf-simple[data-field="'+f.key+'"]');
-      if(cb && cb.checked) conn.customColumns.push({type:'GTGT', field:f.key});
+    for(const f of VNPT_CHECKBOXES){
+      const cb = c.querySelector('.vf-multi[data-id="'+f.id+'"]');
+      if(cb && cb.checked)
+        for(const key of f.keys) conn.customColumns.push({type:'GTGT', field:key});
     }
     const specialOn = c.querySelector('.vf-special-toggle');
     if(specialOn && specialOn.checked){
-      conn.customColumns.push({type:'GTGT', field:'LHHDTrung'});
-      for(const f of SPECIAL_GOODS_FIELDS){
-        const cb = c.querySelector('.vf-field[data-field="'+f.key+'"]');
-        if(cb && cb.checked) conn.customColumns.push({type:'GTGT', field:f.key});
+      const picked = c.querySelector('.vf-goods-type:checked');
+      const type = picked && SPECIAL_GOODS_TYPES.find(t=>t.id===picked.value);
+      if(type){
+        conn.customColumns.push({type:'GTGT', field:type.hddthuKey});
+        for(const key of type.extraKeys) conn.customColumns.push({type:'GTGT', field:key});
       }
     }
     if(conn.customColumns.length===0) delete conn.customColumns;
