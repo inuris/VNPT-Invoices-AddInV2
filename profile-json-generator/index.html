@@ -185,6 +185,8 @@ function addConn(data){
     </div>
   </div>`);
   document.getElementById('conns').appendChild(node);
+  const pos = document.getElementById('conns').children.length - 1;
+  node.style.transitionDelay = Math.min(pos, 6) * 60 + 'ms'; // cap so long lists don't lag a single add
   revealIO.observe(node);
 
   const pats = (data.patterns && data.patterns.length) ? data.patterns : [{}];
