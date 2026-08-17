@@ -44,7 +44,9 @@
   .row{display:grid;gap:8px;align-items:end;margin:0 0 8px}
   .row.pat{grid-template-columns:1fr 1fr 130px 36px}
   .row.ext{grid-template-columns:110px 1.3fr 130px 120px 1fr 36px}
-  @media(max-width:720px){.row.pat,.row.ext{grid-template-columns:1fr}}
+  @media(max-width:720px){.row.ext{grid-template-columns:1fr}}
+  @media(max-width:480px){.row.pat{grid-template-columns:1fr 1fr 88px 30px;gap:6px}}
+  .pats .row.pat:not(:first-child) label{display:none}
   .row .del{padding:0}
 
   .field-note{color:var(--muted);font-size:11.5px;margin-top:2px;line-height:1.6}
