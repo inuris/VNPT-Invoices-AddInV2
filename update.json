@@ -1,6 +1,6 @@
 {
-  "latestVersion": "1.5",
+  "latestVersion": "1.6",
   "downloadUrl": "https://inuris.github.io/VNPT-Invoices-AddInV2/",
-  "notes": "",
+  "notes": "Thêm cột hóa đơn đặc thù (HDDThu, TCHDon, TTHHDTrung) và cột định danh người mua trong mẫu GTGT (tùy chọn theo profile); kiểm tra chặt hơn dữ liệu cột số; sửa lỗi mất cấu hình cột mở rộng khi lưu Cài đặt kết nối; chỉnh giao diện.",
   "mandatory": false
 }
