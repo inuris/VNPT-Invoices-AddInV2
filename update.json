@@ -1,6 +1,6 @@
 {
-  "latestVersion": "1.8",
+  "latestVersion": "1.9",
   "downloadUrl": "https://inuris.github.io/VNPT-Invoices-AddInV2/",
-  "notes": "Sửa nút \"Tạo & phát hành\" bị mất dấu &; gọn lại hộp thoại Đăng ký sử dụng; icon add-in hiện đúng trong Add/Remove Programs; bộ cài không còn cõng theo các bản cũ.",
+  "notes": "Sửa lỗi có thể khiến Excel thỉnh thoảng không nạp được add-in sau khi mở lại (giới hạn thời gian chờ mạng khi kiểm tra bản mới, chạy trễ hơn để không tranh chấp với lúc ribbon đang nạp).",
   "mandatory": false
 }
