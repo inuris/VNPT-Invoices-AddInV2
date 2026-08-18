@@ -62,8 +62,23 @@
       <textarea id="msts" rows="3" placeholder="0315890356&#10;0301234567" spellcheck="false"></textarea>
 
       <div class="checkbox-row">
-        <input type="checkbox" id="expToggle" onchange="toggleExp()">
-        <label for="expToggle">Set expiration date</label>
+        <div style="display:flex;align-items:center;gap:9px;margin-right:14px">
+          <input type="checkbox" id="durationToggle" onchange="toggleDuration()">
+          <label for="durationToggle">Set duration</label>
+        </div>
+        <div style="display:flex;align-items:center;gap:9px">
+          <input type="checkbox" id="expToggle" onchange="toggleExp()">
+          <label for="expToggle">Set expiration date</label>
+        </div>
+      </div>
+      <div id="durationBox" class="exp-box">
+        <select id="duration">
+          <option value="1">1 month</option>
+          <option value="3">3 months</option>
+          <option value="6">6 months</option>
+          <option value="12">1 year</option>
+          <option value="24">2 years</option>
+        </select>
       </div>
       <div id="expBox" class="exp-box">
         <input id="exp" type="date">
@@ -126,9 +141,32 @@ document.querySelectorAll('.tab').forEach(btn => {
   });
 });
 
-// ---- expiration toggle ----
+// ---- expiration toggle (mutually exclusive: exact date vs relative duration) ----
+function toggleDuration(){
+  const on = document.getElementById('durationToggle').checked;
+  if (on) {
+    document.getElementById('expToggle').checked = false;
+    document.getElementById('expBox').classList.remove('show');
+  }
+  document.getElementById('durationBox').classList.toggle('show', on);
+}
 function toggleExp(){
-  document.getElementById('expBox').classList.toggle('show', document.getElementById('expToggle').checked);
+  const on = document.getElementById('expToggle').checked;
+  if (on) {
+    document.getElementById('durationToggle').checked = false;
+    document.getElementById('durationBox').classList.remove('show');
+  }
+  document.getElementById('expBox').classList.toggle('show', on);
+}
+// Ngày hết hạn = hôm nay + N tháng (N từ <select id="duration">), định dạng yyyy-MM-dd
+// (khớp value của <input type="date">) để genLicense() dùng chung 1 đường payload.exp.
+function addMonths(months){
+  const d = new Date();
+  d.setMonth(d.getMonth() + Number(months));
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return y + '-' + m + '-' + day;
 }
 
 // ---- private key: load/save to localStorage ----
@@ -178,11 +216,14 @@ async function genLicense(){
   document.getElementById('resultCard').style.display = 'none';
   try{
     const key = await loadPriv();
-    const exp = document.getElementById('expToggle').checked
-      ? document.getElementById('exp').value.trim() : '';
+    const expOn = document.getElementById('expToggle').checked;
+    const durationOn = document.getElementById('durationToggle').checked;
+    const exp = expOn ? document.getElementById('exp').value.trim()
+      : durationOn ? addMonths(document.getElementById('duration').value)
+      : '';
     const msts = document.getElementById('msts').value.split(/[\n,;]+/).map(s=>s.trim()).filter(Boolean);
     if (msts.length === 0) throw new Error('Enter at least one tax ID (MST).');
-    if (document.getElementById('expToggle').checked && !exp) throw new Error('Pick an expiration date, or uncheck "Set expiration date" for a permanent license.');
+    if (expOn && !exp) throw new Error('Pick an expiration date, or uncheck "Set expiration date" for a permanent license.');
     const payload = {msts:msts};
     if (exp) payload.exp = exp; // omitted => permanent
     const data = new TextEncoder().encode(JSON.stringify(payload));
