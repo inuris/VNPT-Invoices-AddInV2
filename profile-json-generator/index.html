@@ -52,6 +52,15 @@
 
   .field-note{color:var(--muted);font-size:11.5px;margin-top:2px;line-height:1.6}
 
+  .co-list{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:6px;max-width:420px}
+  .co-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--r-sm);
+    background:var(--card-alt);border:1px solid var(--line);cursor:grab;font-size:13px;user-select:none}
+  .co-item:active{cursor:grabbing}
+  .co-item.dragging{opacity:.4}
+  .co-handle{flex:none;color:var(--muted)}
+  .co-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:4px}
+  .co-row select{max-width:160px}
+
   .out{position:sticky;top:20px}
   .out.card{box-shadow:0 0 0 6px rgba(79,70,229,.12), inset 0 1px 0 rgba(255,255,255,.6), var(--shadow-card)}
   @media(max-width:960px){.out{position:static}}
@@ -117,7 +126,8 @@
           <b>Loại chứng từ</b>: <code>CTT</code> / <code>GTGT</code> / <code>PXK</code>.<br>
           <b>Domain</b>: không cần nhập <code>http(s)</code>.<br>
           <b>Cột mở rộng</b> (tùy chọn): map cột Excel → thẻ <code>Extra1</code>…<code>Extra11</code> (cấp hóa đơn) hoặc <code>SP_Extra1</code>/<code>SP_Extra2</code> (cấp dòng). Kiểu: <code>string</code>/<code>numeric</code>/<code>datetime</code>.<br>
-          <b>Cột hóa đơn đặc thù</b> (tùy chọn): thuê tài chính (đổi Sample thuế suất), chiết khấu thương mại (thêm SBKe/NBKe), hàng hóa đặc trưng (<code>HDDThu</code> + cột dòng theo loại) — add-in tự lấy header/ghi chú theo <code>field</code>.
+          <b>Cột hóa đơn đặc thù</b> (tùy chọn): thuê tài chính (đổi Sample thuế suất), chiết khấu thương mại (thêm SBKe/NBKe), hàng hóa đặc trưng (<code>HDDThu</code> + cột dòng theo loại) — add-in tự lấy header/ghi chú theo <code>field</code>.<br>
+          <b>Thứ tự cột khi Tạo mẫu</b> (tùy chọn): kéo-thả để đổi thứ tự cột trên mẫu Excel sinh ra, theo từng loại chứng từ — không đổi thứ tự đọc dữ liệu (đã map theo tên cột).
         </div>
       </details>
     </div>
@@ -155,6 +165,88 @@ function fieldChecked(data, key){ return !!(data.customColumns||[]).some(c=>c &&
 function anyFieldChecked(data, keys){ return keys.some(k=>fieldChecked(data,k)); }
 function selectedGoodsType(data){ return SPECIAL_GOODS_TYPES.find(t=>fieldChecked(data,t.hddthuKey)); }
 function specialSectionOpen(data){ return VNPT_CHECKBOXES.some(f=>anyFieldChecked(data,f.keys)) || !!selectedGoodsType(data); }
+
+// Thứ tự cột MẶC ĐỊNH khi "Tạo mẫu" (khớp vnpt-config.json → documentTypes[].excel[].header,
+// đúng thứ tự). Khách kéo-thả để đổi thứ tự riêng; chỉ xuất ra columnOrder khi khác mặc định.
+const DEFAULT_COLUMNS = {
+  GTGT: ["STT","NgayHoaDon","HinhThucThanhToan","LoaiTienTe","TyGia","MaKhachHang","TenDonVi","HoTenNguoiMuaHang","MaSoThue","DiaChi","SoDienThoai","Email","MaDVQHNSach","SoHoChieu","CCCD","MaHang","TenSanPham","DVT","SoLuong","DonGia","TyLeChietKhau","SoTienChietKhau","GTKCThue","ThanhTien","ThueSuat_Dong","TienThueGTGT_Dong","Cong_Dong","TinhChat","TgTCThue","TgTThue","TTCKTMai","TgTTTBSo","TgTTTBChu"],
+  PXK: ["STT","NgayLap","LenhDieuDong","PhuongTienVanChuyen","NguoiXuatHang","NguoiVanChuyen","DonViNhan","MaSoThue","DiaChiNhan","NguoiNhanHang","MaHang","TenHang","DonViTinh","SoLuong","DonGia","ThanhTien","TongTien"],
+  CTT: ["STT","NLap","MaKhachHang","DDanh","Ten","MST","DChi","SDThoai","QTich","CNCTru","Email","CMND","KTNhap","BHiem","TThang","DThang","Nam","TThien","SThue","TTNTThue","TTNCThue","GChu"]
+};
+// State kéo-thả hiện tại theo từng kết nối: columnOrderState[connId][docType] = [header,...].
+const columnOrderState = {};
+function initColumnOrderState(id, data){
+  const state = {};
+  for(const t of Object.keys(DEFAULT_COLUMNS)) state[t] = DEFAULT_COLUMNS[t].slice();
+  const saved = data.columnOrder || [];
+  for(const entry of saved){
+    if(!entry || !entry.type || !Array.isArray(entry.headers) || entry.headers.length===0) continue;
+    if(!DEFAULT_COLUMNS[entry.type]) continue;
+    // Header đã lưu trước, header mặc định nào chưa có trong đó thì nối vào sau (đề phòng
+    // danh sách cột mặc định đổi/thêm sau khi khách đã lưu 1 order cũ).
+    const known = new Set(entry.headers);
+    const merged = entry.headers.slice();
+    for(const h of DEFAULT_COLUMNS[entry.type]) if(!known.has(h)) merged.push(h);
+    state[entry.type] = merged;
+  }
+  columnOrderState[id] = state;
+}
+function renderColumnOrderList(id){
+  const conn = document.getElementById(id);
+  const type = conn.querySelector('.co-type').value;
+  const list = conn.querySelector('.co-list');
+  const headers = (columnOrderState[id] && columnOrderState[id][type]) || DEFAULT_COLUMNS[type] || [];
+  list.innerHTML = headers.map(h => `
+    <li class="co-item" draggable="true" data-header="${esc(h)}">
+      <svg class="co-handle" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="18" x2="16" y2="18"/></svg>
+      <span>${esc(h)}</span>
+    </li>`).join('');
+}
+function columnOrderResetDefault(id){
+  const conn = document.getElementById(id);
+  const type = conn.querySelector('.co-type').value;
+  columnOrderState[id][type] = DEFAULT_COLUMNS[type].slice();
+  renderColumnOrderList(id);
+  formToJson();
+}
+function getDragAfterElement(list, y){
+  const items = [...list.querySelectorAll('.co-item:not(.dragging)')];
+  return items.reduce((closest, child) => {
+    const box = child.getBoundingClientRect();
+    const offset = y - box.top - box.height / 2;
+    if (offset < 0 && offset > closest.offset) return { offset, element: child };
+    return closest;
+  }, { offset: -Infinity, element: null }).element;
+}
+function syncColumnOrderFromDom(list){
+  const conn = list.closest('.conn');
+  const type = conn.querySelector('.co-type').value;
+  const headers = [...list.querySelectorAll('.co-item')].map(li => li.dataset.header);
+  columnOrderState[conn.id][type] = headers;
+}
+function wireColumnOrderDrag(list){
+  let draggingEl = null;
+  list.addEventListener('dragstart', e => {
+    const li = e.target.closest('.co-item');
+    if (!li) return;
+    draggingEl = li;
+    e.dataTransfer.effectAllowed = 'move';
+    li.classList.add('dragging');
+  });
+  list.addEventListener('dragend', () => {
+    if (draggingEl) draggingEl.classList.remove('dragging');
+    draggingEl = null;
+    syncColumnOrderFromDom(list);
+    formToJson();
+  });
+  list.addEventListener('dragover', e => {
+    if (!draggingEl) return;
+    e.preventDefault();
+    const after = getDragAfterElement(list, e.clientY);
+    if (after == null) list.appendChild(draggingEl);
+    else list.insertBefore(draggingEl, after);
+  });
+}
 let seq = 0;
 let syncing = false; // chặn vòng lặp form <-> json
 
@@ -236,6 +328,16 @@ function addConn(data){
         </div>`).join('')}
       </div>
     </details>
+
+    <details class="sec">
+      <summary class="st" style="cursor:pointer"><h4>Thứ tự cột khi Tạo mẫu</h4><svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+      <div class="field-note">Kéo-thả để đổi thứ tự cột trên mẫu Excel sinh ra. Không đổi thì add-in dùng thứ tự mặc định.</div>
+      <div class="co-row">
+        <select class="co-type" onchange="renderColumnOrderList('${id}')">${opts(Object.keys(DEFAULT_COLUMNS), 'GTGT')}</select>
+        <button class="mini" type="button" onclick="columnOrderResetDefault('${id}')">Khôi phục mặc định</button>
+      </div>
+      <ul class="co-list"></ul>
+    </details>
   </div>`);
   document.getElementById('conns').appendChild(node);
   const pos = document.getElementById('conns').children.length - 1;
@@ -247,6 +349,9 @@ function addConn(data){
   (data.customColumns||[])
     .filter(c=>!(c && c.field && KNOWN_FIELD_KEYS.has(c.field))) // các field chuẩn VNPT hiện qua checkbox, không lặp lại ở đây
     .forEach(c=>addExt(id,c));
+  initColumnOrderState(id, data);
+  renderColumnOrderList(id);
+  wireColumnOrderDrag(node.querySelector('.co-list'));
   renumber();
 }
 
@@ -343,6 +448,16 @@ function collect(){
       }
     }
     if(conn.customColumns.length===0) delete conn.customColumns;
+
+    const order = [];
+    const state = columnOrderState[c.id] || {};
+    for(const t of Object.keys(DEFAULT_COLUMNS)){
+      const cur = state[t];
+      if(cur && JSON.stringify(cur) !== JSON.stringify(DEFAULT_COLUMNS[t]))
+        order.push({type:t, headers:cur});
+    }
+    if(order.length) conn.columnOrder = order;
+
     out.push(conn);
   }
   return out;
