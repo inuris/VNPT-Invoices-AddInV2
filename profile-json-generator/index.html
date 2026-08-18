@@ -52,11 +52,13 @@
 
   .field-note{color:var(--muted);font-size:11.5px;margin-top:2px;line-height:1.6}
 
-  .co-list{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:6px;max-width:420px}
-  .co-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--r-sm);
-    background:var(--card-alt);border:1px solid var(--line);cursor:grab;font-size:13px;user-select:none}
+  .co-list{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:6px;max-width:460px}
+  .co-item{display:flex;align-items:center;gap:8px;cursor:grab;font-size:13px;user-select:none}
   .co-item:active{cursor:grabbing}
   .co-item.dragging{opacity:.4}
+  .co-letter{flex:none;width:18px;text-align:center;color:var(--muted);font-weight:700;font-size:11.5px}
+  .co-pill{flex:1;display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--r-sm);
+    background:var(--card-alt);border:1px solid var(--line);min-width:0}
   .co-handle{flex:none;color:var(--muted)}
   .co-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:4px}
   .co-row select{max-width:160px}
@@ -191,15 +193,34 @@ function initColumnOrderState(id, data){
   }
   columnOrderState[id] = state;
 }
+// Chữ cột kiểu Excel (0-based): 0->A, 25->Z, 26->AA...
+function colLetter(i){
+  let s = '', n = i + 1;
+  while (n > 0) {
+    const rem = (n - 1) % 26;
+    s = String.fromCharCode(65 + rem) + s;
+    n = Math.floor((n - 1) / 26);
+  }
+  return s;
+}
+function refreshColumnLetters(list){
+  [...list.querySelectorAll('.co-item')].forEach((li, i) => {
+    const el = li.querySelector('.co-letter');
+    if (el) el.textContent = colLetter(i);
+  });
+}
 function renderColumnOrderList(id){
   const conn = document.getElementById(id);
   const type = conn.querySelector('.co-type').value;
   const list = conn.querySelector('.co-list');
   const headers = (columnOrderState[id] && columnOrderState[id][type]) || DEFAULT_COLUMNS[type] || [];
-  list.innerHTML = headers.map(h => `
+  list.innerHTML = headers.map((h, i) => `
     <li class="co-item" draggable="true" data-header="${esc(h)}">
-      <svg class="co-handle" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="18" x2="16" y2="18"/></svg>
-      <span>${esc(h)}</span>
+      <span class="co-letter">${colLetter(i)}</span>
+      <span class="co-pill">
+        <svg class="co-handle" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="18" x2="16" y2="18"/></svg>
+        <span>${esc(h)}</span>
+      </span>
     </li>`).join('');
 }
 function columnOrderResetDefault(id){
@@ -236,6 +257,7 @@ function wireColumnOrderDrag(list){
   list.addEventListener('dragend', () => {
     if (draggingEl) draggingEl.classList.remove('dragging');
     draggingEl = null;
+    refreshColumnLetters(list);
     syncColumnOrderFromDom(list);
     formToJson();
   });
@@ -245,6 +267,7 @@ function wireColumnOrderDrag(list){
     const after = getDragAfterElement(list, e.clientY);
     if (after == null) list.appendChild(draggingEl);
     else list.insertBefore(draggingEl, after);
+    refreshColumnLetters(list); // chữ cột luôn khớp vị trí hiện tại, kể cả đang kéo
   });
 }
 let seq = 0;
