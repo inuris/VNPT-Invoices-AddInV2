@@ -268,20 +268,29 @@ function flipReorder(list, mutate){
   }
 }
 function wireColumnOrderDrag(list){
-  let draggingEl = null, startY = 0, pointerId = null;
+  let draggingEl = null, dragOffsetY = 0, pointerId = null;
+  const setTransform = () => { draggingEl.style.transform = `translateY(${dragOffsetY}px) scale(1.03) rotate(-1deg)`; };
 
   function onMove(e){
     if (!draggingEl) return;
-    const dy = e.clientY - startY;
-    draggingEl.style.transform = `translateY(${dy}px) scale(1.03) rotate(-1deg)`;
+    // Cộng dồn theo delta từng bước (không phải so với điểm bắt đầu) — vì vị trí "gốc"
+    // (chưa transform) của hàng đang kéo thay đổi mỗi lần nó đổi chỗ trong DOM bên dưới.
+    dragOffsetY += e.movementY;
+    setTransform();
     const after = getDragAfterElement(list, e.clientY, draggingEl);
     const nextSibling = draggingEl.nextElementSibling;
     const wouldMove = after ? (after !== nextSibling) : (nextSibling !== null);
     if (wouldMove){
+      const beforeTop = draggingEl.getBoundingClientRect().top; // vị trí hiển thị hiện tại (đã gồm transform)
       flipReorder(list, () => {
         if (after == null) list.appendChild(draggingEl);
         else list.insertBefore(draggingEl, after);
       });
+      // DOM vừa đổi chỗ -> vị trí "gốc" của hàng đang kéo dịch theo, nhưng transform thì chưa đổi.
+      // Bù lại phần dịch đó để hàng vẫn đứng yên tại chỗ (không giật), rồi mới tiếp tục bám chuột.
+      const afterTop = draggingEl.getBoundingClientRect().top;
+      dragOffsetY += (beforeTop - afterTop);
+      setTransform();
       refreshColumnLetters(list);
     }
   }
@@ -303,7 +312,7 @@ function wireColumnOrderDrag(list){
     if (!li || e.button !== 0) return;
     draggingEl = li;
     pointerId = e.pointerId;
-    startY = e.clientY;
+    dragOffsetY = 0;
     li.setPointerCapture(pointerId);
     li.style.transition = 'none'; // kéo bám chuột 1:1, không trễ do transition
     li.classList.add('dragging');
