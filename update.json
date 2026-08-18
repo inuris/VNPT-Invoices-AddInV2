@@ -1,6 +1,6 @@
 {
-  "latestVersion": "1.7",
+  "latestVersion": "1.8",
   "downloadUrl": "https://inuris.github.io/VNPT-Invoices-AddInV2/",
-  "notes": "Thêm hỗ trợ hóa đơn cho thuê tài chính, hóa đơn chiết khấu thương mại (SBKe/NBKe) và hàng hóa đặc trưng (xe ô tô/xe máy, dịch vụ vận chuyển, TMĐT) — cấu hình qua Profile Generator, không cần sửa tay JSON.",
+  "notes": "Sửa nút \"Tạo & phát hành\" bị mất dấu &; gọn lại hộp thoại Đăng ký sử dụng; icon add-in hiện đúng trong Add/Remove Programs; bộ cài không còn cõng theo các bản cũ.",
   "mandatory": false
 }
