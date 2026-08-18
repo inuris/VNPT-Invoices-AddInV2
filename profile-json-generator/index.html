@@ -36,6 +36,7 @@
   .sec > .st{display:flex;align-items:center;gap:8px;margin:0 0 10px;flex-wrap:wrap}
   .sec > .st h4{margin:0;font-size:11px;font-weight:700;color:var(--muted);
     text-transform:uppercase;letter-spacing:.1em}
+  .sec > .st h4.hl{color:var(--accent)}
   .sec > .st .hint{color:var(--muted);font-size:11.5px}
   summary.st{list-style:none}
   summary.st::-webkit-details-marker{display:none}
@@ -373,7 +374,7 @@ function addConn(data){
     </div>
 
     <div class="sec">
-      <div class="st"><h4>Tài khoản CAdmin</h4></div>
+      <div class="st"><h4 class="hl">Tài khoản CAdmin</h4></div>
       <div class="grid two">
         <div><label>CAdmin User<span class="req">*</span></label><input class="f-uca" placeholder="tài khoản CAdmin" value="${esc(gp(data,'account','userCAdmin'))}"></div>
         <div><label>CAdmin Password<span class="req">*</span></label><input class="f-pca" placeholder="mật khẩu CAdmin" value="${esc(gp(data,'account','passwordCAdmin'))}"></div>
@@ -381,7 +382,7 @@ function addConn(data){
     </div>
 
     <div class="sec">
-      <div class="st"><h4>Tài khoản WebService</h4></div>
+      <div class="st"><h4 class="hl">Tài khoản WebService</h4></div>
       <div class="grid two">
         <div><label>WebService User<span class="req">*</span></label><input class="f-uws" placeholder="tài khoản Service" value="${esc(gp(data,'account','userWebService'))}"></div>
         <div><label>WebService Password<span class="req">*</span></label><input class="f-pws" placeholder="mật khẩu Service" value="${esc(gp(data,'account','passwordWebService'))}"></div>
@@ -389,7 +390,7 @@ function addConn(data){
     </div>
 
     <div class="sec">
-      <div class="st"><h4>Mẫu / Ký hiệu</h4>
+      <div class="st"><h4 class="hl">Mẫu / Ký hiệu</h4>
         <button class="mini" onclick="addPat('${id}');formToJson()"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Thêm mẫu</button></div>
       <div class="pats"></div>
     </div>
