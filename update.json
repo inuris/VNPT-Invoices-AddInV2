@@ -1,6 +1,6 @@
 {
-  "latestVersion": "1.9",
+  "latestVersion": "2.0",
   "downloadUrl": "https://inuris.github.io/VNPT-Invoices-AddInV2/",
-  "notes": "Sửa lỗi có thể khiến Excel thỉnh thoảng không nạp được add-in sau khi mở lại (giới hạn thời gian chờ mạng khi kiểm tra bản mới, chạy trễ hơn để không tranh chấp với lúc ribbon đang nạp).",
+  "notes": "Đổi thông báo kích hoạt license; nút license trên ribbon báo trước khi license sắp hết hạn (còn dưới 30 ngày).",
   "mandatory": false
 }
