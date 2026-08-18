@@ -53,12 +53,15 @@
   .field-note{color:var(--muted);font-size:11.5px;margin-top:2px;line-height:1.6}
 
   .co-list{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:6px;max-width:460px}
-  .co-item{display:flex;align-items:center;gap:8px;cursor:grab;font-size:13px;user-select:none}
+  .co-item{display:flex;align-items:center;gap:8px;cursor:grab;font-size:13px;user-select:none;
+    touch-action:none;transition:transform 200ms var(--ease);will-change:transform}
   .co-item:active{cursor:grabbing}
-  .co-item.dragging{opacity:.4}
+  .co-item:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:var(--r-sm)}
+  .co-item.dragging{position:relative;z-index:5;transition:box-shadow 200ms var(--ease)}
+  .co-item.dragging .co-pill{background:#fff;box-shadow:0 16px 28px -10px rgba(16,16,24,.28)}
   .co-letter{flex:none;width:18px;text-align:center;color:#ddd;font-weight:700;font-size:11.5px}
   .co-pill{flex:1;display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--r-sm);
-    background:var(--card-alt);border:1px solid var(--line);min-width:0}
+    background:var(--card-alt);border:1px solid var(--line);min-width:0;transition:background 200ms var(--ease),box-shadow 200ms var(--ease)}
   .co-handle{flex:none;color:var(--muted)}
   .co-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:4px}
   .co-row select{max-width:160px}
@@ -215,7 +218,7 @@ function renderColumnOrderList(id){
   const list = conn.querySelector('.co-list');
   const headers = (columnOrderState[id] && columnOrderState[id][type]) || DEFAULT_COLUMNS[type] || [];
   list.innerHTML = headers.map((h, i) => `
-    <li class="co-item" draggable="true" data-header="${esc(h)}">
+    <li class="co-item" tabindex="0" data-header="${esc(h)}" aria-label="${esc(h)}, kéo hoặc dùng phím mũi tên lên/xuống để đổi vị trí">
       <span class="co-letter">${colLetter(i)}</span>
       <span class="co-pill">
         <svg class="co-handle" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="18" x2="16" y2="18"/></svg>
@@ -230,8 +233,8 @@ function columnOrderResetDefault(id){
   renderColumnOrderList(id);
   formToJson();
 }
-function getDragAfterElement(list, y){
-  const items = [...list.querySelectorAll('.co-item:not(.dragging)')];
+function getDragAfterElement(list, y, dragEl){
+  const items = [...list.querySelectorAll('.co-item')].filter(el => el !== dragEl);
   return items.reduce((closest, child) => {
     const box = child.getBoundingClientRect();
     const offset = y - box.top - box.height / 2;
@@ -245,29 +248,85 @@ function syncColumnOrderFromDom(list){
   const headers = [...list.querySelectorAll('.co-item')].map(li => li.dataset.header);
   columnOrderState[conn.id][type] = headers;
 }
+// FLIP: ghi vị trí "First", để DOM tự sắp lại ("Last"), rồi tween ngược từ First -> Last
+// bằng transform (GPU-only, không đụng layout) — mượt hơn hẳn so với việc các hàng "nhảy" tức thì.
+function flipReorder(list, mutate){
+  const before = new Map([...list.children].map(el => [el, el.getBoundingClientRect()]));
+  mutate();
+  for (const el of list.children){
+    const from = before.get(el);
+    if (!from) continue;
+    const to = el.getBoundingClientRect();
+    const dy = from.top - to.top;
+    if (!dy || el.classList.contains('dragging')) continue; // phần tử đang kéo tự có transform riêng
+    el.style.transition = 'none';
+    el.style.transform = `translateY(${dy}px)`;
+    requestAnimationFrame(() => {
+      el.style.transition = '';
+      el.style.transform = '';
+    });
+  }
+}
 function wireColumnOrderDrag(list){
-  let draggingEl = null;
-  list.addEventListener('dragstart', e => {
-    const li = e.target.closest('.co-item');
-    if (!li) return;
-    draggingEl = li;
-    e.dataTransfer.effectAllowed = 'move';
-    li.classList.add('dragging');
-  });
-  list.addEventListener('dragend', () => {
-    if (draggingEl) draggingEl.classList.remove('dragging');
+  let draggingEl = null, startY = 0, pointerId = null;
+
+  function onMove(e){
+    if (!draggingEl) return;
+    const dy = e.clientY - startY;
+    draggingEl.style.transform = `translateY(${dy}px) scale(1.03) rotate(-1deg)`;
+    const after = getDragAfterElement(list, e.clientY, draggingEl);
+    const nextSibling = draggingEl.nextElementSibling;
+    const wouldMove = after ? (after !== nextSibling) : (nextSibling !== null);
+    if (wouldMove){
+      flipReorder(list, () => {
+        if (after == null) list.appendChild(draggingEl);
+        else list.insertBefore(draggingEl, after);
+      });
+      refreshColumnLetters(list);
+    }
+  }
+  function onUp(){
+    if (!draggingEl) return;
+    if (pointerId != null) draggingEl.releasePointerCapture(pointerId);
+    draggingEl.classList.remove('dragging');
+    draggingEl.style.transition = '';
+    draggingEl.style.transform = '';
     draggingEl = null;
     refreshColumnLetters(list);
     syncColumnOrderFromDom(list);
     formToJson();
+    window.removeEventListener('pointermove', onMove);
+    window.removeEventListener('pointerup', onUp);
+  }
+  list.addEventListener('pointerdown', e => {
+    const li = e.target.closest('.co-item');
+    if (!li || e.button !== 0) return;
+    draggingEl = li;
+    pointerId = e.pointerId;
+    startY = e.clientY;
+    li.setPointerCapture(pointerId);
+    li.style.transition = 'none'; // kéo bám chuột 1:1, không trễ do transition
+    li.classList.add('dragging');
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
   });
-  list.addEventListener('dragover', e => {
-    if (!draggingEl) return;
+
+  // Bàn phím: focus 1 hàng, mũi tên lên/xuống để đổi vị trí — cùng hiệu ứng FLIP.
+  list.addEventListener('keydown', e => {
+    if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+    const li = e.target.closest('.co-item');
+    if (!li) return;
+    const sib = e.key === 'ArrowUp' ? li.previousElementSibling : li.nextElementSibling;
+    if (!sib) return;
     e.preventDefault();
-    const after = getDragAfterElement(list, e.clientY);
-    if (after == null) list.appendChild(draggingEl);
-    else list.insertBefore(draggingEl, after);
-    refreshColumnLetters(list); // chữ cột luôn khớp vị trí hiện tại, kể cả đang kéo
+    flipReorder(list, () => {
+      if (e.key === 'ArrowUp') list.insertBefore(li, sib);
+      else list.insertBefore(sib, li);
+    });
+    refreshColumnLetters(list);
+    syncColumnOrderFromDom(list);
+    formToJson();
+    li.focus();
   });
 }
 let seq = 0;
