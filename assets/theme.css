@@ -122,6 +122,7 @@ svg[data-icon]{width:18px;height:18px;flex:none;stroke-width:1.5}
 /* --- Form controls --- */
 label{display:block;font-size:12px;color:var(--muted);margin:0 0 7px;font-weight:600}
 label .req{color:var(--req)}
+label .opt{font-weight:400;font-style:italic}
 label.sub-label{font-weight:600;color:var(--muted);margin-top:18px}
 input, select, textarea{
   width:100%;background:var(--card-alt);border:1px solid transparent;color:var(--text);

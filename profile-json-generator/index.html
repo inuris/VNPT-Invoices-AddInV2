@@ -90,6 +90,7 @@
     </div>
     <div>
       <h1>Tạo JSON cấu hình kết nối</h1>
+      <p class="sub">File json có chứa mật khẩu, nên gửi mail cho khách hàng</p>
     </div>
   </header>
 
@@ -377,7 +378,7 @@ function addConn(data){
       <div class="st"><h4 class="hl">Tài khoản CAdmin</h4></div>
       <div class="grid two">
         <div><label>CAdmin User<span class="req">*</span></label><input class="f-uca" placeholder="tài khoản CAdmin" value="${esc(gp(data,'account','userCAdmin'))}"></div>
-        <div><label>CAdmin Password<span class="req">*</span></label><input class="f-pca" placeholder="mật khẩu CAdmin" value="${esc(gp(data,'account','passwordCAdmin'))}"></div>
+        <div><label>CAdmin Password <span class="opt">(có thể để trống)</span></label><input class="f-pca" placeholder="mật khẩu CAdmin" value="${esc(gp(data,'account','passwordCAdmin'))}"></div>
       </div>
     </div>
 
@@ -385,7 +386,7 @@ function addConn(data){
       <div class="st"><h4 class="hl">Tài khoản WebService</h4></div>
       <div class="grid two">
         <div><label>WebService User<span class="req">*</span></label><input class="f-uws" placeholder="tài khoản Service" value="${esc(gp(data,'account','userWebService'))}"></div>
-        <div><label>WebService Password<span class="req">*</span></label><input class="f-pws" placeholder="mật khẩu Service" value="${esc(gp(data,'account','passwordWebService'))}"></div>
+        <div><label>WebService Password <span class="opt">(có thể để trống)</span></label><input class="f-pws" placeholder="mật khẩu Service" value="${esc(gp(data,'account','passwordWebService'))}"></div>
       </div>
     </div>
 
@@ -563,9 +564,7 @@ function validate(data){
     if(!c.mst) errs.push(w+': thiếu MST.');
     if(!c.domain) errs.push(w+': thiếu Domain.');
     if(!c.account||!c.account.userCAdmin) errs.push(w+': thiếu CAdmin User.');
-    if(!c.account||!c.account.passwordCAdmin) errs.push(w+': thiếu CAdmin Password.');
     if(!c.account||!c.account.userWebService) errs.push(w+': thiếu WebService User.');
-    if(!c.account||!c.account.passwordWebService) errs.push(w+': thiếu WebService Password.');
   });
   return errs;
 }
@@ -654,6 +653,9 @@ function copyJson(){
     .then(()=>{ errs.length ? showValidity(data) : flash(ICON_CHECK+'Đã sao chép JSON.'); })
     .catch(()=>flash('Hãy chọn và Ctrl+C.'));
 }
+function hasAnyPassword(data){
+  return data.some(c => c.account && (c.account.passwordCAdmin || c.account.passwordWebService));
+}
 function downloadJson(){
   formToJson();
   const data=collect();
@@ -663,6 +665,7 @@ function downloadJson(){
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download='vnpt-connections.json'; a.click(); URL.revokeObjectURL(a.href);
   errs.length ? showValidity(data) : flash(ICON_DOWNLOAD+'Đã tải vnpt-connections.json');
+  if (hasAnyPassword(data)) alert('File json có chứa mật khẩu, cần bảo mật, chỉ nên gửi mail cho khách hàng');
 }
 function flash(html){ const m=document.getElementById('msg'); m.className='msg ok'; m.innerHTML=html; }
 
