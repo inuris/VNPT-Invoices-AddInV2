@@ -1,6 +1,6 @@
 {
-  "latestVersion": "2.1",
+  "latestVersion": "2.2",
   "downloadUrl": "https://inuris.github.io/VNPT-Invoices-AddInV2/",
-  "notes": "Nút Mẫu đổi thành dropdown chọn thẳng GTGT/PXK/CTT; bỏ ép Kiểm tra dữ liệu trước khi Tạo nháp/Tạo & phát hành; fix lỗi kết nối khi Domain lỡ nhập kèm http(s)://; hỗ trợ thứ tự cột tùy chỉnh khi Tạo mẫu.",
+  "notes": "Hóa đơn GTGT chuyển sang chuẩn XML tt78; đọc số tiền ngoại tệ có phần lẻ (cents); fix lỗi cài đặt khi cùng phiên bản (ClickOnce).",
   "mandatory": false
 }
