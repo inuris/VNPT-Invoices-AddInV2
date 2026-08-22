@@ -1,6 +1,6 @@
 {
-  "latestVersion": "2.0",
+  "latestVersion": "2.1",
   "downloadUrl": "https://inuris.github.io/VNPT-Invoices-AddInV2/",
-  "notes": "Đổi thông báo kích hoạt license; nút license trên ribbon báo trước khi license sắp hết hạn (còn dưới 30 ngày).",
+  "notes": "Nút Mẫu đổi thành dropdown chọn thẳng GTGT/PXK/CTT; bỏ ép Kiểm tra dữ liệu trước khi Tạo nháp/Tạo & phát hành; fix lỗi kết nối khi Domain lỡ nhập kèm http(s)://; hỗ trợ thứ tự cột tùy chỉnh khi Tạo mẫu.",
   "mandatory": false
 }
