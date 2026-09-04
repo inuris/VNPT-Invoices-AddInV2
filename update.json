@@ -1,6 +1,6 @@
 {
-  "latestVersion": "2.2",
+  "latestVersion": "2.3",
   "downloadUrl": "https://inuris.github.io/VNPT-Invoices-AddInV2/",
-  "notes": "Hóa đơn GTGT chuyển sang chuẩn XML tt78; đọc số tiền ngoại tệ có phần lẻ (cents); fix lỗi cài đặt khi cùng phiên bản (ClickOnce).",
+  "notes": "Bổ sung đầy đủ mã lỗi VNPT trả về (thông báo lỗi chi tiết hơn); GTGT tt78 hỗ trợ đủ Extra1-11 và suất 8%.",
   "mandatory": false
 }
