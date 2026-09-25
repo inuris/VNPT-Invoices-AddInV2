@@ -1,6 +1,6 @@
 {
-  "latestVersion": "2.3",
+  "latestVersion": "2.4",
   "downloadUrl": "https://inuris.github.io/VNPT-Invoices-AddInV2/",
-  "notes": "Bổ sung đầy đủ mã lỗi VNPT trả về (thông báo lỗi chi tiết hơn); GTGT tt78 hỗ trợ đủ Extra1-11 và suất 8%.",
+  "notes": "CusAddress (GTGT) chỉ bắt buộc khi có TenDonVi+MaSoThue; sửa publish.ps1 dùng đường dẫn tương đối.",
   "mandatory": false
 }
