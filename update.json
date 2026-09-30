@@ -1,6 +1,6 @@
 {
-  "latestVersion": "2.4",
+  "latestVersion": "2.5",
   "downloadUrl": "https://inuris.github.io/VNPT-Invoices-AddInV2/",
-  "notes": "CusAddress (GTGT) chỉ bắt buộc khi có TenDonVi+MaSoThue; sửa publish.ps1 dùng đường dẫn tương đối.",
+  "notes": "Bảo mật: mã hóa file cấu hình kết nối (mật khẩu CAdmin/WebService) bằng Windows DPAPI thay vì lưu chữ thường; tự nâng cấp file cũ, không cần nhập lại tài khoản.",
   "mandatory": false
 }
