@@ -163,7 +163,7 @@ form.addEventListener('submit', async e => {
     // no-cors: không đọc được response, nhưng request vẫn tới doPost bình thường.
     await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body });
     err.className = 'msg ok';
-    err.textContent = 'Đã gửi, kiểm tra email trong ít phút.';
+    err.textContent = 'Đã nhận yêu cầu, bấm Tải lại sau vài phút để nhận license.';
     document.getElementById('f-mst').value = '';
     document.getElementById('f-note').value = '';
   } catch (ex) {
