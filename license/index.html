@@ -23,7 +23,10 @@
   @media(max-width:600px){.auth-row{grid-template-columns:1fr}}
 
   .list-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
-  .list-toolbar input{flex:1;min-width:140px}
+  .filter-short{width:140px;flex:none}
+  #fetchBtn.loading svg{animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @media (prefers-reduced-motion: reduce){ #fetchBtn.loading svg{animation:none} }
   .list-empty{color:var(--muted);font-size:13px;text-align:center;padding:24px 0}
 
   table.lic-table{width:100%;border-collapse:collapse;font-size:12.5px}
@@ -51,7 +54,6 @@
     </div>
     <div>
       <h1>License Generator</h1>
-      <p class="sub">Key sẽ được gửi về email</p>
     </div>
   </header>
 
@@ -71,6 +73,9 @@
   <div class="cols">
     <div class="left">
       <div class="card reveal">
+        <div class="list-toolbar">
+          <h3 style="margin:0;font-size:14px;flex:none">Tạo license</h3>
+        </div>
         <form id="licForm">
           <div class="field">
             <label>MST khách hàng <span class="req">*</span></label>
@@ -101,10 +106,10 @@
       <div class="card reveal">
         <div class="list-toolbar">
           <h3 style="margin:0;font-size:14px;flex:none">Danh sách yêu cầu</h3>
-          <input type="text" id="f-filter" placeholder="Lọc theo MST...">
-          <button class="mini" id="fetchBtn">
+          <span class="spacer" style="flex:1"></span>
+          <input type="text" id="f-filter" placeholder="Lọc MST..." class="filter-short">
+          <button class="primary icon" id="fetchBtn" title="Nhận" aria-label="Nhận">
             <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-            Nhận
           </button>
         </div>
         <div id="listArea"></div>
@@ -189,7 +194,7 @@ async function loadRecords(){
     return;
   }
   fetchBtn.disabled = true;
-  fetchBtn.textContent = 'Đang tải...';
+  fetchBtn.classList.add('loading');
   try {
     const url = WEB_APP_URL + '?email=' + encodeURIComponent(email) + '&passcode=' + encodeURIComponent(passcode);
     const res = await fetch(url);
@@ -206,7 +211,7 @@ async function loadRecords(){
     listArea.innerHTML = '<div class="list-empty">Không tải được danh sách — kiểm tra lại Email/Passcode hoặc thử lại.</div>';
   } finally {
     fetchBtn.disabled = false;
-    fetchBtn.textContent = 'Nhận';
+    fetchBtn.classList.remove('loading');
   }
 }
 
