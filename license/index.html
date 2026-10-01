@@ -68,6 +68,15 @@
         <input type="password" id="auth-passcode" placeholder="passcode">
       </div>
     </div>
+    <button class="link" type="button" id="forgotLink" style="margin-top:10px">Quên passcode?</button>
+    <div id="resetPanel" style="display:none;margin-top:10px">
+      <div class="field" style="margin-bottom:8px">
+        <label>Email nhận passcode mới</label>
+        <input type="email" id="reset-email" placeholder="ten.nv@vnpt.vn">
+      </div>
+      <button class="sec" type="button" id="resetBtn">Gửi passcode mới</button>
+      <div id="resetMsg" class="msg"></div>
+    </div>
   </div>
 
   <div class="cols">
@@ -129,6 +138,47 @@ authEmail.value = localStorage.getItem('lic_email') || '';
 authPasscode.value = localStorage.getItem('lic_passcode') || '';
 authEmail.addEventListener('input', () => localStorage.setItem('lic_email', authEmail.value.trim()));
 authPasscode.addEventListener('input', () => localStorage.setItem('lic_passcode', authPasscode.value.trim()));
+
+// ---- Quên passcode ----
+const forgotLink = document.getElementById('forgotLink');
+const resetPanel = document.getElementById('resetPanel');
+const resetEmail = document.getElementById('reset-email');
+const resetBtn = document.getElementById('resetBtn');
+const resetMsg = document.getElementById('resetMsg');
+
+forgotLink.addEventListener('click', () => {
+  const show = resetPanel.style.display === 'none';
+  resetPanel.style.display = show ? 'block' : 'none';
+  if (show) resetEmail.value = authEmail.value;
+});
+
+resetBtn.addEventListener('click', async () => {
+  const email = resetEmail.value.trim();
+  resetMsg.className = 'msg';
+  resetMsg.textContent = '';
+  if (!email) {
+    resetMsg.className = 'msg err';
+    resetMsg.textContent = 'Nhập email trước.';
+    return;
+  }
+  resetBtn.disabled = true;
+  resetBtn.textContent = 'Đang gửi...';
+  try {
+    await fetch(WEB_APP_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: new URLSearchParams({ action: 'reset_passcode', email: email })
+    });
+    resetMsg.className = 'msg ok';
+    resetMsg.textContent = 'Nếu email có trong hệ thống, passcode mới đã được gửi.';
+  } catch (ex) {
+    resetMsg.className = 'msg err';
+    resetMsg.textContent = 'Gửi thất bại, kiểm tra kết nối mạng và thử lại.';
+  } finally {
+    resetBtn.disabled = false;
+    resetBtn.textContent = 'Gửi passcode mới';
+  }
+});
 
 // ---- Gửi yêu cầu (cột trái) ----
 const form = document.getElementById('licForm');
