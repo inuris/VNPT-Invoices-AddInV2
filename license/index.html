@@ -106,11 +106,11 @@
       <div class="card reveal">
         <div class="list-toolbar">
           <h3 style="margin:0;font-size:14px;flex:none">Danh sách yêu cầu</h3>
-          <span class="spacer" style="flex:1"></span>
-          <input type="text" id="f-filter" placeholder="Lọc MST..." class="filter-short">
-          <button class="primary icon" id="fetchBtn" title="Nhận" aria-label="Nhận">
+          <button class="primary icon" id="fetchBtn" title="Tải" aria-label="Tải">
             <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
           </button>
+          <span class="spacer" style="flex:1"></span>
+          <input type="text" id="f-filter" placeholder="Lọc MST..." class="filter-short">
         </div>
         <div id="listArea"></div>
       </div>
@@ -220,7 +220,7 @@ function renderList(){
   const filtered = q ? allRecords.filter(r => String(r.mst || '').toLowerCase().includes(q)) : allRecords;
 
   if (filtered.length === 0) {
-    listArea.innerHTML = '<div class="list-empty">Chưa có dữ liệu. Bấm "Nhận" để tải.</div>';
+    listArea.innerHTML = '<div class="list-empty">Chưa có dữ liệu. Bấm Tải để tải.</div>';
     return;
   }
 
@@ -230,7 +230,7 @@ function renderList(){
   const pageRows = filtered.slice(start, start + PAGE_SIZE);
 
   let html = '<table class="lic-table"><thead><tr>' +
-    '<th>Ngày yêu cầu</th><th>MST</th><th>License</th><th>Thời hạn</th>' +
+    '<th>Ngày yêu cầu</th><th>MST</th><th>License</th><th>Thời hạn</th><th>Ghi chú</th>' +
     '</tr></thead><tbody>';
 
   pageRows.forEach((r, i) => {
@@ -243,6 +243,7 @@ function renderList(){
       '<svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>' +
       '</button></td>' +
       '<td>' + esc_(r.exp || 'Vĩnh viễn') + '</td>' +
+      '<td>' + esc_(r.note) + '</td>' +
       '</tr>';
   });
   html += '</tbody></table>';
@@ -276,7 +277,7 @@ function esc_(s){
   return (s == null ? '' : String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
 }
 
-listArea.innerHTML = '<div class="list-empty">Bấm "Nhận" để tải danh sách yêu cầu của bạn.</div>';
+listArea.innerHTML = '<div class="list-empty">Bấm Tải để tải danh sách yêu cầu của bạn.</div>';
 
 const io = new IntersectionObserver(entries => {
   entries.forEach(e => { if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
