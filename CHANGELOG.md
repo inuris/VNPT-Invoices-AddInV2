@@ -84,5 +84,3 @@
 
 ### Fixed
 - Mất cấu hình cột mở rộng khi lưu Cài đặt kết nối
-
-## [1.5] - 2026-08-17
