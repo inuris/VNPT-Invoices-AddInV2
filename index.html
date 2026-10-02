@@ -35,6 +35,10 @@
   .modal-body{overflow-y:auto;font-size:13px;line-height:1.6;color:var(--text)}
   .modal-body h3{font-size:13px;font-weight:700;margin:16px 0 4px;color:var(--accent-ink)}
   .modal-body h3:first-child{margin-top:0}
+  .modal-body h4{font-size:11px;font-weight:700;margin:10px 0 2px;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.04em}
+  .modal-body ul{margin:0 0 4px;padding-left:18px}
+  .modal-body li{margin:0 0 2px}
   .modal-body p{margin:0 0 4px;color:var(--text)}
   .modal-body blockquote{
     margin:0 0 12px;padding:10px 12px;background:var(--card-alt);border-radius:var(--r-sm);
@@ -114,6 +118,18 @@
       if (block.indexOf('> ') === 0) {
         var text = block.split('\n').map(function(l){ return l.replace(/^>\s?/, ''); }).join(' ');
         return '<blockquote>' + inlineMd(text) + '</blockquote>';
+      }
+      var lines = block.split('\n');
+      if (lines[0].indexOf('### ') === 0) {
+        var heading = '<h4>' + inlineMd(lines[0].slice(4)) + '</h4>';
+        var items = lines.slice(1).filter(function(l){ return l.indexOf('- ') === 0; })
+          .map(function(l){ return '<li>' + inlineMd(l.slice(2)) + '</li>'; }).join('');
+        return heading + '<ul>' + items + '</ul>';
+      }
+      if (lines[0].indexOf('- ') === 0) {
+        var items2 = lines.filter(function(l){ return l.indexOf('- ') === 0; })
+          .map(function(l){ return '<li>' + inlineMd(l.slice(2)) + '</li>'; }).join('');
+        return '<ul>' + items2 + '</ul>';
       }
       return '<p>' + inlineMd(block.split('\n').join(' ')) + '</p>';
     }).join('');
