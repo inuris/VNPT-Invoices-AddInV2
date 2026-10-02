@@ -205,10 +205,12 @@ function handleResetPasscode_(email) {
   var sheet = SpreadsheetApp.openById(SS_ID).getSheetByName('Users');
   var data = sheet.getDataRange().getValues();
   for (var i = 1; i < data.length; i++) {
-    var active = (data[i][2] === 1 || data[i][2] === '1' || data[i][2] === true);
-    if (String(data[i][0]).trim().toLowerCase() === email && active) {
+    if (String(data[i][0]).trim().toLowerCase() === email) {
       var newCode = String(Math.floor(100000 + Math.random() * 900000));
-      sheet.getRange(i + 1, 2).setValue(newCode);
+      var rowNum = i + 1;
+      sheet.getRange(rowNum, 2).setValue(newCode); // passcode mới
+      sheet.getRange(rowNum, 3).setValue(1);       // mở khóa lại (reset có hiệu lực kể cả khi đang bị khóa)
+      sheet.getRange(rowNum, 4).setValue(0);       // reset retry về 0
 
       var html =
         '<div style="font-family:Arial,sans-serif;max-width:420px;margin:0 auto;padding:24px;color:#16161A">' +
