@@ -17,6 +17,30 @@
   footer{margin-top:28px;text-align:center;color:var(--muted);font-size:11px;
     text-transform:uppercase;letter-spacing:.08em}
   .head-block{margin-bottom:18px}
+  .ver-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 22px}
+  .ver-row .pill-badge{margin:0}
+
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(22,22,26,.45);display:none;
+    align-items:center;justify-content:center;padding:24px;z-index:100;
+  }
+  .modal-overlay.open{display:flex}
+  .modal-card{
+    background:var(--card);border-radius:var(--r-lg);box-shadow:var(--shadow-card);
+    max-width:480px;width:100%;max-height:min(640px,80vh);padding:24px;
+    display:flex;flex-direction:column;gap:14px;
+  }
+  .modal-head{display:flex;align-items:center;justify-content:space-between;flex:none}
+  .modal-head h2{font-size:18px;font-weight:800;margin:0}
+  .modal-body{overflow-y:auto;font-size:13px;line-height:1.6;color:var(--text)}
+  .modal-body h3{font-size:13px;font-weight:700;margin:16px 0 4px;color:var(--accent-ink)}
+  .modal-body h3:first-child{margin-top:0}
+  .modal-body p{margin:0 0 4px;color:var(--text)}
+  .modal-body blockquote{
+    margin:0 0 12px;padding:10px 12px;background:var(--card-alt);border-radius:var(--r-sm);
+    color:var(--muted);font-size:12px;
+  }
+  .modal-body code{font-size:11.5px}
 </style>
 </head>
 <body>
@@ -28,7 +52,10 @@
       <h1 style="margin-top:16px">VNPT Invoices Add-in</h1>
       <p class="sub">Excel add-in tạo &amp; phát hành hóa đơn điện tử VNPT Invoice</p>
     </div>
-    <div class="pill-badge ok reveal" id="verPill" style="margin:0 0 22px"><span id="verText">Đang tải phiên bản…</span></div>
+    <div class="ver-row reveal">
+      <div class="pill-badge ok" id="verPill"><span id="verText">Đang tải phiên bản…</span></div>
+      <button class="link" id="changelogBtn" type="button">Changelog</button>
+    </div>
 
     <a class="btn primary reveal" id="setupLink" href="VNPT.Invoices.AddInV2-Setup.exe" download="VNPT.Invoices.AddInV2-Setup.exe">
       <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -50,6 +77,18 @@
     <footer>TTKDGP — Phòng Giải pháp số</footer>
   </div>
 
+  <div class="modal-overlay" id="changelogOverlay">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2>Changelog</h2>
+        <button class="icon" id="changelogClose" type="button" aria-label="Đóng">
+          <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="changelogBody">Đang tải…</div>
+    </div>
+  </div>
+
 <script>
   fetch('update.json?t=' + Date.now())
     .then(function(r){ return r.json(); })
@@ -58,6 +97,46 @@
       document.getElementById('setupLink').download = 'VNPT.Invoices.AddInV2-v' + d.latestVersion + '-Setup.exe';
     })
     .catch(function(){ document.getElementById('verPill').style.display = 'none'; });
+
+  function escHtml(s){
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  function inlineMd(s){
+    return escHtml(s)
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/`(.+?)`/g, '<code>$1</code>');
+  }
+  function changelogToHtml(md){
+    return md.split(/\n\n+/).map(function(block){
+      block = block.trim();
+      if (!block || block.indexOf('# Changelog') === 0) return '';
+      if (block.indexOf('## ') === 0) return '<h3>' + inlineMd(block.slice(3)) + '</h3>';
+      if (block.indexOf('> ') === 0) {
+        var text = block.split('\n').map(function(l){ return l.replace(/^>\s?/, ''); }).join(' ');
+        return '<blockquote>' + inlineMd(text) + '</blockquote>';
+      }
+      return '<p>' + inlineMd(block.split('\n').join(' ')) + '</p>';
+    }).join('');
+  }
+
+  var changelogOverlay = document.getElementById('changelogOverlay');
+  var changelogBody = document.getElementById('changelogBody');
+  var changelogLoaded = false;
+  function openChangelog(){
+    changelogOverlay.classList.add('open');
+    if (changelogLoaded) return;
+    fetch('CHANGELOG.md?t=' + Date.now())
+      .then(function(r){ return r.text(); })
+      .then(function(md){ changelogBody.innerHTML = changelogToHtml(md); changelogLoaded = true; })
+      .catch(function(){ changelogBody.textContent = 'Không tải được changelog.'; });
+  }
+  document.getElementById('changelogBtn').addEventListener('click', openChangelog);
+  document.getElementById('changelogClose').addEventListener('click', function(){
+    changelogOverlay.classList.remove('open');
+  });
+  changelogOverlay.addEventListener('click', function(e){
+    if (e.target === changelogOverlay) changelogOverlay.classList.remove('open');
+  });
 
   var io = new IntersectionObserver(function(entries){
     entries.forEach(function(e){ if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
