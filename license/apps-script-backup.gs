@@ -120,9 +120,13 @@ function recordData_(sheet, e) {
   var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
   var row = [];
   for (var i = 0; i < headers.length; i++) {
-    row.push(headers[i] === 'Timestamp'
-      ? Utilities.formatDate(new Date(), 'Asia/Ho_Chi_Minh', 'dd/MM/yyyy HH:mm:ss')
-      : (e.parameter[headers[i]] || ''));
+    if (headers[i] === 'Timestamp') {
+      row.push(Utilities.formatDate(new Date(), 'Asia/Ho_Chi_Minh', 'dd/MM/yyyy HH:mm:ss'));
+    } else if (headers[i] === 'Passcode') {
+      row.push(''); // không log passcode thật vào sheet theo dõi — chỉ dùng để xác thực, không lưu lại
+    } else {
+      row.push(e.parameter[headers[i]] || '');
+    }
   }
   sheet.appendRow(row);
   return sheet.getLastRow();
@@ -202,6 +206,15 @@ function writeResult_(sheet, row, license, exp) {
 
 function handleResetPasscode_(email) {
   email = String(email || '').trim().toLowerCase();
+  var genericMsg = { status: true, message: 'Nếu email có trong hệ thống, passcode mới đã được gửi.' };
+  if (!email) return jsonResponse_(genericMsg);
+
+  // Chặn spam reset cho cùng 1 email trong 60s — tránh tốn quota MailApp và làm
+  // phiền chủ tài khoản thật nếu bị gọi lặp lại liên tục (không tiết lộ gì khác qua response).
+  var cache = CacheService.getScriptCache();
+  var cacheKey = 'reset_cd_' + email;
+  if (cache.get(cacheKey)) return jsonResponse_(genericMsg);
+
   var sheet = SpreadsheetApp.openById(SS_ID).getSheetByName('Users');
   var data = sheet.getDataRange().getValues();
   for (var i = 1; i < data.length; i++) {
@@ -229,8 +242,9 @@ function handleResetPasscode_(email) {
         body: 'Passcode mới: ' + newCode, // fallback cho client không đọc HTML
         htmlBody: html
       });
+      cache.put(cacheKey, '1', 60); // giây
       break;
     }
   }
-  return jsonResponse_({ status: true, message: 'Nếu email có trong hệ thống, passcode mới đã được gửi.' });
+  return jsonResponse_(genericMsg);
 }
