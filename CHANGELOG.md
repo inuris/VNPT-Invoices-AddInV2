@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.6] - 2026-10-12
+
+### Added
+- Bỏ qua dòng đang Ẩn (Hide) trong Excel khi Tạo nháp/Tạo & phát hành/Kiểm tra dữ liệu (CTT/GTGT/PXK)
+
 ## [2.5] - 2026-09-30
 
 ### Security

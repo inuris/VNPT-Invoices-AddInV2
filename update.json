@@ -1,6 +1,6 @@
 {
-  "latestVersion": "2.5",
+  "latestVersion": "2.6",
   "downloadUrl": "https://inuris.github.io/VNPT-Invoices-AddInV2/",
-  "notes": "Bảo mật: mã hóa file cấu hình kết nối (mật khẩu CAdmin/WebService) bằng Windows DPAPI thay vì lưu chữ thường; tự nâng cấp file cũ, không cần nhập lại tài khoản.",
+  "notes": "Bỏ qua dòng đang Ẩn (Hide) trong Excel khi Tạo nháp/Tạo & phát hành/Kiểm tra dữ liệu (CTT/GTGT/PXK).",
   "mandatory": false
 }
