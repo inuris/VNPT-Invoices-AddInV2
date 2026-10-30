@@ -27,6 +27,7 @@
     display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12.5px;flex:0 0 auto}
   .conn > .head .name{font-weight:700;font-size:15px;color:var(--text);min-height:1.2em}
   .conn > .head .spacer{flex:1}
+  .conn.collapsed > *:not(.head){display:none}
 
   .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
   .grid.two{grid-template-columns:1fr 1fr}
@@ -340,6 +341,22 @@ function wireColumnOrderDrag(list){
     li.focus();
   });
 }
+const ICON_EYE='<svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+const ICON_EYE_OFF='<svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.86 21.86 0 0 1 5.06-6.06M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a21.8 21.8 0 0 1-3.22 4.44M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+function applyVisState(id, hiddenFlag){
+  const conn = document.getElementById(id);
+  conn.dataset.hidden = hiddenFlag ? '1' : '0';
+  conn.classList.toggle('collapsed', hiddenFlag);
+  const btn = conn.querySelector('.toggle-vis');
+  btn.innerHTML = hiddenFlag ? ICON_EYE_OFF : ICON_EYE;
+  btn.title = hiddenFlag ? 'Hiện lại' : 'Ẩn';
+  btn.setAttribute('aria-label', btn.title);
+}
+function toggleVis(id){
+  const conn = document.getElementById(id);
+  applyVisState(id, conn.dataset.hidden !== '1');
+  formToJson();
+}
 let seq = 0;
 let syncing = false; // chặn vòng lặp form <-> json
 
@@ -365,6 +382,7 @@ function addConn(data){
       <div class="idx"></div>
       <div class="name"></div>
       <div class="spacer"></div>
+      <button class="mini icon toggle-vis" title="Ẩn" aria-label="Ẩn" onclick="toggleVis('${id}')"></button>
       <button class="mini danger icon" title="Xóa kết nối" aria-label="Xóa kết nối" onclick="this.closest('.conn').remove();renumber();formToJson()"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
 
@@ -436,6 +454,7 @@ function addConn(data){
   const pos = document.getElementById('conns').children.length - 1;
   node.style.transitionDelay = Math.min(pos, 6) * 60 + 'ms'; // cap so long lists don't lag a single add
   revealIO.observe(node);
+  applyVisState(id, !!data.hidden);
 
   const pats = (data.patterns && data.patterns.length) ? data.patterns : [{}];
   pats.forEach(p=>addPat(id,p));
@@ -510,6 +529,7 @@ function collect(){
       patterns: [],
       customColumns: []
     };
+    if(c.dataset.hidden==='1') conn.hidden = true;
     for(const r of c.querySelectorAll('.row.pat')){
       const pat=val(r,'.p-pat'), ser=val(r,'.p-ser'), ty=val(r,'.p-type')||'CTT';
       if(pat||ser) conn.patterns.push({pattern:pat, serial:ser, type:ty});
@@ -555,6 +575,9 @@ function collect(){
   }
   return out;
 }
+
+// Kết nối đang Ẩn không xuất ra JSON (Sao chép / Tải) — chỉ giữ lại trong form + localStorage.
+function collectVisible(){ return collect().filter(c=>!c.hidden); }
 
 function validate(data){
   const errs=[];
@@ -645,22 +668,21 @@ document.addEventListener('focusout', e=>{
 
 function copyJson(){
   formToJson();
-  const t=document.getElementById('json');
-  const data=collect();
+  const data=collectVisible();
   const errs=validate(data);
-  t.select(); t.setSelectionRange(0,999999);
-  navigator.clipboard.writeText(t.value)
+  const text=JSON.stringify(data,null,2);
+  navigator.clipboard.writeText(text)
     .then(()=>{ errs.length ? showValidity(data) : flash(ICON_CHECK+'Đã sao chép JSON.'); })
-    .catch(()=>flash('Hãy chọn và Ctrl+C.'));
+    .catch(()=>flash('Sao chép lỗi, thử lại.'));
 }
 function hasAnyPassword(data){
   return data.some(c => c.account && (c.account.passwordCAdmin || c.account.passwordWebService));
 }
 function downloadJson(){
   formToJson();
-  const data=collect();
+  const data=collectVisible();
   const errs=validate(data);
-  const json=document.getElementById('json').value;
+  const json=JSON.stringify(data,null,2);
   const blob=new Blob([json],{type:'application/json'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download='vnpt-connections.json'; a.click(); URL.revokeObjectURL(a.href);
