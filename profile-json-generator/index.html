@@ -174,7 +174,7 @@
           <b>Tài khoản WebService</b>: tài khoản Service tạo ở menu Phân Quyền.<br>
           <b>Loại chứng từ</b>: <code>CTT</code> / <code>GTGT</code> / <code>PXK</code>.<br>
           <b>Domain</b>: không cần nhập <code>http(s)</code>.<br>
-          <b>Cột mở rộng</b> (tùy chọn): thêm cột ghi vào thẻ <code>Extra1</code>…<code>Extra11</code> (cấp hóa đơn) hoặc <code>SP_Extra1</code>/<code>SP_Extra2</code> (cấp dòng). Kiểu: <code>string</code>/<code>numeric</code>/<code>datetime</code>. Tên cột mặc định là tên thẻ, đổi tên ở "Thứ tự &amp; tên cột".<br>
+          <b>Cột mở rộng</b> (tùy chọn): thêm cột ghi vào thẻ <code>Extra</code>, <code>Extra1</code>…<code>Extra11</code> (cấp hóa đơn) hoặc <code>SP_Extra1</code>/<code>SP_Extra2</code> (cấp dòng). Kiểu: <code>string</code>/<code>numeric</code>/<code>datetime</code>. Tên cột mặc định là tên thẻ, đổi tên ở "Thứ tự &amp; tên cột".<br>
           <b>Cột hóa đơn đặc thù</b> (tùy chọn): chọn loại hóa đơn đặc thù để mẫu Excel bổ sung các cột hàng hóa đặc trưng (VD: Biển kiểm soát).<br>
           <b>Mã hóa chữ</b>: để Unicode (mặc định) cho file bình thường; chọn VNI-Windows nếu file xuất ra dùng font VNI (VD: <code>Coâng ty</code>).<br>
           <b>Thứ tự &amp; tên cột</b> (tùy chọn): kéo-thả để đổi thứ tự cột trên mẫu Excel sinh ra; khai tên thay thế khi file của khách đặt tên cột khác mẫu (VD: xuất từ phần mềm khác), dòng tiêu đề, công thức tính cột (giống Excel) và giá trị mặc định khi ô trống.
@@ -187,7 +187,7 @@
 
 <script>
 const DOC_TYPES = ["CTT","GTGT","PXK"];
-const SLOTS = ["Extra1","Extra2","Extra3","Extra4","Extra5","Extra6","Extra7","Extra8","Extra9","Extra10","Extra11","SP_Extra1","SP_Extra2"];
+const SLOTS = ["Extra","Extra1","Extra2","Extra3","Extra4","Extra5","Extra6","Extra7","Extra8","Extra9","Extra10","Extra11","SP_Extra1","SP_Extra2"];
 const DTYPES = ["string","numeric","datetime"];
 
 // Cột chuẩn VNPT ngoài Extra — khớp OptionalFieldCatalog bên add-in (Data/Template/OptionalFieldCatalog.cs).
@@ -564,6 +564,16 @@ function addConn(data){
   (data.customColumns||[])
     .filter(c=>!(c && c.field && KNOWN_FIELD_KEYS.has(c.field))) // các field chuẩn VNPT hiện qua checkbox, không lặp lại ở đây
     .forEach(c=>addExt(id,c));
+  // Hồ sơ cũ map thẳng cột file → thẻ Extra/ExtraN/SP_ExtraN (VD GoodsTitle → Extra) ⇒ hiện thành cột mở rộng tương đương.
+  for(const m of (data.columnMapping||[])){
+    const t = (m && m.type) || 'GTGT';
+    for(const [erp, target] of Object.entries((m && m.map) || {})){
+      const slot = SLOTS.find(x=>x.toLowerCase()===String(target||'').trim().toLowerCase());
+      if(!slot || !erp || (DEFAULT_COLUMNS[t]||[]).some(h=>h.toLowerCase()===slot.toLowerCase())) continue;
+      if((data.customColumns||[]).some(c=>c && (c.type||'GTGT')===t && String(c.header||'').toLowerCase()===erp.toLowerCase())) continue;
+      addExt(id, {type:t, header:erp, extraSlot:slot});
+    }
+  }
   initColumnOrderState(id, data);
   initMappingState(id, data);
   renderMapping(id); // vẽ cả danh sách thứ tự cột + tên thay thế
