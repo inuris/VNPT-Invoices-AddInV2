@@ -588,7 +588,7 @@ function renderMapping(id){
   conn.querySelector('.stdmap').innerHTML =
     '<div class="hd">Cột trong file ERP</div><div></div><div class="hd">Cột chuẩn add-in</div><div class="hd hd-def">Mặc định</div>' +
     std.map(h=>{ const k=h.toLowerCase(); const e=erpFor[k]||'', d=defFor[k]||'';
-      return `<input class="s-erp" data-std="${esc(h)}" placeholder="${esc(h)}" value="${esc(e)}" oninput="this.nextElementSibling.nextElementSibling.classList.toggle('on',!!this.value.trim())">`
+      return `<input class="s-erp" data-std="${esc(h)}" placeholder="${h==='STT'&&type!=='CTT'?'Trống = tự động (cả file 1 hóa đơn)':esc(h)}" value="${esc(e)}" oninput="this.nextElementSibling.nextElementSibling.classList.toggle('on',!!this.value.trim())">`
         + `<span class="arrow">→</span><span class="std ${e?'on':''}">${esc(h)}</span>`
         + `<input class="s-def" data-std="${esc(h)}" value="${esc(d)}">`; }).join('');
   otherMaps.forEach(([a,b])=>addMapRow(id,'maps',a,b));
