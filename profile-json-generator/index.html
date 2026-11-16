@@ -70,6 +70,7 @@
 
   .co-list{list-style:none;margin:4px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
   .co-item .co-pill .std-name{flex:1;min-width:0;overflow-wrap:anywhere}
+  .ext-tag{font-size:10.5px;font-weight:600;color:var(--accent);background:rgba(79,70,229,.08);border-radius:999px;padding:1px 7px;margin-left:4px;vertical-align:1px}
   .co-pill input.co-alt{flex:0 1 50%;min-width:0;height:28px;min-height:0;padding:4px 10px;font-size:12.5px;background:#fff;border:1px solid var(--line);border-radius:8px;cursor:text}
   .co-pill input.co-alt::placeholder{color:#c4c4cc}
   .co-item.renamed .co-pill .std-name{font-weight:700}
@@ -231,14 +232,37 @@ function initColumnOrderState(id, data){
   for(const entry of saved){
     if(!entry || !entry.type || !Array.isArray(entry.headers) || entry.headers.length===0) continue;
     if(!DEFAULT_COLUMNS[entry.type]) continue;
-    // Header đã lưu trước, header mặc định nào chưa có trong đó thì nối vào sau (đề phòng
-    // danh sách cột mặc định đổi/thêm sau khi khách đã lưu 1 order cũ).
-    const known = new Set(entry.headers);
-    const merged = entry.headers.slice();
-    for(const h of DEFAULT_COLUMNS[entry.type]) if(!known.has(h)) merged.push(h);
-    state[entry.type] = merged;
+    state[entry.type] = entry.headers.slice(); // đối chiếu với cột mặc định + cột mở rộng ở orderFor()
   }
   columnOrderState[id] = state;
+}
+// Cột mở rộng (customColumns) đã khai cho loại chứng từ t — tên cột Excel, theo thứ tự khai.
+function extHeaders(id, t){
+  const out=[], seen=new Set();
+  document.getElementById(id).querySelectorAll('.exts .row.ext').forEach(r=>{
+    const h=val(r,'.e-header'); if(!h || (val(r,'.e-type')||'GTGT')!==t || seen.has(h.toLowerCase())) return;
+    seen.add(h.toLowerCase()); out.push(h);
+  });
+  return out;
+}
+// Thứ tự tự nhiên = cột mặc định + cột mở rộng (add-in nối cột mở rộng vào cuối mẫu).
+function naturalOrder(id, t){
+  const std=DEFAULT_COLUMNS[t]||[], have=new Set(std.map(h=>h.toLowerCase()));
+  return std.concat(extHeaders(id,t).filter(h=>!have.has(h.toLowerCase())));
+}
+// Thứ tự hiện tại: giữ thứ tự đã kéo của các cột còn tồn tại, cột mới (VD vừa thêm cột mở rộng) nối vào cuối.
+function orderFor(id, t){
+  const nat=naturalOrder(id,t), byKey=new Map(nat.map(h=>[h.toLowerCase(),h]));
+  const res=[], used=new Set();
+  for(const h of ((columnOrderState[id]||{})[t]||[])){ const k=String(h).toLowerCase(); if(byKey.has(k) && !used.has(k)){ used.add(k); res.push(byKey.get(k)); } }
+  for(const h of nat) if(!used.has(h.toLowerCase())) res.push(h);
+  return res;
+}
+// Cột mở rộng đổi (thêm/xóa/đổi tên/đổi loại) → vẽ lại danh sách thứ tự & tên cột.
+function refreshOrderList(id){
+  syncMappingFromDom(id);
+  renderColumnOrderList(id);
+  formToJson();
 }
 // Chữ cột kiểu Excel (0-based): 0->A, 25->Z, 26->AA...
 function colLetter(i){
@@ -260,27 +284,30 @@ function renderColumnOrderList(id){
   const conn = document.getElementById(id);
   const type = conn.querySelector('.m-type').value;
   const list = conn.querySelector('.co-list');
-  const headers = (columnOrderState[id] && columnOrderState[id][type]) || DEFAULT_COLUMNS[type] || [];
+  const headers = orderFor(id, type);
+  columnOrderState[id][type] = headers;
+  const extSet = new Set(extHeaders(id, type).map(h=>h.toLowerCase()));
   // Tên thay thế: lấy từ mappingState (map tên trong file → tên mặc định).
   const altFor = {};
   const mst = (mappingState[id]||{})[type] || {maps:[], fx:[]};
   for(const [k,f] of (mst.fx||[])){ const lk=(k||'').toLowerCase(); if(!(lk in altFor)) altFor[lk]=f; } // công thức ưu tiên
   for(const [a,b] of mst.maps){ const k=(b||'').toLowerCase(); if(!(k in altFor)) altFor[k]=a; }
   list.innerHTML = headers.map((h, i) => { const a = altFor[h.toLowerCase()]||''; return `
-    <li class="co-item ${a?'renamed':''}" tabindex="0" data-header="${esc(h)}" aria-label="${esc(h)}, kéo hoặc dùng phím mũi tên lên/xuống để đổi vị trí">
+    <li class="co-item ${a?'renamed':''} ${extSet.has(h.toLowerCase())?'is-ext':''}" tabindex="0" data-header="${esc(h)}" aria-label="${esc(h)}, kéo hoặc dùng phím mũi tên lên/xuống để đổi vị trí">
       <span class="co-letter">${colLetter(i)}</span>
       <span class="co-pill">
         <svg class="co-handle" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="18" x2="16" y2="18"/></svg>
-        <span class="std-name">${esc(h)}</span>
-        <input class="co-alt s-alt" data-std="${esc(h)}" aria-label="Tên thay thế cho ${esc(h)}" spellcheck="false" placeholder="${h==='STT'&&type!=='CTT'?'Trống = tự động (cả file 1 HĐ)':'Tên thay thế hoặc =công thức'}" value="${esc(a)}" oninput="altChanged(this)">
+        <span class="std-name">${esc(h)}${extSet.has(h.toLowerCase())?' <small class="ext-tag">mở rộng</small>':''}</span>
+        <input class="co-alt s-alt ${isFormula(a)?'is-fx':''} ${isFormula(a)&&formulaError(a)?'bad':''}" data-std="${esc(h)}" aria-label="Tên thay thế cho ${esc(h)}" spellcheck="false" placeholder="${h==='STT'&&type!=='CTT'?'Trống = tự động (cả file 1 HĐ)':'Tên thay thế hoặc =công thức'}" value="${esc(a)}" oninput="altChanged(this)">
       </span>
     </li>`; }).join('');
+  refreshFxErrors(conn);
 }
 function columnOrderResetDefault(id){
   const conn = document.getElementById(id);
   const type = conn.querySelector('.m-type').value;
   syncMappingFromDom(id); // giữ tên thay thế đã gõ
-  columnOrderState[id][type] = DEFAULT_COLUMNS[type].slice();
+  columnOrderState[id][type] = naturalOrder(id, type);
   renderColumnOrderList(id);
   formToJson();
 }
@@ -501,9 +528,11 @@ function addConn(data){
           VD cộng: <code>=IYear + IMonth + IDay</code> · ghép ngày: <code>=TEXT(IYear,"0000") &amp; "-" &amp; TEXT(IMonth,"00") &amp; "-" &amp; TEXT(IDay,"00")</code></div>
         <ul class="co-list"></ul>
         <div class="fx-errs msg err" style="margin-top:8px"></div>
-        <div class="st"><h4>Cột khác (Extra, SP_Extra, cột tùy chọn…)</h4><span class="spacer" style="flex:1"></span>
-          <button class="mini" type="button" onclick="addMapRow('${id}','maps');formToJson()"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Thêm</button></div>
-        <div class="maps"></div>
+        <div class="maps-wrap" hidden>
+          <div class="st"><h4>Cột ngoài mẫu (hồ sơ cũ)</h4></div>
+          <div class="field-note" style="margin-bottom:8px">Ánh xạ tới cột không có trong danh sách trên (VD: <code>Extra</code>), giữ lại từ hồ sơ đã có. Cột mở rộng mới hãy thêm ở "Cột mở rộng" — cột sẽ tự hiện trong danh sách trên để sắp xếp.</div>
+          <div class="maps"></div>
+        </div>
         <div class="st"><h4>Giá trị mặc định (khi ô trống)</h4><span class="spacer" style="flex:1"></span>
           <button class="mini" type="button" onclick="addMapRow('${id}','defs');formToJson()"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Thêm</button></div>
         <div class="defs"></div>
@@ -652,13 +681,14 @@ function renderMapping(id){
   conn.querySelector('.m-hrow').value = st.headerRow || 1;
   for(const k of ['maps','defs']) conn.querySelector('.'+k).innerHTML = '';
   // Cột chuẩn (có trong danh sách thứ tự cột) hiện ô "Tên thay thế" ngay trên dòng kéo-thả; còn lại → "Cột khác".
-  const stdSet = new Set((DEFAULT_COLUMNS[type]||[]).map(h=>h.toLowerCase()));
+  const stdSet = new Set(orderFor(id, type).map(h=>h.toLowerCase()));
   const seen = new Set(), otherMaps = [];
   // Công thức cũng đi chung ô: cột chuẩn → ô trong dòng (ưu tiên công thức), cột khác → "Cột khác".
   for(const [k,f] of st.fx){ const lk=(k||'').toLowerCase(); if(stdSet.has(lk) && !seen.has(lk)) seen.add(lk); else otherMaps.push([f,k]); }
   for(const [a,b] of st.maps){ const k=(b||'').toLowerCase(); if(stdSet.has(k) && !seen.has(k)) seen.add(k); else otherMaps.push([a,b]); }
   renderColumnOrderList(id);
   otherMaps.forEach(([a,b])=>addMapRow(id,'maps',a,b));
+  conn.querySelector('.maps-wrap').hidden = !otherMaps.length;
   conn.querySelectorAll('.co-list .s-alt, .maps .alt-in').forEach(i=>{ const v=i.value.trim(); i.classList.toggle('is-fx',isFormula(v)); i.classList.toggle('bad',isFormula(v)&&!!formulaError(v)); });
   refreshFxErrors(conn);
   st.defs.forEach(([a,b])=>addMapRow(id,'defs',a,b));
@@ -724,7 +754,7 @@ function addExt(id, c){
       <div><label>Thẻ Extra</label><select class="e-slot">${opts(SLOTS, c.extraSlot||'Extra9')}</select></div>
       <div><label>Kiểu</label><select class="e-dtype">${opts(DTYPES, c.dataType||'string')}</select></div>
       <div><label>Ghi chú</label><input class="e-note" placeholder="VD: Nhập số hợp đồng 0-9" value="${esc(c.note)}"></div>
-      <div class="del"><button class="mini danger icon" title="Xóa cột" aria-label="Xóa cột" onclick="this.closest('.row').remove();formToJson()"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+      <div class="del"><button class="mini danger icon" title="Xóa cột" aria-label="Xóa cột" onclick="const c=this.closest('.conn').id;this.closest('.row').remove();refreshOrderList(c)"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
     </div>`);
   box.appendChild(row);
 }
@@ -799,8 +829,9 @@ function collect(){
     const order = [];
     const state = columnOrderState[c.id] || {};
     for(const t of Object.keys(DEFAULT_COLUMNS)){
-      const cur = state[t];
-      if(cur && JSON.stringify(cur) !== JSON.stringify(DEFAULT_COLUMNS[t]))
+      if(!state[t]) continue;
+      const cur = orderFor(c.id, t);
+      if(JSON.stringify(cur) !== JSON.stringify(naturalOrder(c.id, t)))
         order.push({type:t, headers:cur});
     }
     if(order.length) conn.columnOrder = order;
@@ -894,7 +925,8 @@ document.addEventListener('input', e=>{
   if(e.target.id==='json'){ jsonToForm(); persist(); return; }
   if(e.target.closest('.conn')){
     if(e.target.classList.contains('f-name')) renumber();
-    formToJson();
+    if(e.target.closest('.exts')) refreshOrderList(e.target.closest('.conn').id);
+    else formToJson();
   }
 });
 // rời ô Domain -> chuẩn hóa (bỏ http(s):// và '/')
