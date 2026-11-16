@@ -1,5 +1,19 @@
 # Changelog
 
+## [Unreleased]
+
+## [2.7] - 2026-11-16
+
+### Added
+- GTGT: cột `Extra` (không số) → TTChung/TTKhac (tt78 `<Extra>`), giống Extra1/Extra2
+- GTGT: cột `NganHangNguoiMua` → NMua/TNHang (tt78 `CusBankName`), `SoTaiKhoanNguoiMua` → NMua/STKNHang (tt78 `CusBankNo`)
+- Đọc file Excel xuất từ ERP khác: hồ sơ khai `columnMapping` (đổi tên cột, dòng tiêu đề, giá trị mặc định, ghép ngày từ 3 cột; không có cột STT thì cả file là 1 hóa đơn) — chuẩn hóa trong bộ nhớ, không sửa file
+- `textEncoding` trong hồ sơ: chuyển chữ VNI-Windows → Unicode (`"vni"`; bỏ trống = Unicode, không đổi); Kiểm tra dữ liệu cảnh báo khi thấy chữ VNI mà hồ sơ để Unicode
+
+### Fixed
+- Lưu cấu hình kết nối không còn làm mất thứ tự cột (`columnOrder`)
+- Kiểm tra dữ liệu GTGT/PXK nhận cột mở rộng của hồ sơ giống lúc Tạo nháp
+
 ## [2.6] - 2026-10-12
 
 ### Added

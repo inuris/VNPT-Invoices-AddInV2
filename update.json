@@ -1,6 +1,6 @@
 {
-  "latestVersion": "2.6",
+  "latestVersion": "2.7",
   "downloadUrl": "https://inuris.github.io/VNPT-Invoices-AddInV2/",
-  "notes": "Bỏ qua dòng đang Ẩn (Hide) trong Excel khi Tạo nháp/Tạo & phát hành/Kiểm tra dữ liệu (CTT/GTGT/PXK).",
+  "notes": "Đọc file Excel xuất từ ERP khác (đổi tên cột, ghép ngày, chuyển VNI → Unicode theo hồ sơ); GTGT thêm cột Extra, ngân hàng/số tài khoản người mua.",
   "mandatory": false
 }
