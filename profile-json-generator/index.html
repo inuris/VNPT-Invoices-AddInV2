@@ -68,7 +68,11 @@
 
   .field-note{color:var(--muted);font-size:11.5px;margin-top:2px;line-height:1.6}
 
-  .co-list{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:6px;max-width:460px}
+  .co-list{list-style:none;margin:4px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+  .co-item .co-pill .std-name{flex:1;min-width:0;overflow-wrap:anywhere}
+  .co-pill input.co-alt{flex:0 1 50%;min-width:0;height:28px;min-height:0;padding:4px 10px;font-size:12.5px;background:#fff;border:1px solid var(--line);border-radius:8px;cursor:text}
+  .co-pill input.co-alt::placeholder{color:#c4c4cc}
+  .co-item.renamed .co-pill .std-name{font-weight:700}
   .co-item{display:flex;align-items:center;gap:8px;cursor:grab;font-size:13px;user-select:none;
     touch-action:none;transition:transform 200ms var(--ease);will-change:transform}
   .co-item:active{cursor:grabbing}
@@ -87,11 +91,6 @@
   .maps .row.map:not(:first-child) label,.defs .row.map:not(:first-child) label,.fx .row.map:not(:first-child) label{display:none}
   .fx-err{grid-column:2/3;color:var(--danger-text);font-size:11.5px;margin-top:-2px}
   .fx-err:empty{display:none}
-  .stdmap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:6px 10px;align-items:center}
-  .stdmap .hd{font-size:11px;font-weight:700;color:var(--muted)}
-  .stdmap .arrow{color:var(--muted)}
-  .stdmap .std{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;overflow-wrap:anywhere}
-  .stdmap .std.on{font-weight:700}
   .erp-body{margin-top:8px}
   .erp-body .st{display:flex;align-items:center;gap:8px;margin:14px 0 8px}
   .erp-body .st h4{margin:0;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
@@ -176,9 +175,8 @@
           <b>Domain</b>: không cần nhập <code>http(s)</code>.<br>
           <b>Cột mở rộng</b> (tùy chọn): map cột Excel → thẻ <code>Extra1</code>…<code>Extra11</code> (cấp hóa đơn) hoặc <code>SP_Extra1</code>/<code>SP_Extra2</code> (cấp dòng). Kiểu: <code>string</code>/<code>numeric</code>/<code>datetime</code>.<br>
           <b>Cột hóa đơn đặc thù</b> (tùy chọn): chọn loại hóa đơn đặc thù để mẫu Excel bổ sung các cột hàng hóa đặc trưng (VD: Biển kiểm soát).<br>
-          <b>Thứ tự cột khi Tạo mẫu</b> (tùy chọn): kéo-thả để đổi thứ tự cột trên mẫu Excel sinh ra.<br>
           <b>Mã hóa chữ</b>: để Unicode (mặc định) cho file bình thường; chọn VNI-Windows nếu file xuất ra dùng font VNI (VD: <code>Coâng ty</code>).<br>
-          <b>Map cột mặc định thành tên khác</b> (tùy chọn): khi file của khách đặt tên cột khác mẫu (VD: xuất từ phần mềm khác). Khai tên thay thế cho từng cột mặc định, dòng tiêu đề, công thức tính cột (giống Excel) và giá trị mặc định khi ô trống.
+          <b>Thứ tự &amp; tên cột</b> (tùy chọn): kéo-thả để đổi thứ tự cột trên mẫu Excel sinh ra; khai tên thay thế khi file của khách đặt tên cột khác mẫu (VD: xuất từ phần mềm khác), dòng tiêu đề, công thức tính cột (giống Excel) và giá trị mặc định khi ô trống.
         </div>
       </details>
     </div>
@@ -260,21 +258,26 @@ function refreshColumnLetters(list){
 }
 function renderColumnOrderList(id){
   const conn = document.getElementById(id);
-  const type = conn.querySelector('.co-type').value;
+  const type = conn.querySelector('.m-type').value;
   const list = conn.querySelector('.co-list');
   const headers = (columnOrderState[id] && columnOrderState[id][type]) || DEFAULT_COLUMNS[type] || [];
-  list.innerHTML = headers.map((h, i) => `
-    <li class="co-item" tabindex="0" data-header="${esc(h)}" aria-label="${esc(h)}, kéo hoặc dùng phím mũi tên lên/xuống để đổi vị trí">
+  // Tên thay thế: lấy từ mappingState (map tên trong file → tên mặc định).
+  const altFor = {};
+  for(const [a,b] of ((mappingState[id]||{})[type]||{maps:[]}).maps){ const k=(b||'').toLowerCase(); if(!(k in altFor)) altFor[k]=a; }
+  list.innerHTML = headers.map((h, i) => { const a = altFor[h.toLowerCase()]||''; return `
+    <li class="co-item ${a?'renamed':''}" tabindex="0" data-header="${esc(h)}" aria-label="${esc(h)}, kéo hoặc dùng phím mũi tên lên/xuống để đổi vị trí">
       <span class="co-letter">${colLetter(i)}</span>
       <span class="co-pill">
         <svg class="co-handle" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="18" x2="16" y2="18"/></svg>
-        <span>${esc(h)}</span>
+        <span class="std-name">${esc(h)}</span>
+        <input class="co-alt s-alt" data-std="${esc(h)}" aria-label="Tên thay thế cho ${esc(h)}" placeholder="${h==='STT'&&type!=='CTT'?'Trống = tự động (cả file 1 HĐ)':'Tên thay thế'}" value="${esc(a)}" oninput="this.closest('.co-item').classList.toggle('renamed',!!this.value.trim())">
       </span>
-    </li>`).join('');
+    </li>`; }).join('');
 }
 function columnOrderResetDefault(id){
   const conn = document.getElementById(id);
-  const type = conn.querySelector('.co-type').value;
+  const type = conn.querySelector('.m-type').value;
+  syncMappingFromDom(id); // giữ tên thay thế đã gõ
   columnOrderState[id][type] = DEFAULT_COLUMNS[type].slice();
   renderColumnOrderList(id);
   formToJson();
@@ -290,7 +293,7 @@ function getDragAfterElement(list, y, dragEl){
 }
 function syncColumnOrderFromDom(list){
   const conn = list.closest('.conn');
-  const type = conn.querySelector('.co-type').value;
+  const type = conn.querySelector('.m-type').value;
   const headers = [...list.querySelectorAll('.co-item')].map(li => li.dataset.header);
   columnOrderState[conn.id][type] = headers;
 }
@@ -355,7 +358,7 @@ function wireColumnOrderDrag(list){
   }
   list.addEventListener('pointerdown', e => {
     const li = e.target.closest('.co-item');
-    if (!li || e.button !== 0) return;
+    if (!li || e.button !== 0 || e.target.closest('input')) return;
     draggingEl = li;
     pointerId = e.pointerId;
     dragOffsetY = 0;
@@ -370,7 +373,7 @@ function wireColumnOrderDrag(list){
   list.addEventListener('keydown', e => {
     if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
     const li = e.target.closest('.co-item');
-    if (!li) return;
+    if (!li || e.target !== li) return;
     const sib = e.key === 'ArrowUp' ? li.previousElementSibling : li.nextElementSibling;
     if (!sib) return;
     e.preventDefault();
@@ -483,33 +486,17 @@ function addConn(data){
       </div>
     </details>
 
-    <details class="sec">
-      <summary class="st" style="cursor:pointer"><h4>Thứ tự cột khi Tạo mẫu</h4><svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
-      <div class="field-note">Kéo-thả để đổi thứ tự cột trên mẫu Excel sinh ra. Không đổi thì add-in dùng thứ tự mặc định.</div>
-      <div class="co-row">
-        <select class="co-type" onchange="renderColumnOrderList('${id}')">${opts(Object.keys(DEFAULT_COLUMNS), 'GTGT')}</select>
-        <button class="mini" type="button" onclick="columnOrderResetDefault('${id}')">Khôi phục mặc định</button>
-      </div>
-      <ul class="co-list"></ul>
-    </details>
-
-    <details class="sec enc-sec" ${data.textEncoding?'open':''}>
-      <summary class="st" style="cursor:pointer"><h4>Mã hóa chữ trong file Excel</h4><svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
-      <div class="grid two">
-        <div><select class="f-enc" aria-label="Mã hóa chữ">${ENCODINGS.map(e=>`<option value="${e.v}" ${(data.textEncoding||'')===e.v?'selected':''}>${e.label}</option>`).join('')}</select>
-          <div class="field-note">Không chọn = Unicode, add-in không chuyển đổi gì.</div></div>
-      </div>
-    </details>
-
-    <details class="sec erp-sec" ${(data.columnMapping||[]).length?'open':''}>
-      <summary class="st" style="cursor:pointer"><h4>Map cột mặc định thành tên khác</h4><svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+    <details class="sec erp-sec" ${((data.columnMapping||[]).length||(data.columnOrder||[]).length)?'open':''}>
+      <summary class="st" style="cursor:pointer"><h4>Thứ tự &amp; tên cột</h4><svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
       <div class="erp-body">
         <div class="co-row">
           <select class="m-type" onchange="switchMappingType('${id}')">${opts(DOC_TYPES, firstMappingType(data))}</select>
           <label style="margin:0">Dòng tiêu đề</label><input class="m-hrow" type="number" min="1" style="max-width:80px">
+          <span class="spacer" style="flex:1"></span>
+          <button class="mini" type="button" onclick="columnOrderResetDefault('${id}')">Khôi phục thứ tự</button>
         </div>
-        <div class="field-note" style="margin:8px 0">Dùng khi file Excel của khách (VD: xuất từ phần mềm khác) đặt tên cột khác mẫu chuẩn.</div>
-        <div class="stdmap"></div>
+        <div class="field-note" style="margin:8px 0">Kéo-thả để đổi thứ tự cột trên mẫu Excel sinh ra (không đổi = thứ tự mặc định). Ô "Tên thay thế" trong mỗi dòng: tên cột khi file của khách đặt tên khác mẫu (VD: xuất từ phần mềm khác), để trống sẽ giữ nguyên mặc định.</div>
+        <ul class="co-list"></ul>
         <div class="st"><h4>Cột khác (Extra, SP_Extra, cột tùy chọn…)</h4><span class="spacer" style="flex:1"></span>
           <button class="mini" type="button" onclick="addMapRow('${id}','maps');formToJson()"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Thêm</button></div>
         <div class="maps"></div>
@@ -525,6 +512,14 @@ function addConn(data){
         <div class="field-note">Cột tùy biến (VD: PartItem → SP_Extra1) khai ở "Cột mở rộng" theo tên cột thật trong file.</div>
       </div>
     </details>
+
+    <details class="sec enc-sec" ${data.textEncoding?'open':''}>
+      <summary class="st" style="cursor:pointer"><h4>Mã hóa chữ trong file Excel</h4><svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+      <div class="grid two">
+        <div><select class="f-enc" aria-label="Mã hóa chữ">${ENCODINGS.map(e=>`<option value="${e.v}" ${(data.textEncoding||'')===e.v?'selected':''}>${e.label}</option>`).join('')}</select>
+          <div class="field-note">Không chọn = Unicode, add-in không chuyển đổi gì.</div></div>
+      </div>
+    </details>
   </div>`);
   document.getElementById('conns').appendChild(node);
   const pos = document.getElementById('conns').children.length - 1;
@@ -538,10 +533,9 @@ function addConn(data){
     .filter(c=>!(c && c.field && KNOWN_FIELD_KEYS.has(c.field))) // các field chuẩn VNPT hiện qua checkbox, không lặp lại ở đây
     .forEach(c=>addExt(id,c));
   initColumnOrderState(id, data);
-  renderColumnOrderList(id);
-  wireColumnOrderDrag(node.querySelector('.co-list'));
   initMappingState(id, data);
-  renderMapping(id);
+  renderMapping(id); // vẽ cả danh sách thứ tự cột + tên thay thế
+  wireColumnOrderDrag(node.querySelector('.co-list'));
   renumber();
 }
 
@@ -555,7 +549,7 @@ const EXTRA_STD = ["Extra","Extra1","Extra2","Extra3","Extra4","Extra5","Extra6"
   "NganHangNguoiMua","SoTaiKhoanNguoiMua","HoaDonDacThu","TinhChatHoaDon","SBKE","NBKE","NgayCapHoChieu","NgayHetHanHoChieu","QuocTich","SoTienQuyDoi","GiamThueGTGT"];
 // mappingState[connId][type] = {headerRow, maps:[[erp,std]], defs:[[std,value]], fx:[[target,formula]]}
 const mappingState = {};
-function firstMappingType(data){ const m=(data.columnMapping||[]).find(x=>x&&x.type); return m?m.type:'GTGT'; }
+function firstMappingType(data){ const m=(data.columnMapping||[]).find(x=>x&&x.type)||(data.columnOrder||[]).find(x=>x&&DEFAULT_COLUMNS[x.type]); return m?m.type:'GTGT'; }
 function emptyMapping(){ return {headerRow:1, maps:[], defs:[], fx:[]}; }
 // compose dạng cũ {date:[năm,tháng,ngày]} → công thức tương đương
 function dateToFormula(d){ const c=n=>/^[A-Za-z_][\w.]*$/.test(n)?n:'['+n+']';
@@ -652,19 +646,11 @@ function renderMapping(id){
   conn.dataset.mtype = type;
   conn.querySelector('.m-hrow').value = st.headerRow || 1;
   for(const k of ['maps','defs','fx']) conn.querySelector('.'+k).innerHTML = '';
-  // Cột chuẩn: 1 dòng/cột — trái = tên mặc định, phải = tên thay thế (tên cột trong file khách).
-  const std = DEFAULT_COLUMNS[type] || [];
-  const stdSet = new Set(std.map(h=>h.toLowerCase()));
-  const altFor = {}, otherMaps = [];
-  for(const [a,b] of st.maps){
-    const k = (b||'').toLowerCase();
-    if(stdSet.has(k) && !(k in altFor)) altFor[k] = a; else otherMaps.push([a,b]);
-  }
-  conn.querySelector('.stdmap').innerHTML =
-    '<div class="hd">Tên mặc định</div><div class="hd">Tên thay thế (Để trống sẽ giữ nguyên mặc định)</div>' +
-    std.map(h=>{ const a=altFor[h.toLowerCase()]||'';
-      return `<span class="std ${a?'on':''}">${esc(h)}</span>`
-        + `<input class="s-alt" data-std="${esc(h)}" aria-label="Tên thay thế cho ${esc(h)}" placeholder="${h==='STT'&&type!=='CTT'?'Trống = tự động (cả file 1 hóa đơn)':''}" value="${esc(a)}" oninput="this.previousElementSibling.classList.toggle('on',!!this.value.trim())">`; }).join('');
+  // Cột chuẩn (có trong danh sách thứ tự cột) hiện ô "Tên thay thế" ngay trên dòng kéo-thả; còn lại → "Cột khác".
+  const stdSet = new Set((DEFAULT_COLUMNS[type]||[]).map(h=>h.toLowerCase()));
+  const seen = new Set(), otherMaps = [];
+  for(const [a,b] of st.maps){ const k=(b||'').toLowerCase(); if(stdSet.has(k) && !seen.has(k)) seen.add(k); else otherMaps.push([a,b]); }
+  renderColumnOrderList(id);
   otherMaps.forEach(([a,b])=>addMapRow(id,'maps',a,b));
   st.fx.forEach(([a,b])=>addMapRow(id,'fx',a,b));
   st.defs.forEach(([a,b])=>addMapRow(id,'defs',a,b));
@@ -676,7 +662,7 @@ function syncMappingFromDom(id){
   const type = conn.dataset.mtype;
   if(!type || !mappingState[id]) return;
   const rows = sel => [...conn.querySelectorAll('.'+sel+' .row.map')].map(r=>[val(r,'.m-a'), val(r,'.m-b')]).filter(([a,b])=>a&&b);
-  const alts = [...conn.querySelectorAll('.stdmap .s-alt')].map(i=>[i.value.trim(), i.dataset.std]).filter(([a])=>a);
+  const alts = [...conn.querySelectorAll('.co-list .s-alt')].map(i=>[i.value.trim(), i.dataset.std]).filter(([a])=>a);
   const hr = parseInt(conn.querySelector('.m-hrow').value,10);
   mappingState[id][type] = {
     headerRow: hr>1 ? hr : 1,
