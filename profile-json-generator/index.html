@@ -62,6 +62,7 @@
   .row.pat{grid-template-columns:1fr 1fr 130px 36px}
   .row.ext{grid-template-columns:110px 140px 120px 1fr 36px}
   @media(max-width:720px){.row.ext{grid-template-columns:1fr}}
+  @media(min-width:721px){.exts .row.ext:not(:first-child) label{display:none}}
   @media(max-width:480px){.row.pat{grid-template-columns:1fr 1fr 88px 30px;gap:6px}}
   .pats .row.pat:not(:first-child) label{display:none}
   .row .del{padding:0}
