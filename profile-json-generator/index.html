@@ -87,10 +87,10 @@
   .co-row select{max-width:160px}
 
   .row.map{grid-template-columns:1fr 1fr 36px}
-  .row.map.fxr{grid-template-columns:minmax(0,.7fr) minmax(0,2fr) 36px}
-  .maps .row.map:not(:first-child) label,.defs .row.map:not(:first-child) label,.fx .row.map:not(:first-child) label{display:none}
-  .fx-err{grid-column:2/3;color:var(--danger-text);font-size:11.5px;margin-top:-2px}
-  .fx-err:empty{display:none}
+  .maps .row.map:not(:first-child) label,.defs .row.map:not(:first-child) label{display:none}
+  .fx-errs:empty{display:none}
+  input.is-fx{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  input.is-fx.bad{border-color:var(--danger-text) !important;box-shadow:0 0 0 2px rgba(220,38,38,.12)}
   .erp-body{margin-top:8px}
   .erp-body .st{display:flex;align-items:center;gap:8px;margin:14px 0 8px}
   .erp-body .st h4{margin:0;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
@@ -263,14 +263,16 @@ function renderColumnOrderList(id){
   const headers = (columnOrderState[id] && columnOrderState[id][type]) || DEFAULT_COLUMNS[type] || [];
   // Tên thay thế: lấy từ mappingState (map tên trong file → tên mặc định).
   const altFor = {};
-  for(const [a,b] of ((mappingState[id]||{})[type]||{maps:[]}).maps){ const k=(b||'').toLowerCase(); if(!(k in altFor)) altFor[k]=a; }
+  const mst = (mappingState[id]||{})[type] || {maps:[], fx:[]};
+  for(const [k,f] of (mst.fx||[])){ const lk=(k||'').toLowerCase(); if(!(lk in altFor)) altFor[lk]=f; } // công thức ưu tiên
+  for(const [a,b] of mst.maps){ const k=(b||'').toLowerCase(); if(!(k in altFor)) altFor[k]=a; }
   list.innerHTML = headers.map((h, i) => { const a = altFor[h.toLowerCase()]||''; return `
     <li class="co-item ${a?'renamed':''}" tabindex="0" data-header="${esc(h)}" aria-label="${esc(h)}, kéo hoặc dùng phím mũi tên lên/xuống để đổi vị trí">
       <span class="co-letter">${colLetter(i)}</span>
       <span class="co-pill">
         <svg class="co-handle" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="18" x2="16" y2="18"/></svg>
         <span class="std-name">${esc(h)}</span>
-        <input class="co-alt s-alt" data-std="${esc(h)}" aria-label="Tên thay thế cho ${esc(h)}" placeholder="${h==='STT'&&type!=='CTT'?'Trống = tự động (cả file 1 HĐ)':'Tên thay thế'}" value="${esc(a)}" oninput="this.closest('.co-item').classList.toggle('renamed',!!this.value.trim())">
+        <input class="co-alt s-alt" data-std="${esc(h)}" aria-label="Tên thay thế cho ${esc(h)}" spellcheck="false" placeholder="${h==='STT'&&type!=='CTT'?'Trống = tự động (cả file 1 HĐ)':'Tên thay thế hoặc =công thức'}" value="${esc(a)}" oninput="altChanged(this)">
       </span>
     </li>`; }).join('');
 }
@@ -495,16 +497,13 @@ function addConn(data){
           <span class="spacer" style="flex:1"></span>
           <button class="mini" type="button" onclick="columnOrderResetDefault('${id}')">Khôi phục thứ tự</button>
         </div>
-        <div class="field-note" style="margin:8px 0">Kéo-thả để đổi thứ tự cột trên mẫu Excel sinh ra (không đổi = thứ tự mặc định). Ô "Tên thay thế" trong mỗi dòng: tên cột khi file của khách đặt tên khác mẫu (VD: xuất từ phần mềm khác), để trống sẽ giữ nguyên mặc định.</div>
+        <div class="field-note" style="margin:8px 0">Kéo-thả để đổi thứ tự cột trên mẫu Excel sinh ra (không đổi = thứ tự mặc định). Ô bên phải mỗi dòng: để trống = giữ nguyên tên mặc định; gõ <b>tên thay thế</b> khi file của khách đặt tên cột khác mẫu (VD: xuất từ phần mềm khác); gõ bắt đầu bằng <code>=</code> là <b>công thức</b> tính cột đó từ các cột khác, giống Excel: <code>+ - * /</code>, <code>&amp;</code> nối chữ, <code>TEXT(giá trị, "định dạng")</code> (VD <code>"0000"</code>, <code>"00"</code>, <code>"#,##0.00"</code>), tên cột có khoảng trắng viết trong <code>[ ]</code>; kết quả ghi đè cột đó.<br>
+          VD cộng: <code>=IYear + IMonth + IDay</code> · ghép ngày: <code>=TEXT(IYear,"0000") &amp; "-" &amp; TEXT(IMonth,"00") &amp; "-" &amp; TEXT(IDay,"00")</code></div>
         <ul class="co-list"></ul>
+        <div class="fx-errs msg err" style="margin-top:8px"></div>
         <div class="st"><h4>Cột khác (Extra, SP_Extra, cột tùy chọn…)</h4><span class="spacer" style="flex:1"></span>
           <button class="mini" type="button" onclick="addMapRow('${id}','maps');formToJson()"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Thêm</button></div>
         <div class="maps"></div>
-        <div class="st"><h4>Công thức</h4><span class="spacer" style="flex:1"></span>
-          <button class="mini" type="button" onclick="addMapRow('${id}','fx');formToJson()"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Thêm</button></div>
-        <div class="field-note" style="margin-bottom:8px">Tính giá trị cột từ các cột khác, giống công thức Excel: <code>+ - * /</code>, <code>&amp;</code> nối chữ, <code>TEXT(giá trị, "định dạng")</code> (VD <code>"0000"</code>, <code>"00"</code>, <code>"#,##0.00"</code>). Tên cột có khoảng trắng viết trong <code>[ ]</code>. Kết quả ghi đè cột đích.<br>
-          VD cộng: <code>=IYear + IMonth + IDay</code> · ghép ngày: <code>=TEXT(IYear,"0000") &amp; "-" &amp; TEXT(IMonth,"00") &amp; "-" &amp; TEXT(IDay,"00")</code></div>
-        <div class="fx"></div>
         <div class="st"><h4>Giá trị mặc định (khi ô trống)</h4><span class="spacer" style="flex:1"></span>
           <button class="mini" type="button" onclick="addMapRow('${id}','defs');formToJson()"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Thêm</button></div>
         <div class="defs"></div>
@@ -570,7 +569,7 @@ function initMappingState(id, data){
   mappingState[id] = st;
 }
 const ICON_X='<svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
-// maps: a = tên cột trong file, b = tên mặc định (hiện b trước). defs: a = cột, b = giá trị. fx: a = cột, b = công thức.
+// maps: a = tên thay thế hoặc "=công thức", b = tên mặc định (hiện b trước). defs: a = cột, b = giá trị.
 function addMapRow(id, kind, a, b){
   const box = document.getElementById(id).querySelector('.'+kind);
   const del = `<div class="del"><button class="mini danger icon" title="Xóa" aria-label="Xóa" onclick="this.closest('.row').remove();formToJson()">${ICON_X}</button></div>`;
@@ -578,19 +577,9 @@ function addMapRow(id, kind, a, b){
     box.appendChild(el(`
     <div class="row map">
       <div><label>Tên mặc định</label><input class="m-b" list="${id}-std" placeholder="VD: Extra1" value="${esc(b)}"></div>
-      <div><label>Tên thay thế</label><input class="m-a" placeholder="VD: GhiChu" value="${esc(a)}"></div>
+      <div><label>Tên thay thế hoặc =công thức</label><input class="m-a alt-in" spellcheck="false" placeholder="VD: GhiChu" value="${esc(a)}" oninput="altChanged(this)"></div>
       ${del}
     </div>`));
-  } else if(kind==='fx'){
-    const row = el(`
-    <div class="row map fxr">
-      <div><label>Cột</label><input class="m-a" list="${id}-std" placeholder="VD: NgayHoaDon" value="${esc(a)}"></div>
-      <div><label>Giá trị</label><input class="m-b fx-in" spellcheck="false" placeholder='VD: =TEXT(IYear,"0000") &amp; "-" &amp; TEXT(IMonth,"00") &amp; "-" &amp; TEXT(IDay,"00")' value="${esc(b)}" oninput="checkFxRow(this)"></div>
-      ${del}
-      <div class="fx-err"></div>
-    </div>`);
-    box.appendChild(row);
-    checkFxRow(row.querySelector('.fx-in'));
   } else {
     box.appendChild(el(`
     <div class="row map">
@@ -635,9 +624,25 @@ function formulaError(text){
     return '';
   }catch(e){ return e.message; }
 }
-function checkFxRow(inp){
-  const box=inp.closest('.row').querySelector('.fx-err');
-  box.textContent = inp.value.trim() ? (formulaError(inp.value) ? 'Công thức chưa đúng: '+formulaError(inp.value) : '') : '';
+// Ô tên thay thế / công thức: bắt đầu bằng "=" là công thức → kiểm tra cú pháp, viền đỏ + liệt kê lỗi dưới danh sách.
+function isFormula(v){ return String(v||'').trim().startsWith('='); }
+function altChanged(inp){
+  const v=inp.value.trim(), fx=isFormula(v), err=fx?formulaError(v):'';
+  inp.classList.toggle('is-fx', fx);
+  inp.classList.toggle('bad', !!err);
+  inp.title = err ? 'Công thức chưa đúng: '+err : '';
+  const li=inp.closest('.co-item'); if(li) li.classList.toggle('renamed', !!v);
+  refreshFxErrors(inp.closest('.conn'));
+}
+function refreshFxErrors(conn){
+  if(!conn) return;
+  const box=conn.querySelector('.fx-errs'); if(!box) return;
+  const errs=[...conn.querySelectorAll('.co-list .s-alt, .maps .alt-in')].filter(i=>isFormula(i.value)).map(i=>{
+    const e=formulaError(i.value); if(!e) return '';
+    const name=i.dataset.std || val(i.closest('.row'),'.m-b') || '?';
+    return ICON_WARN+'Công thức cột '+esc(name)+': '+esc(e);
+  }).filter(Boolean);
+  box.innerHTML=errs.join('<br>');
 }
 function renderMapping(id){
   const conn = document.getElementById(id);
@@ -645,14 +650,17 @@ function renderMapping(id){
   const st = mappingState[id][type];
   conn.dataset.mtype = type;
   conn.querySelector('.m-hrow').value = st.headerRow || 1;
-  for(const k of ['maps','defs','fx']) conn.querySelector('.'+k).innerHTML = '';
+  for(const k of ['maps','defs']) conn.querySelector('.'+k).innerHTML = '';
   // Cột chuẩn (có trong danh sách thứ tự cột) hiện ô "Tên thay thế" ngay trên dòng kéo-thả; còn lại → "Cột khác".
   const stdSet = new Set((DEFAULT_COLUMNS[type]||[]).map(h=>h.toLowerCase()));
   const seen = new Set(), otherMaps = [];
+  // Công thức cũng đi chung ô: cột chuẩn → ô trong dòng (ưu tiên công thức), cột khác → "Cột khác".
+  for(const [k,f] of st.fx){ const lk=(k||'').toLowerCase(); if(stdSet.has(lk) && !seen.has(lk)) seen.add(lk); else otherMaps.push([f,k]); }
   for(const [a,b] of st.maps){ const k=(b||'').toLowerCase(); if(stdSet.has(k) && !seen.has(k)) seen.add(k); else otherMaps.push([a,b]); }
   renderColumnOrderList(id);
   otherMaps.forEach(([a,b])=>addMapRow(id,'maps',a,b));
-  st.fx.forEach(([a,b])=>addMapRow(id,'fx',a,b));
+  conn.querySelectorAll('.co-list .s-alt, .maps .alt-in').forEach(i=>{ const v=i.value.trim(); i.classList.toggle('is-fx',isFormula(v)); i.classList.toggle('bad',isFormula(v)&&!!formulaError(v)); });
+  refreshFxErrors(conn);
   st.defs.forEach(([a,b])=>addMapRow(id,'defs',a,b));
   conn.querySelector('datalist').innerHTML = (DEFAULT_COLUMNS[type]||[]).concat(type==='CTT'?[]:EXTRA_STD).map(h=>`<option value="${esc(h)}">`).join('');
 }
@@ -662,13 +670,13 @@ function syncMappingFromDom(id){
   const type = conn.dataset.mtype;
   if(!type || !mappingState[id]) return;
   const rows = sel => [...conn.querySelectorAll('.'+sel+' .row.map')].map(r=>[val(r,'.m-a'), val(r,'.m-b')]).filter(([a,b])=>a&&b);
-  const alts = [...conn.querySelectorAll('.co-list .s-alt')].map(i=>[i.value.trim(), i.dataset.std]).filter(([a])=>a);
+  const alts = [...conn.querySelectorAll('.co-list .s-alt')].map(i=>[i.value.trim(), i.dataset.std]).filter(([a])=>a).concat(rows('maps'));
   const hr = parseInt(conn.querySelector('.m-hrow').value,10);
   mappingState[id][type] = {
     headerRow: hr>1 ? hr : 1,
-    maps: alts.concat(rows('maps')),
+    maps: alts.filter(([a])=>!isFormula(a)),
     defs: rows('defs'),
-    fx: rows('fx')
+    fx: alts.filter(([a])=>isFormula(a)).map(([f,k])=>[k,f])
   };
 }
 function switchMappingType(id){
