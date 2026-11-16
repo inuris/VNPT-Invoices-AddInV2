@@ -60,7 +60,7 @@
 
   .row{display:grid;gap:8px;align-items:end;margin:0 0 8px}
   .row.pat{grid-template-columns:1fr 1fr 130px 36px}
-  .row.ext{grid-template-columns:110px 1.3fr 130px 120px 1fr 36px}
+  .row.ext{grid-template-columns:110px 140px 120px 1fr 36px}
   @media(max-width:720px){.row.ext{grid-template-columns:1fr}}
   @media(max-width:480px){.row.pat{grid-template-columns:1fr 1fr 88px 30px;gap:6px}}
   .pats .row.pat:not(:first-child) label{display:none}
@@ -174,7 +174,7 @@
           <b>Tài khoản WebService</b>: tài khoản Service tạo ở menu Phân Quyền.<br>
           <b>Loại chứng từ</b>: <code>CTT</code> / <code>GTGT</code> / <code>PXK</code>.<br>
           <b>Domain</b>: không cần nhập <code>http(s)</code>.<br>
-          <b>Cột mở rộng</b> (tùy chọn): map cột Excel → thẻ <code>Extra1</code>…<code>Extra11</code> (cấp hóa đơn) hoặc <code>SP_Extra1</code>/<code>SP_Extra2</code> (cấp dòng). Kiểu: <code>string</code>/<code>numeric</code>/<code>datetime</code>.<br>
+          <b>Cột mở rộng</b> (tùy chọn): thêm cột ghi vào thẻ <code>Extra1</code>…<code>Extra11</code> (cấp hóa đơn) hoặc <code>SP_Extra1</code>/<code>SP_Extra2</code> (cấp dòng). Kiểu: <code>string</code>/<code>numeric</code>/<code>datetime</code>. Tên cột mặc định là tên thẻ, đổi tên ở "Thứ tự &amp; tên cột".<br>
           <b>Cột hóa đơn đặc thù</b> (tùy chọn): chọn loại hóa đơn đặc thù để mẫu Excel bổ sung các cột hàng hóa đặc trưng (VD: Biển kiểm soát).<br>
           <b>Mã hóa chữ</b>: để Unicode (mặc định) cho file bình thường; chọn VNI-Windows nếu file xuất ra dùng font VNI (VD: <code>Coâng ty</code>).<br>
           <b>Thứ tự &amp; tên cột</b> (tùy chọn): kéo-thả để đổi thứ tự cột trên mẫu Excel sinh ra; khai tên thay thế khi file của khách đặt tên cột khác mẫu (VD: xuất từ phần mềm khác), dòng tiêu đề, công thức tính cột (giống Excel) và giá trị mặc định khi ô trống.
@@ -236,15 +236,19 @@ function initColumnOrderState(id, data){
   }
   columnOrderState[id] = state;
 }
-// Cột mở rộng (customColumns) đã khai cho loại chứng từ t — tên cột Excel, theo thứ tự khai.
-function extHeaders(id, t){
+// Cột mở rộng (customColumns) đã khai cho loại chứng từ t, theo thứ tự khai. Tên cột = tên đổi ở
+// "Thứ tự & tên cột" (ô ẩn .e-header), để trống = chính tên thẻ (VD SP_Extra1).
+function extInfo(id, t){
   const out=[], seen=new Set();
   document.getElementById(id).querySelectorAll('.exts .row.ext').forEach(r=>{
-    const h=val(r,'.e-header'); if(!h || (val(r,'.e-type')||'GTGT')!==t || seen.has(h.toLowerCase())) return;
-    seen.add(h.toLowerCase()); out.push(h);
+    if((val(r,'.e-type')||'GTGT')!==t) return;
+    const slot=val(r,'.e-slot'), rename=val(r,'.e-header'), header=rename||slot;
+    if(!header || seen.has(header.toLowerCase())) return;
+    seen.add(header.toLowerCase()); out.push({k:r.dataset.k, slot, rename, header});
   });
   return out;
 }
+function extHeaders(id, t){ return extInfo(id,t).map(x=>x.header); }
 // Thứ tự tự nhiên = cột mặc định + cột mở rộng (add-in nối cột mở rộng vào cuối mẫu).
 function naturalOrder(id, t){
   const std=DEFAULT_COLUMNS[t]||[], have=new Set(std.map(h=>h.toLowerCase()));
@@ -286,19 +290,24 @@ function renderColumnOrderList(id){
   const list = conn.querySelector('.co-list');
   const headers = orderFor(id, type);
   columnOrderState[id][type] = headers;
-  const extSet = new Set(extHeaders(id, type).map(h=>h.toLowerCase()));
+  const extBy = new Map(extInfo(id, type).map(x=>[x.header.toLowerCase(), x]));
   // Tên thay thế: lấy từ mappingState (map tên trong file → tên mặc định).
   const altFor = {};
   const mst = (mappingState[id]||{})[type] || {maps:[], fx:[]};
   for(const [k,f] of (mst.fx||[])){ const lk=(k||'').toLowerCase(); if(!(lk in altFor)) altFor[lk]=f; } // công thức ưu tiên
   for(const [a,b] of mst.maps){ const k=(b||'').toLowerCase(); if(!(k in altFor)) altFor[k]=a; }
-  list.innerHTML = headers.map((h, i) => { const a = altFor[h.toLowerCase()]||''; return `
-    <li class="co-item ${a?'renamed':''} ${extSet.has(h.toLowerCase())?'is-ext':''}" tabindex="0" data-header="${esc(h)}" aria-label="${esc(h)}, kéo hoặc dùng phím mũi tên lên/xuống để đổi vị trí">
+  list.innerHTML = headers.map((h, i) => {
+    const ext = extBy.get(h.toLowerCase());
+    // Cột mở rộng: tên hiển thị = thẻ; ô bên phải = tên cột đã đổi (hoặc công thức).
+    const a = ext ? ((isFormula(altFor[h.toLowerCase()]) ? altFor[h.toLowerCase()] : '') || ext.rename) : (altFor[h.toLowerCase()]||'');
+    const shown = ext ? ext.slot : h;
+    return `
+    <li class="co-item ${a?'renamed':''} ${ext?'is-ext':''}" tabindex="0" data-header="${esc(h)}" ${ext?`data-ext="${ext.k}"`:''} aria-label="${esc(shown)}, kéo hoặc dùng phím mũi tên lên/xuống để đổi vị trí">
       <span class="co-letter">${colLetter(i)}</span>
       <span class="co-pill">
         <svg class="co-handle" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="18" x2="16" y2="18"/></svg>
-        <span class="std-name">${esc(h)}${extSet.has(h.toLowerCase())?' <small class="ext-tag">mở rộng</small>':''}</span>
-        <input class="co-alt s-alt ${isFormula(a)?'is-fx':''} ${isFormula(a)&&formulaError(a)?'bad':''}" data-std="${esc(h)}" aria-label="Tên thay thế cho ${esc(h)}" spellcheck="false" placeholder="${h==='STT'&&type!=='CTT'?'Trống = tự động (cả file 1 HĐ)':'Tên thay thế hoặc =công thức'}" value="${esc(a)}" oninput="altChanged(this)">
+        <span class="std-name">${esc(shown)}${ext?' <small class="ext-tag">mở rộng</small>':''}</span>
+        <input class="co-alt s-alt ${isFormula(a)?'is-fx':''} ${isFormula(a)&&formulaError(a)?'bad':''}" data-std="${esc(h)}" aria-label="Tên thay thế cho ${esc(shown)}" spellcheck="false" placeholder="${h==='STT'&&type!=='CTT'?'Trống = tự động (cả file 1 HĐ)':'Tên thay thế hoặc =công thức'}" value="${esc(a)}" oninput="altChanged(this)">
       </span>
     </li>`; }).join('');
   refreshFxErrors(conn);
@@ -491,7 +500,7 @@ function addConn(data){
 
     <div class="sec">
       <div class="st"><h4>Cột mở rộng (tùy chọn)</h4><span class="spacer" style="flex:1"></span>
-        <button class="mini" onclick="addExt('${id}');formToJson()"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Thêm cột</button></div>
+        <button class="mini" onclick="addExt('${id}');refreshOrderList('${id}')"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Thêm cột</button></div>
       <div class="exts"></div>
     </div>
 
@@ -537,7 +546,7 @@ function addConn(data){
           <button class="mini" type="button" onclick="addMapRow('${id}','defs');formToJson()"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Thêm</button></div>
         <div class="defs"></div>
         <datalist id="${id}-std"></datalist>
-        <div class="field-note">Cột tùy biến (VD: PartItem → SP_Extra1) khai ở "Cột mở rộng" theo tên cột thật trong file.</div>
+        <div class="field-note">Cột mở rộng (thêm ở "Cột mở rộng") hiện ở cuối danh sách với tên thẻ (VD <code>SP_Extra1</code>); gõ tên cột thật trong file vào ô bên phải để đổi tên (VD <code>PartItem</code>).</div>
       </div>
     </details>
 
@@ -661,7 +670,21 @@ function altChanged(inp){
   inp.classList.toggle('bad', !!err);
   inp.title = err ? 'Công thức chưa đúng: '+err : '';
   const li=inp.closest('.co-item'); if(li) li.classList.toggle('renamed', !!v);
-  refreshFxErrors(inp.closest('.conn'));
+  const conn=inp.closest('.conn');
+  if(li && li.dataset.ext){
+    // Cột mở rộng: đổi tên = đổi customColumns.header (công thức thì cột giữ tên thẻ).
+    const row=conn.querySelector('.row.ext[data-k="'+li.dataset.ext+'"]');
+    if(row){
+      row.querySelector('.e-header').value = fx ? '' : v;
+      const nh = (fx ? '' : v) || val(row,'.e-slot'), oh = li.dataset.header;
+      if(nh !== oh){
+        const t = conn.querySelector('.m-type').value, arr = columnOrderState[conn.id][t]||[];
+        const i = arr.indexOf(oh); if(i>=0) arr[i]=nh;
+        li.dataset.header = nh;
+      }
+    }
+  }
+  refreshFxErrors(conn);
 }
 function refreshFxErrors(conn){
   if(!conn) return;
@@ -700,7 +723,9 @@ function syncMappingFromDom(id){
   const type = conn.dataset.mtype;
   if(!type || !mappingState[id]) return;
   const rows = sel => [...conn.querySelectorAll('.'+sel+' .row.map')].map(r=>[val(r,'.m-a'), val(r,'.m-b')]).filter(([a,b])=>a&&b);
-  const alts = [...conn.querySelectorAll('.co-list .s-alt')].map(i=>[i.value.trim(), i.dataset.std]).filter(([a])=>a).concat(rows('maps'));
+  const alts = [...conn.querySelectorAll('.co-list .co-item')].map(li=>{ const i=li.querySelector('.s-alt'), v=i.value.trim();
+      return li.dataset.ext ? (isFormula(v) ? [v, li.dataset.header] : ['','']) : [v, li.dataset.header]; })
+    .filter(([a])=>a).concat(rows('maps'));
   const hr = parseInt(conn.querySelector('.m-hrow').value,10);
   mappingState[id][type] = {
     headerRow: hr>1 ? hr : 1,
@@ -744,14 +769,16 @@ function addPat(id, p){
   box.appendChild(row);
 }
 
+let extSeq = 0;
 function addExt(id, c){
   c = c || {};
   const box = document.getElementById(id).querySelector('.exts');
+  const slot = c.extraSlot||'Extra9';
+  const rename = c.header && c.header !== slot ? c.header : '';
   const row = el(`
-    <div class="row ext">
+    <div class="row ext" data-k="${++extSeq}">
       <div><label>Loại CT</label><select class="e-type">${opts(DOC_TYPES, c.type||'GTGT')}</select></div>
-      <div><label>Tên cột Excel</label><input class="e-header" placeholder="VD: SoHopDong" value="${esc(c.header)}"></div>
-      <div><label>Thẻ Extra</label><select class="e-slot">${opts(SLOTS, c.extraSlot||'Extra9')}</select></div>
+      <div><label>Thẻ Extra</label><select class="e-slot" data-prev="${esc(slot)}">${opts(SLOTS, slot)}</select><input type="hidden" class="e-header" value="${esc(rename)}"></div>
       <div><label>Kiểu</label><select class="e-dtype">${opts(DTYPES, c.dataType||'string')}</select></div>
       <div><label>Ghi chú</label><input class="e-note" placeholder="VD: Nhập số hợp đồng 0-9" value="${esc(c.note)}"></div>
       <div class="del"><button class="mini danger icon" title="Xóa cột" aria-label="Xóa cột" onclick="const c=this.closest('.conn').id;this.closest('.row').remove();refreshOrderList(c)"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
@@ -800,7 +827,7 @@ function collect(){
     }
     if(conn.patterns.length===0) conn.patterns.push({pattern:'', serial:'', type:'CTT'});
     for(const r of c.querySelectorAll('.row.ext')){
-      const h=val(r,'.e-header');
+      const h=val(r,'.e-header')||val(r,'.e-slot');
       if(!h) continue;
       conn.customColumns.push({
         type: val(r,'.e-type')||'GTGT',
@@ -925,7 +952,16 @@ document.addEventListener('input', e=>{
   if(e.target.id==='json'){ jsonToForm(); persist(); return; }
   if(e.target.closest('.conn')){
     if(e.target.classList.contains('f-name')) renumber();
-    if(e.target.closest('.exts')) refreshOrderList(e.target.closest('.conn').id);
+    if(e.target.closest('.exts')){
+      const conn=e.target.closest('.conn');
+      if(e.target.classList.contains('e-slot')){
+        const row=e.target.closest('.row.ext'), prev=e.target.dataset.prev, cur=e.target.value;
+        if(!val(row,'.e-header') && prev && prev!==cur)
+          for(const t of Object.keys(columnOrderState[conn.id]||{})){ const arr=columnOrderState[conn.id][t]; const i=arr.indexOf(prev); if(i>=0) arr[i]=cur; }
+        e.target.dataset.prev=cur;
+      }
+      refreshOrderList(conn.id);
+    }
     else formToJson();
   }
 });
