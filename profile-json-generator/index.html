@@ -73,6 +73,12 @@
   .row.date3{grid-template-columns:1.2fr 1fr 1fr 1fr}
   @media(max-width:480px){.row.date3{grid-template-columns:1fr 1fr}}
   .maps .row.map:not(:first-child) label,.defs .row.map:not(:first-child) label{display:none}
+  .stdmap{display:grid;grid-template-columns:1fr auto 1fr 1fr;gap:6px 8px;align-items:center}
+  .stdmap .hd{font-size:11px;font-weight:700;color:var(--muted)}
+  .stdmap .arrow{color:var(--muted)}
+  .stdmap .std{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;overflow-wrap:anywhere}
+  .stdmap .std.on{font-weight:700}
+  @media(max-width:560px){.stdmap{grid-template-columns:1fr auto 1fr}.stdmap .s-def,.stdmap .hd-def{display:none}}
   .erp-body{margin-top:8px}
   .erp-body .st{display:flex;align-items:center;gap:8px;margin:14px 0 8px}
   .erp-body .st h4{margin:0;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
@@ -477,7 +483,10 @@ function addConn(data){
           <select class="m-type" onchange="switchMappingType('${id}')">${opts(DOC_TYPES, firstMappingType(data))}</select>
           <label style="margin:0">Dòng tiêu đề</label><input class="m-hrow" type="number" min="1" style="max-width:80px">
         </div>
-        <div class="st"><h4>Đổi tên cột (cột ERP → cột chuẩn)</h4><span class="spacer" style="flex:1"></span>
+        <div class="st"><h4>Cột chuẩn ← cột trong file ERP</h4></div>
+        <div class="field-note" style="margin-bottom:8px">Gõ tên cột của file ERP vào ô bên trái cột chuẩn tương ứng. Để trống = file đã dùng đúng tên chuẩn (hoặc không có cột này). Ô "Mặc định" điền khi ô trống/không có cột.</div>
+        <div class="stdmap"></div>
+        <div class="st"><h4>Cột khác (Extra, SP_Extra, cột tùy chọn…)</h4><span class="spacer" style="flex:1"></span>
           <button class="mini" type="button" onclick="addMapRow('${id}','maps');formToJson()"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Thêm</button></div>
         <div class="maps"></div>
         <div class="st"><h4>Ghép ngày từ 3 cột</h4></div>
@@ -487,7 +496,7 @@ function addConn(data){
           <div><label>Cột tháng</label><input class="d-m" placeholder="VD: IMonth"></div>
           <div><label>Cột ngày</label><input class="d-d" placeholder="VD: IDay"></div>
         </div>
-        <div class="st"><h4>Giá trị mặc định (ô trống / không có cột)</h4><span class="spacer" style="flex:1"></span>
+        <div class="st"><h4>Giá trị mặc định cho cột khác</h4><span class="spacer" style="flex:1"></span>
           <button class="mini" type="button" onclick="addMapRow('${id}','defs');formToJson()"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Thêm</button></div>
         <div class="defs"></div>
         <datalist id="${id}-std"></datalist>
@@ -566,8 +575,24 @@ function renderMapping(id){
   conn.querySelector('.m-hrow').value = st.headerRow || 1;
   conn.querySelector('.maps').innerHTML = '';
   conn.querySelector('.defs').innerHTML = '';
-  (st.maps.length ? st.maps : [['','']]).forEach(([a,b])=>addMapRow(id,'maps',a,b));
-  st.defs.forEach(([a,b])=>addMapRow(id,'defs',a,b));
+  // Cột chuẩn mặc định: 1 dòng/cột, ô trái = tên cột ERP, ô phải = giá trị mặc định.
+  const std = DEFAULT_COLUMNS[type] || [];
+  const stdSet = new Set(std.map(h=>h.toLowerCase()));
+  const erpFor = {}, otherMaps = [];
+  for(const [a,b] of st.maps){
+    const k = (b||'').toLowerCase();
+    if(stdSet.has(k) && !(k in erpFor)) erpFor[k] = a; else otherMaps.push([a,b]);
+  }
+  const defFor = {}, otherDefs = [];
+  for(const [a,b] of st.defs){ const k=(a||'').toLowerCase(); if(stdSet.has(k) && !(k in defFor)) defFor[k]=b; else otherDefs.push([a,b]); }
+  conn.querySelector('.stdmap').innerHTML =
+    '<div class="hd">Cột trong file ERP</div><div></div><div class="hd">Cột chuẩn add-in</div><div class="hd hd-def">Mặc định</div>' +
+    std.map(h=>{ const k=h.toLowerCase(); const e=erpFor[k]||'', d=defFor[k]||'';
+      return `<input class="s-erp" data-std="${esc(h)}" placeholder="${esc(h)}" value="${esc(e)}" oninput="this.nextElementSibling.nextElementSibling.classList.toggle('on',!!this.value.trim())">`
+        + `<span class="arrow">→</span><span class="std ${e?'on':''}">${esc(h)}</span>`
+        + `<input class="s-def" data-std="${esc(h)}" value="${esc(d)}">`; }).join('');
+  otherMaps.forEach(([a,b])=>addMapRow(id,'maps',a,b));
+  otherDefs.forEach(([a,b])=>addMapRow(id,'defs',a,b));
   conn.querySelector('.d-target').value = st.date.target||'';
   conn.querySelector('.d-y').value = st.date.y||'';
   conn.querySelector('.d-m').value = st.date.m||'';
@@ -580,11 +605,12 @@ function syncMappingFromDom(id){
   const type = conn.dataset.mtype;
   if(!type || !mappingState[id]) return;
   const rows = sel => [...conn.querySelectorAll('.'+sel+' .row.map')].map(r=>[val(r,'.m-a'), val(r,'.m-b')]).filter(([a,b])=>a&&b);
+  const stdRows = sel => [...conn.querySelectorAll('.stdmap '+sel)].map(i=>[i.dataset.std, i.value.trim()]).filter(([h,v])=>v);
   const hr = parseInt(conn.querySelector('.m-hrow').value,10);
   mappingState[id][type] = {
     headerRow: hr>1 ? hr : 1,
-    maps: rows('maps'),
-    defs: rows('defs'),
+    maps: stdRows('.s-erp').map(([h,v])=>[v,h]).concat(rows('maps')),
+    defs: stdRows('.s-def').concat(rows('defs')),
     date: {target:val(conn,'.d-target'), y:val(conn,'.d-y'), m:val(conn,'.d-m'), d:val(conn,'.d-d')}
   };
 }
