@@ -98,6 +98,9 @@
   .fx-tip .sig{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
   .fx-tip .sig b{text-decoration:underline}
   .fx-tip .mut{color:var(--muted)}
+  .fx-tip .tip-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px}
+  .fx-tip .tip-list li{display:flex;flex-wrap:wrap;gap:2px 8px;align-items:baseline}
+  .fx-tip .tip-list li::before{content:"•";color:var(--muted)}
   .fx-tip .err{color:var(--danger-text)}
   input.is-fx{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
   input.is-fx.bad{border-color:var(--danger-text) !important;box-shadow:0 0 0 2px rgba(220,38,38,.12)}
@@ -703,8 +706,12 @@ function updateFxTip(inp){
     html = `<div class="sig">TEXT(${arg===0?'<b>giá trị</b>':'giá trị'}, ${arg>=1?'<b>"định dạng"</b>':'"định dạng"'})</div>`
       + `<div class="mut">${arg===0?'Tên cột hoặc phép tính, VD: <code>IYear</code>':'Định dạng số, VD: <code>"0000"</code> · <code>"00"</code> · <code>"#,##0.00"</code>'}</div>`;
   } else {
-    html = `<div class="sig">=Cột1 + Cột2 &nbsp;·&nbsp; =Cột1 &amp; "-" &amp; Cột2 &nbsp;·&nbsp; =TEXT(Cột, "00")</div>`
-      + `<div class="mut">Phép tính <code>+ - * /</code>, nối chữ <code>&amp;</code>, chữ trong <code>" "</code>, tên cột có khoảng trắng viết <code>[Tên cột]</code>.</div>`;
+    html = `<ul class="tip-list">`
+      + `<li><code>=Cột1 + Cột2</code> <span class="mut">cộng, trừ, nhân, chia: + - * /</span></li>`
+      + `<li><code>=Cột1 &amp; "-" &amp; Cột2</code> <span class="mut">nối chữ bằng &amp;, chữ đặt trong " "</span></li>`
+      + `<li><code>=TEXT(Cột, "00")</code> <span class="mut">định dạng số</span></li>`
+      + `<li><code>[Tên cột]</code> <span class="mut">tên cột có khoảng trắng</span></li>`
+      + `</ul>`;
   }
   const err = v.trim()!=='=' ? formulaError(v) : '';
   if(err && !/cuối công thức|đóng chuỗi|thiếu dấu \)/.test(err)) html += `<div class="err">${esc(err)}</div>`; // lỗi do đang gõ dở thì thôi
