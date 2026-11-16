@@ -69,6 +69,20 @@
   .co-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:4px}
   .co-row select{max-width:160px}
 
+  .row.map{grid-template-columns:1fr 1fr 36px}
+  .row.date3{grid-template-columns:1.2fr 1fr 1fr 1fr}
+  @media(max-width:480px){.row.date3{grid-template-columns:1fr 1fr}}
+  .maps .row.map:not(:first-child) label,.defs .row.map:not(:first-child) label{display:none}
+  .stdmap{display:grid;grid-template-columns:1fr auto 1fr 1fr;gap:6px 8px;align-items:center}
+  .stdmap .hd{font-size:11px;font-weight:700;color:var(--muted)}
+  .stdmap .arrow{color:var(--muted)}
+  .stdmap .std{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;overflow-wrap:anywhere}
+  .stdmap .std.on{font-weight:700}
+  @media(max-width:560px){.stdmap{grid-template-columns:1fr auto 1fr}.stdmap .s-def,.stdmap .hd-def{display:none}}
+  .erp-body{margin-top:8px}
+  .erp-body .st{display:flex;align-items:center;gap:8px;margin:14px 0 8px}
+  .erp-body .st h4{margin:0;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+
   .out{position:sticky;top:20px}
   .out.card{box-shadow:0 0 0 6px rgba(79,70,229,.12), inset 0 1px 0 rgba(255,255,255,.6), var(--shadow-card)}
   @media(max-width:960px){.out{position:static}}
@@ -136,7 +150,9 @@
           <b>Domain</b>: không cần nhập <code>http(s)</code>.<br>
           <b>Cột mở rộng</b> (tùy chọn): map cột Excel → thẻ <code>Extra1</code>…<code>Extra11</code> (cấp hóa đơn) hoặc <code>SP_Extra1</code>/<code>SP_Extra2</code> (cấp dòng). Kiểu: <code>string</code>/<code>numeric</code>/<code>datetime</code>.<br>
           <b>Cột hóa đơn đặc thù</b> (tùy chọn): chọn loại hóa đơn đặc thù để mẫu Excel bổ sung các cột hàng hóa đặc trưng (VD: Biển kiểm soát).<br>
-          <b>Thứ tự cột khi Tạo mẫu</b> (tùy chọn): kéo-thả để đổi thứ tự cột trên mẫu Excel sinh ra.
+          <b>Thứ tự cột khi Tạo mẫu</b> (tùy chọn): kéo-thả để đổi thứ tự cột trên mẫu Excel sinh ra.<br>
+          <b>Mã hóa chữ</b>: để Unicode (mặc định) cho file bình thường; chọn VNI-Windows nếu file xuất ra dùng font VNI (VD: <code>Coâng ty</code>).<br>
+          <b>File xuất từ ERP</b> (tùy chọn): khi khách dùng file xuất thẳng từ phần mềm khác (tên cột khác mẫu). Khai tên cột ERP → tên cột chuẩn của add-in, dòng tiêu đề, giá trị mặc định, ghép ngày từ 3 cột.
         </div>
       </details>
     </div>
@@ -450,6 +466,43 @@ function addConn(data){
       </div>
       <ul class="co-list"></ul>
     </details>
+
+    <details class="sec erp-sec" ${(data.textEncoding||data.inputSource||(data.columnMapping||[]).length)?'open':''}>
+      <summary class="st" style="cursor:pointer"><h4>Mã hóa chữ &amp; file xuất từ ERP</h4><svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+      <div class="grid two">
+        <div><label>Mã hóa chữ trong file Excel</label>
+          <select class="f-enc">${ENCODINGS.map(e=>`<option value="${e.v}" ${(data.textEncoding||'')===e.v?'selected':''}>${e.label}</option>`).join('')}</select>
+          <div class="field-note">Không chọn = Unicode, add-in không chuyển đổi gì.</div></div>
+      </div>
+      <div class="checkbox-row" style="margin-top:10px">
+        <input type="checkbox" class="f-erp" id="${id}-erp" onchange="toggleErp('${id}')" ${(data.inputSource==='erp'||(data.columnMapping||[]).length)?'checked':''}>
+        <label for="${id}-erp">File xuất từ phần mềm khác (ERP) — tên cột khác mẫu chuẩn</label>
+      </div>
+      <div class="erp-body" style="display:${(data.inputSource==='erp'||(data.columnMapping||[]).length)?'block':'none'}">
+        <div class="co-row">
+          <select class="m-type" onchange="switchMappingType('${id}')">${opts(DOC_TYPES, firstMappingType(data))}</select>
+          <label style="margin:0">Dòng tiêu đề</label><input class="m-hrow" type="number" min="1" style="max-width:80px">
+        </div>
+        <div class="st"><h4>Cột chuẩn ← cột trong file ERP</h4></div>
+        <div class="field-note" style="margin-bottom:8px">Gõ tên cột của file ERP vào ô bên trái cột chuẩn tương ứng. Để trống = file đã dùng đúng tên chuẩn (hoặc không có cột này). Ô "Mặc định" điền khi ô trống/không có cột.</div>
+        <div class="stdmap"></div>
+        <div class="st"><h4>Cột khác (Extra, SP_Extra, cột tùy chọn…)</h4><span class="spacer" style="flex:1"></span>
+          <button class="mini" type="button" onclick="addMapRow('${id}','maps');formToJson()"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Thêm</button></div>
+        <div class="maps"></div>
+        <div class="st"><h4>Ghép ngày từ 3 cột</h4></div>
+        <div class="row date3">
+          <div><label>Cột chuẩn</label><input class="d-target" list="${id}-std" placeholder="VD: NgayHoaDon"></div>
+          <div><label>Cột năm</label><input class="d-y" placeholder="VD: IYear"></div>
+          <div><label>Cột tháng</label><input class="d-m" placeholder="VD: IMonth"></div>
+          <div><label>Cột ngày</label><input class="d-d" placeholder="VD: IDay"></div>
+        </div>
+        <div class="st"><h4>Giá trị mặc định cho cột khác</h4><span class="spacer" style="flex:1"></span>
+          <button class="mini" type="button" onclick="addMapRow('${id}','defs');formToJson()"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Thêm</button></div>
+        <div class="defs"></div>
+        <datalist id="${id}-std"></datalist>
+        <div class="field-note">Cột không khai giữ nguyên tên. Cột tùy biến (VD: PartItem → SP_Extra1) khai ở "Cột mở rộng" theo tên cột gốc của file ERP.</div>
+      </div>
+    </details>
   </div>`);
   document.getElementById('conns').appendChild(node);
   const pos = document.getElementById('conns').children.length - 1;
@@ -465,7 +518,129 @@ function addConn(data){
   initColumnOrderState(id, data);
   renderColumnOrderList(id);
   wireColumnOrderDrag(node.querySelector('.co-list'));
+  initMappingState(id, data);
+  renderMapping(id);
   renumber();
+}
+
+// ---------- Mã hóa chữ & file ERP (textEncoding / inputSource / columnMapping) ----------
+const ENCODINGS = [
+  {v:'', label:'Unicode (mặc định)'},
+  {v:'vni', label:'VNI-Windows → chuyển sang Unicode'}
+];
+// Cột chuẩn gợi ý khi đổi tên (ngoài DEFAULT_COLUMNS): Extra*, cột tùy chọn add-in đọc theo tên cố định.
+const EXTRA_STD = ["Extra","Extra1","Extra2","Extra3","Extra4","Extra5","Extra6","Extra7","Extra8","Extra9","Extra10","Extra11","SP_Extra1","SP_Extra2",
+  "NganHangNguoiMua","SoTaiKhoanNguoiMua","HoaDonDacThu","TinhChatHoaDon","SBKE","NBKE","NgayCapHoChieu","NgayHetHanHoChieu","QuocTich","SoTienQuyDoi","GiamThueGTGT"];
+const DATE_TARGET = {GTGT:'NgayHoaDon', PXK:'NgayLap', CTT:'NLap'};
+// mappingState[connId][type] = {headerRow, maps:[[erp,std]], defs:[[std,value]], date:{target,y,m,d}}
+const mappingState = {};
+function firstMappingType(data){ const m=(data.columnMapping||[]).find(x=>x&&x.type); return m?m.type:'GTGT'; }
+function emptyMapping(type){ return {headerRow:1, maps:[], defs:[], date:{target:DATE_TARGET[type]||'',y:'',m:'',d:''}}; }
+function initMappingState(id, data){
+  const st = {};
+  for(const t of DOC_TYPES) st[t] = emptyMapping(t);
+  for(const m of (data.columnMapping||[])){
+    if(!m || !st[m.type||'GTGT']) continue;
+    const t = m.type||'GTGT';
+    const dt = Object.entries(m.compose||{}).find(([k,v])=>v && Array.isArray(v.date));
+    st[t] = {
+      headerRow: m.headerRow>1 ? m.headerRow : 1,
+      maps: Object.entries(m.map||{}),
+      defs: Object.entries(m.defaults||{}),
+      date: dt ? {target:dt[0], y:dt[1].date[0]||'', m:dt[1].date[1]||'', d:dt[1].date[2]||''} : emptyMapping(t).date
+    };
+  }
+  mappingState[id] = st;
+}
+function addMapRow(id, kind, a, b){
+  const box = document.getElementById(id).querySelector('.'+kind);
+  const l1 = kind==='maps' ? 'Cột trong file ERP' : 'Cột chuẩn';
+  const l2 = kind==='maps' ? 'Cột chuẩn add-in' : 'Giá trị';
+  const ph1 = kind==='maps' ? 'VD: CpnTitle' : 'VD: LoaiTienTe';
+  const ph2 = kind==='maps' ? 'VD: TenDonVi' : 'VD: VND';
+  const list1 = kind==='defs' ? `list="${id}-std"` : '';
+  const list2 = kind==='maps' ? `list="${id}-std"` : '';
+  box.appendChild(el(`
+    <div class="row map">
+      <div><label>${l1}</label><input class="m-a" ${list1} placeholder="${ph1}" value="${esc(a)}"></div>
+      <div><label>${l2}</label><input class="m-b" ${list2} placeholder="${ph2}" value="${esc(b)}"></div>
+      <div class="del"><button class="mini danger icon" title="Xóa" aria-label="Xóa" onclick="this.closest('.row').remove();formToJson()"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    </div>`));
+}
+function renderMapping(id){
+  const conn = document.getElementById(id);
+  const type = conn.querySelector('.m-type').value;
+  const st = mappingState[id][type];
+  conn.dataset.mtype = type;
+  conn.querySelector('.m-hrow').value = st.headerRow || 1;
+  conn.querySelector('.maps').innerHTML = '';
+  conn.querySelector('.defs').innerHTML = '';
+  // Cột chuẩn mặc định: 1 dòng/cột, ô trái = tên cột ERP, ô phải = giá trị mặc định.
+  const std = DEFAULT_COLUMNS[type] || [];
+  const stdSet = new Set(std.map(h=>h.toLowerCase()));
+  const erpFor = {}, otherMaps = [];
+  for(const [a,b] of st.maps){
+    const k = (b||'').toLowerCase();
+    if(stdSet.has(k) && !(k in erpFor)) erpFor[k] = a; else otherMaps.push([a,b]);
+  }
+  const defFor = {}, otherDefs = [];
+  for(const [a,b] of st.defs){ const k=(a||'').toLowerCase(); if(stdSet.has(k) && !(k in defFor)) defFor[k]=b; else otherDefs.push([a,b]); }
+  conn.querySelector('.stdmap').innerHTML =
+    '<div class="hd">Cột trong file ERP</div><div></div><div class="hd">Cột chuẩn add-in</div><div class="hd hd-def">Mặc định</div>' +
+    std.map(h=>{ const k=h.toLowerCase(); const e=erpFor[k]||'', d=defFor[k]||'';
+      return `<input class="s-erp" data-std="${esc(h)}" placeholder="${h==='STT'&&type!=='CTT'?'Trống = tự động (cả file 1 hóa đơn)':esc(h)}" value="${esc(e)}" oninput="this.nextElementSibling.nextElementSibling.classList.toggle('on',!!this.value.trim())">`
+        + `<span class="arrow">→</span><span class="std ${e?'on':''}">${esc(h)}</span>`
+        + `<input class="s-def" data-std="${esc(h)}" value="${esc(d)}">`; }).join('');
+  otherMaps.forEach(([a,b])=>addMapRow(id,'maps',a,b));
+  otherDefs.forEach(([a,b])=>addMapRow(id,'defs',a,b));
+  conn.querySelector('.d-target').value = st.date.target||'';
+  conn.querySelector('.d-y').value = st.date.y||'';
+  conn.querySelector('.d-m').value = st.date.m||'';
+  conn.querySelector('.d-d').value = st.date.d||'';
+  conn.querySelector('datalist').innerHTML = (DEFAULT_COLUMNS[type]||[]).concat(type==='CTT'?[]:EXTRA_STD).map(h=>`<option value="${esc(h)}">`).join('');
+}
+// DOM (loại chứng từ đang hiện) -> mappingState
+function syncMappingFromDom(id){
+  const conn = document.getElementById(id);
+  const type = conn.dataset.mtype;
+  if(!type || !mappingState[id]) return;
+  const rows = sel => [...conn.querySelectorAll('.'+sel+' .row.map')].map(r=>[val(r,'.m-a'), val(r,'.m-b')]).filter(([a,b])=>a&&b);
+  const stdRows = sel => [...conn.querySelectorAll('.stdmap '+sel)].map(i=>[i.dataset.std, i.value.trim()]).filter(([h,v])=>v);
+  const hr = parseInt(conn.querySelector('.m-hrow').value,10);
+  mappingState[id][type] = {
+    headerRow: hr>1 ? hr : 1,
+    maps: stdRows('.s-erp').map(([h,v])=>[v,h]).concat(rows('maps')),
+    defs: stdRows('.s-def').concat(rows('defs')),
+    date: {target:val(conn,'.d-target'), y:val(conn,'.d-y'), m:val(conn,'.d-m'), d:val(conn,'.d-d')}
+  };
+}
+function switchMappingType(id){
+  const conn = document.getElementById(id);
+  syncMappingFromDom(id);
+  renderMapping(id);
+  formToJson();
+}
+function toggleErp(id){
+  const conn = document.getElementById(id);
+  conn.querySelector('.erp-body').style.display = conn.querySelector('.f-erp').checked ? 'block' : 'none';
+  formToJson();
+}
+// mappingState -> JSON columnMapping (chỉ loại có khai gì đó)
+function collectMapping(id){
+  syncMappingFromDom(id);
+  const out = [];
+  for(const t of DOC_TYPES){
+    const st = mappingState[id] && mappingState[id][t];
+    if(!st) continue;
+    const m = {type:t};
+    if(st.headerRow>1) m.headerRow = st.headerRow;
+    if(st.maps.length) m.map = Object.fromEntries(st.maps);
+    if(st.defs.length) m.defaults = Object.fromEntries(st.defs);
+    const d = st.date;
+    if(d.target && d.y && d.m && d.d) m.compose = {[d.target]:{date:[d.y,d.m,d.d]}};
+    if(Object.keys(m).length>1) out.push(m);
+  }
+  return out;
 }
 
 function addPat(id, p){
@@ -571,6 +746,15 @@ function collect(){
         order.push({type:t, headers:cur});
     }
     if(order.length) conn.columnOrder = order;
+
+    const enc = val(c,'.f-enc');
+    if(enc) conn.textEncoding = enc;
+    const erp = c.querySelector('.f-erp');
+    if(erp && erp.checked){
+      conn.inputSource = 'erp';
+      const cm = collectMapping(c.id);
+      if(cm.length) conn.columnMapping = cm;
+    }
 
     out.push(conn);
   }
