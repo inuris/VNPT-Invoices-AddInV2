@@ -91,6 +91,14 @@
   .row.map{grid-template-columns:1fr 1fr 36px}
   .maps .row.map:not(:first-child) label,.defs .row.map:not(:first-child) label{display:none}
   .fx-errs:empty{display:none}
+  .fx-tip{position:absolute;z-index:40;max-width:min(420px,calc(100vw - 32px));padding:8px 10px;border-radius:8px;
+    background:#fff;border:1px solid var(--line);box-shadow:0 10px 24px -10px rgba(16,16,24,.3);font-size:12px;line-height:1.55;color:var(--text);pointer-events:none}
+  .fx-tip[hidden]{display:none}
+  .fx-tip code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;background:none;padding:0}
+  .fx-tip .sig{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+  .fx-tip .sig b{text-decoration:underline}
+  .fx-tip .mut{color:var(--muted)}
+  .fx-tip .err{color:var(--danger-text)}
   input.is-fx{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
   input.is-fx.bad{border-color:var(--danger-text) !important;box-shadow:0 0 0 2px rgba(220,38,38,.12)}
   .erp-body{margin-top:8px}
@@ -308,7 +316,7 @@ function renderColumnOrderList(id){
       <span class="co-pill">
         <svg class="co-handle" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="18" x2="16" y2="18"/></svg>
         <span class="std-name">${esc(shown)}${ext?' <small class="ext-tag">mở rộng</small>':''}</span>
-        <input class="co-alt s-alt ${isFormula(a)?'is-fx':''} ${isFormula(a)&&formulaError(a)?'bad':''}" data-std="${esc(h)}" aria-label="Tên thay thế cho ${esc(shown)}" spellcheck="false" placeholder="${h==='STT'&&type!=='CTT'?'Trống = tự động (cả file 1 HĐ)':'Tên thay thế hoặc =công thức'}" value="${esc(a)}" oninput="altChanged(this)">
+        <input class="co-alt s-alt ${isFormula(a)?'is-fx':''} ${isFormula(a)&&formulaError(a)?'bad':''}" data-std="${esc(h)}" aria-label="Tên thay thế cho ${esc(shown)}" spellcheck="false" placeholder="${h==='STT'&&type!=='CTT'?'Trống = tự động (cả file 1 HĐ)':'Tên thay thế'}" value="${esc(a)}" oninput="altChanged(this)">
       </span>
     </li>`; }).join('');
   refreshFxErrors(conn);
@@ -534,8 +542,7 @@ function addConn(data){
           <span class="spacer" style="flex:1"></span>
           <button class="mini" type="button" onclick="columnOrderResetDefault('${id}')">Khôi phục thứ tự</button>
         </div>
-        <div class="field-note" style="margin:8px 0">Kéo-thả để đổi thứ tự cột trên mẫu Excel sinh ra (không đổi = thứ tự mặc định). Ô bên phải mỗi dòng: để trống = giữ nguyên tên mặc định; gõ <b>tên thay thế</b> khi file của khách đặt tên cột khác mẫu (VD: xuất từ phần mềm khác); gõ bắt đầu bằng <code>=</code> là <b>công thức</b> tính cột đó từ các cột khác, giống Excel: <code>+ - * /</code>, <code>&amp;</code> nối chữ, <code>TEXT(giá trị, "định dạng")</code> (VD <code>"0000"</code>, <code>"00"</code>, <code>"#,##0.00"</code>), tên cột có khoảng trắng viết trong <code>[ ]</code>; kết quả ghi đè cột đó.<br>
-          VD cộng: <code>=IYear + IMonth + IDay</code> · ghép ngày: <code>=TEXT(IYear,"0000") &amp; "-" &amp; TEXT(IMonth,"00") &amp; "-" &amp; TEXT(IDay,"00")</code></div>
+        <div class="field-note" style="margin:8px 0">Kéo-thả để đổi thứ tự cột trên mẫu Excel. Ô bên phải: tên cột trong file của khách nếu khác mẫu (để trống = giữ nguyên). Gõ <code>=</code> để nhập công thức.</div>
         <ul class="co-list"></ul>
         <div class="fx-errs msg err" style="margin-top:8px"></div>
         <div class="st"><h4>Giá trị mặc định (khi ô trống)</h4><span class="spacer" style="flex:1"></span>
@@ -670,6 +677,49 @@ function formulaError(text){
 }
 // Ô tên thay thế / công thức: bắt đầu bằng "=" là công thức → kiểm tra cú pháp, viền đỏ + liệt kê lỗi dưới danh sách.
 function isFormula(v){ return String(v||'').trim().startsWith('='); }
+// ---------- Tooltip gợi ý công thức (giống gợi ý hàm của Excel, gọn) ----------
+let fxTipEl = null;
+function fxTip(){ if(!fxTipEl){ fxTipEl=document.createElement('div'); fxTipEl.className='fx-tip'; fxTipEl.hidden=true; fxTipEl.setAttribute('role','tooltip'); document.body.appendChild(fxTipEl); } return fxTipEl; }
+// Con trỏ đang trong TEXT( … ) thì trả về chỉ số tham số (0/1), không thì -1.
+function textArgAt(s){
+  const st=[]; let inStr=false;
+  for(let i=0;i<s.length;i++){
+    const c=s[i];
+    if(c==='"'){ inStr=!inStr; continue; }
+    if(inStr) continue;
+    if(c==='('){ const m=/([\p{L}_][\p{L}\p{N}_.]*)\s*$/u.exec(s.slice(0,i)); st.push({fn:m?m[1].toUpperCase():'', arg:0}); }
+    else if(c===')') st.pop();
+    else if(c===',' && st.length) st[st.length-1].arg++;
+  }
+  const top=st[st.length-1];
+  return top && top.fn==='TEXT' ? top.arg : -1;
+}
+function updateFxTip(inp){
+  const tip=fxTip(), v=inp.value;
+  if(document.activeElement!==inp || !isFormula(v)){ tip.hidden=true; return; }
+  const arg=textArgAt(v.slice(0, inp.selectionStart==null ? v.length : inp.selectionStart));
+  let html;
+  if(arg>=0){
+    html = `<div class="sig">TEXT(${arg===0?'<b>giá trị</b>':'giá trị'}, ${arg>=1?'<b>"định dạng"</b>':'"định dạng"'})</div>`
+      + `<div class="mut">${arg===0?'Tên cột hoặc phép tính, VD: <code>IYear</code>':'Định dạng số, VD: <code>"0000"</code> · <code>"00"</code> · <code>"#,##0.00"</code>'}</div>`;
+  } else {
+    html = `<div class="sig">=Cột1 + Cột2 &nbsp;·&nbsp; =Cột1 &amp; "-" &amp; Cột2 &nbsp;·&nbsp; =TEXT(Cột, "00")</div>`
+      + `<div class="mut">Phép tính <code>+ - * /</code>, nối chữ <code>&amp;</code>, chữ trong <code>" "</code>, tên cột có khoảng trắng viết <code>[Tên cột]</code>.</div>`;
+  }
+  const err = v.trim()!=='=' ? formulaError(v) : '';
+  if(err && !/cuối công thức|đóng chuỗi|thiếu dấu \)/.test(err)) html += `<div class="err">${esc(err)}</div>`; // lỗi do đang gõ dở thì thôi
+  tip.innerHTML = html; tip.hidden=false;
+  const r=inp.getBoundingClientRect();
+  const left=Math.max(16, Math.min(r.left, window.innerWidth - tip.offsetWidth - 16));
+  tip.style.left = (left + window.scrollX) + 'px';
+  tip.style.top = (r.bottom + window.scrollY + 6) + 'px';
+}
+document.addEventListener('focusin', e=>{ if(e.target.matches && e.target.matches('.s-alt, .alt-in')) updateFxTip(e.target); });
+document.addEventListener('focusout', e=>{ if(e.target.matches && e.target.matches('.s-alt, .alt-in')) fxTip().hidden=true; });
+document.addEventListener('keyup', e=>{ if(e.target.matches && e.target.matches('.s-alt, .alt-in')) updateFxTip(e.target); });
+document.addEventListener('click', e=>{ if(e.target.matches && e.target.matches('.s-alt, .alt-in')) updateFxTip(e.target); });
+window.addEventListener('scroll', ()=>{ const a=document.activeElement; if(a && a.matches && a.matches('.s-alt, .alt-in')) updateFxTip(a); }, {passive:true});
+
 function altChanged(inp){
   const v=inp.value.trim(), fx=isFormula(v), err=fx?formulaError(v):'';
   inp.classList.toggle('is-fx', fx);
@@ -691,6 +741,7 @@ function altChanged(inp){
     }
   }
   refreshFxErrors(conn);
+  updateFxTip(inp);
 }
 function refreshFxErrors(conn){
   if(!conn) return;
