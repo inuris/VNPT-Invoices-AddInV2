@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [2.8] - 2026-11-16
+
+### Added
+- Hồ sơ `columnMapping`: cột tính bằng công thức kiểu Excel (`compose.<Cột>.formula`): `+ - * /`, `&`, `TEXT(giá trị, "định dạng")`; ghi đè cột đích, lỗi ghi `#LỖI công thức: …`. Dạng cũ `date` vẫn đọc được
+
 ## [2.7] - 2026-11-16
 
 ### Added

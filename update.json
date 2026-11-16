@@ -1,6 +1,6 @@
 {
-  "latestVersion": "2.7",
+  "latestVersion": "2.8",
   "downloadUrl": "https://inuris.github.io/VNPT-Invoices-AddInV2/",
-  "notes": "Đọc file Excel xuất từ ERP khác (đổi tên cột, ghép ngày, chuyển VNI → Unicode theo hồ sơ); GTGT thêm cột Extra, ngân hàng/số tài khoản người mua.",
+  "notes": "Hồ sơ đọc file ERP: cột tính bằng công thức kiểu Excel (+ - * /, &, TEXT).",
   "mandatory": false
 }
