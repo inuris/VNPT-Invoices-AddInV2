@@ -188,7 +188,7 @@
           <b>Domain</b>: không cần nhập <code>http(s)</code>.<br>
           <b>Cột mở rộng</b> (tùy chọn): thêm cột ghi vào thẻ <code>Extra</code>, <code>Extra1</code>…<code>Extra11</code> (cấp hóa đơn) hoặc <code>SP_Extra1</code>/<code>SP_Extra2</code> (cấp dòng). Kiểu: <code>string</code>/<code>numeric</code>/<code>datetime</code>. Tên cột mặc định là tên thẻ, đổi tên ở "Thứ tự &amp; tên cột".<br>
           <b>Cột hóa đơn đặc thù</b> (tùy chọn): chọn loại hóa đơn đặc thù để mẫu Excel bổ sung các cột hàng hóa đặc trưng (VD: Biển kiểm soát).<br>
-          <b>Mã hóa chữ</b>: để Unicode (mặc định) cho file bình thường; chọn VNI-Windows nếu file xuất ra dùng font VNI (VD: <code>Coâng ty</code>).<br>
+          <b>Chuyển mã sang Unicode</b>: để Unicode (không chuyển mã) cho file bình thường; chọn VNI nếu file dùng font VNI (VD: <code>Coâng ty</code>).<br>
           <b>Thứ tự &amp; tên cột</b> (tùy chọn): kéo-thả để đổi thứ tự cột trên mẫu Excel sinh ra; khai tên thay thế khi file của khách đặt tên cột khác mẫu (VD: xuất từ phần mềm khác), dòng tiêu đề, công thức tính cột (giống Excel) và giá trị mặc định khi ô trống.
         </div>
       </details>
@@ -556,10 +556,10 @@ function addConn(data){
     </details>
 
     <details class="sec enc-sec" ${data.textEncoding?'open':''}>
-      <summary class="st" style="cursor:pointer"><h4>Mã hóa chữ trong file Excel</h4><svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+      <summary class="st" style="cursor:pointer"><h4>Chuyển mã sang Unicode</h4><svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
       <div class="grid two">
-        <div><select class="f-enc" aria-label="Mã hóa chữ">${ENCODINGS.map(e=>`<option value="${e.v}" ${(data.textEncoding||'')===e.v?'selected':''}>${e.label}</option>`).join('')}</select>
-          <div class="field-note">Không chọn = Unicode, add-in không chuyển đổi gì.</div></div>
+        <div><label>Chọn bảng mã đang dùng trong Excel</label><select class="f-enc">${ENCODINGS.map(e=>`<option value="${e.v}" ${(data.textEncoding||'')===e.v?'selected':''}>${e.label}</option>`).join('')}</select>
+</div>
       </div>
     </details>
   </div>`);
@@ -593,8 +593,8 @@ function addConn(data){
 
 // ---------- Mã hóa chữ & file ERP (textEncoding / inputSource / columnMapping) ----------
 const ENCODINGS = [
-  {v:'', label:'Unicode (mặc định)'},
-  {v:'vni', label:'VNI-Windows → chuyển sang Unicode'}
+  {v:'', label:'Unicode (không chuyển mã)'},
+  {v:'vni', label:'VNI'}
 ];
 // Cột chuẩn gợi ý khi đổi tên (ngoài DEFAULT_COLUMNS): Extra*, cột tùy chọn add-in đọc theo tên cố định.
 const EXTRA_STD = ["Extra","Extra1","Extra2","Extra3","Extra4","Extra5","Extra6","Extra7","Extra8","Extra9","Extra10","Extra11","SP_Extra1","SP_Extra2",
