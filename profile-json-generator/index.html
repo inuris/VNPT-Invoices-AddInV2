@@ -18,6 +18,19 @@
   .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px;align-items:center}
   .btn-add-conn{width:48px;height:48px;min-height:48px;padding:0}
   .btn-add-conn svg{width:20px;height:20px;stroke-width:1.5}
+  .toolbar{position:relative;z-index:30}
+  .add-wrap{position:relative}
+  .add-menu{position:absolute;top:calc(100% + 8px);left:0;z-index:20;min-width:250px;padding:6px;
+    background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);box-shadow:var(--shadow-card), 0 12px 28px -12px rgba(16,16,24,.25);
+    display:flex;flex-direction:column;gap:2px}
+  .add-menu[hidden]{display:none}
+  .add-menu button{display:flex;align-items:center;gap:10px;width:100%;justify-content:flex-start;text-align:left;
+    background:none;box-shadow:none;color:var(--text);padding:10px 12px;min-height:0;border-radius:8px;font-weight:500}
+  .add-menu button:hover,.add-menu button:focus-visible{background:var(--card-alt);transform:none;box-shadow:none}
+  .add-menu button svg{flex:none;width:18px;height:18px;color:var(--accent)}
+  .add-menu span{display:flex;flex-direction:column;gap:1px}
+  .add-menu b{font-size:13px;font-weight:700}
+  .add-menu small{font-size:11.5px;color:var(--muted)}
 
   .conn{margin:0 0 16px}
   .conn > .head{display:flex;align-items:center;gap:10px;margin:0 0 14px}
@@ -113,9 +126,22 @@
   <div class="cols">
   <div class="left">
     <div class="toolbar reveal">
-      <button class="primary icon btn-add-conn" title="Thêm kết nối" aria-label="Thêm kết nối" onclick="addConn();formToJson()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      </button>
+      <div class="add-wrap">
+        <button class="primary icon btn-add-conn" id="btn-add" title="Thêm kết nối" aria-label="Thêm kết nối" aria-haspopup="menu" aria-expanded="false" onclick="toggleAddMenu()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <div class="add-menu" id="add-menu" role="menu" hidden>
+          <button type="button" role="menuitem" onclick="addNewConn()">
+            <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+            <span><b>Mới</b><small>Thêm kết nối trống</small></span>
+          </button>
+          <button type="button" role="menuitem" onclick="pickImportJson()">
+            <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span><b>Nhập từ JSON</b><small>Thêm các kết nối từ file .json</small></span>
+          </button>
+        </div>
+        <input type="file" id="import-file" accept=".json,application/json" multiple hidden onchange="importJsonFiles(this)">
+      </div>
       <span class="spacer" style="flex:1"></span>
       <button class="danger" onclick="clearAll()">
         <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
@@ -878,6 +904,54 @@ function flash(html){ const m=document.getElementById('msg'); m.className='msg o
 
 function esc(s){ return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
 function gp(o,a,b){ return (o&&o[a]&&o[a][b])||''; }
+
+// ---------- Nút Thêm: Mới / Nhập từ JSON ----------
+function toggleAddMenu(force){
+  const m=document.getElementById('add-menu'), b=document.getElementById('btn-add');
+  const open = force===undefined ? m.hidden : force;
+  m.hidden=!open; b.setAttribute('aria-expanded', open?'true':'false');
+  if(open) m.querySelector('button').focus();
+}
+function addNewConn(){
+  toggleAddMenu(false);
+  addConn(); formToJson();
+  const last=document.querySelector('#conns > .conn:last-child');
+  if(last) last.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function pickImportJson(){
+  toggleAddMenu(false);
+  const inp=document.getElementById('import-file'); inp.value=''; inp.click();
+}
+// Đọc 1 hoặc nhiều file .json (mảng kết nối hoặc 1 object) và THÊM vào cuối danh sách, không xóa kết nối đang có.
+async function importJsonFiles(inp){
+  const files=[...(inp.files||[])]; if(!files.length) return;
+  const added=[], errs=[];
+  for(const f of files){
+    try{
+      let arr=JSON.parse((await f.text()).replace(/^\uFEFF/,''));
+      if(!Array.isArray(arr)) arr=[arr];
+      const ok=arr.filter(x=>x && typeof x==='object' && !Array.isArray(x));
+      if(!ok.length) throw new Error('không có kết nối nào');
+      added.push(...ok);
+    }catch(e){ errs.push(esc(f.name)+': '+(e instanceof SyntaxError?'JSON không hợp lệ':esc(e.message))); }
+  }
+  const before=document.querySelectorAll('#conns > .conn').length;
+  added.forEach(d=>addConn(d));
+  if(added.length) formToJson();
+  const first=document.querySelectorAll('#conns > .conn')[before];
+  if(first) first.scrollIntoView({behavior:'smooth',block:'start'});
+  const m=document.getElementById('msg');
+  if(errs.length){ m.className='msg err'; m.innerHTML=(added.length?ICON_CHECK+'Đã nhập '+added.length+' kết nối.<br>':'')+errs.map(e=>ICON_WARN+e).join('<br>'); }
+  else flash(ICON_CHECK+'Đã nhập '+added.length+' kết nối từ '+(files.length>1?files.length+' file':esc(files[0].name))+'.');
+  inp.value='';
+}
+document.addEventListener('click', e=>{
+  const m=document.getElementById('add-menu');
+  if(!m.hidden && !e.target.closest('.add-wrap')) toggleAddMenu(false);
+});
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape' && !document.getElementById('add-menu').hidden){ toggleAddMenu(false); document.getElementById('btn-add').focus(); }
+});
 
 // khởi tạo: khôi phục từ localStorage nếu có, không thì 1 kết nối mẫu
 const savedJson = loadFromStorage();
