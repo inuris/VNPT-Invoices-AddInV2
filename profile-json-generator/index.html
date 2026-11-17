@@ -206,10 +206,15 @@ const DTYPES = ["string","numeric","datetime"];
 // Xuất ra {type:'GTGT', field:'<key>'} thay vì header/extraSlot; add-in tự lấy header/note/tag XML theo key.
 
 // Checkbox độc lập, mỗi cái bật ra 1 hoặc nhiều field cùng lúc.
+// type: loại chứng từ (mặc định GTGT); headers: cột chuẩn thêm vào "Thứ tự & tên cột" để đổi tên/công thức.
 const VNPT_CHECKBOXES = [
   {id:'leasing', keys:['VATRate_Leasing'], label:'Hóa đơn cho thuê tài chính'},
-  {id:'discount', keys:['SBKe','NBKe'], label:'Hóa đơn chiết khấu thương mại'}
+  {id:'discount', keys:['SBKe','NBKe'], label:'Hóa đơn chiết khấu thương mại'},
+  {id:'fkey-gtgt', type:'GTGT', keys:['Fkey'], headers:['Fkey'], label:'GTGT: khóa hóa đơn lấy từ cột Fkey (VNPT chặn gửi trùng)'},
+  {id:'pxk-currency', type:'PXK', keys:['LoaiTienTe','TyGia','HinhThucThanhToan'], headers:['LoaiTienTe','TyGia','HinhThucThanhToan'], label:'PXK bằng ngoại tệ: thêm cột LoaiTienTe, TyGia, HinhThucThanhToan'},
+  {id:'fkey-pxk', type:'PXK', keys:['Fkey'], headers:['Fkey'], label:'PXK: khóa phiếu lấy từ cột Fkey (VNPT chặn gửi trùng)'}
 ];
+const cbType = f => f.type || 'GTGT';
 
 // Hàng hóa đặc trưng: chọn 1 trong 3 loại (radio) — mỗi loại gắn cột HoaDonDacThu (Sample khác nhau)
 // cấp hóa đơn + các cột cấp dòng tương ứng (cùng cấp SP_Extra, bắt buộc khi TinhChat = 5).
@@ -223,10 +228,16 @@ const KNOWN_FIELD_KEYS = new Set([
   ...VNPT_CHECKBOXES.reduce((a,f)=>a.concat(f.keys),[]),
   ...SPECIAL_GOODS_TYPES.reduce((a,t)=>a.concat([t.hddthuKey], t.extraKeys),[])
 ]);
-function fieldChecked(data, key){ return !!(data.customColumns||[]).some(c=>c && c.field===key); }
-function anyFieldChecked(data, keys){ return keys.some(k=>fieldChecked(data,k)); }
+function fieldChecked(data, key, type){ return !!(data.customColumns||[]).some(c=>c && c.field===key && (!type || (c.type||'GTGT')===type)); }
+function anyFieldChecked(data, keys, type){ return keys.some(k=>fieldChecked(data,k,type)); }
 function selectedGoodsType(data){ return SPECIAL_GOODS_TYPES.find(t=>fieldChecked(data,t.hddthuKey)); }
-function specialSectionOpen(data){ return VNPT_CHECKBOXES.some(f=>anyFieldChecked(data,f.keys)) || !!selectedGoodsType(data); }
+function specialSectionOpen(data){ return VNPT_CHECKBOXES.some(f=>anyFieldChecked(data,f.keys,cbType(f))) || !!selectedGoodsType(data); }
+// Cột chuẩn do checkbox đang bật thêm vào mẫu của loại t (VD PXK ngoại tệ → LoaiTienTe, TyGia, HinhThucThanhToan).
+function checkboxHeaders(id, t){
+  const conn=document.getElementById(id); if(!conn) return [];
+  return VNPT_CHECKBOXES.filter(f=>cbType(f)===t && f.headers).filter(f=>{ const cb=conn.querySelector('.vf-multi[data-id="'+f.id+'"]'); return cb && cb.checked; })
+    .reduce((a,f)=>a.concat(f.headers),[]);
+}
 
 // Thứ tự cột MẶC ĐỊNH khi "Tạo mẫu" (khớp vnpt-config.json → documentTypes[].excel[].header,
 // đúng thứ tự). Khách kéo-thả để đổi thứ tự riêng; chỉ xuất ra columnOrder khi khác mặc định.
@@ -264,7 +275,9 @@ function extHeaders(id, t){ return extInfo(id,t).map(x=>x.header); }
 // Thứ tự tự nhiên = cột mặc định + cột mở rộng (add-in nối cột mở rộng vào cuối mẫu).
 function naturalOrder(id, t){
   const std=DEFAULT_COLUMNS[t]||[], have=new Set(std.map(h=>h.toLowerCase()));
-  return std.concat(extHeaders(id,t).filter(h=>!have.has(h.toLowerCase())));
+  const extra=[];
+  for(const h of checkboxHeaders(id,t).concat(extHeaders(id,t))) if(!have.has(h.toLowerCase())){ have.add(h.toLowerCase()); extra.push(h); }
+  return std.concat(extra);
 }
 // Thứ tự hiện tại: giữ thứ tự đã kéo của các cột còn tồn tại, cột mới (VD vừa thêm cột mở rộng) nối vào cuối.
 function orderFor(id, t){
@@ -520,7 +533,7 @@ function addConn(data){
       <summary class="st" style="cursor:pointer"><h4>Cột hóa đơn đặc thù</h4><svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
       ${VNPT_CHECKBOXES.map(f=>`
       <div class="checkbox-row">
-        <input type="checkbox" class="vf-multi" data-id="${f.id}" id="${id}-${f.id}" onchange="formToJson()" ${anyFieldChecked(data,f.keys)?'checked':''}>
+        <input type="checkbox" class="vf-multi" data-id="${f.id}" id="${id}-${f.id}" onchange="${f.headers?`refreshOrderList('${id}')`:'formToJson()'}" ${anyFieldChecked(data,f.keys,cbType(f))?'checked':''}>
         <label for="${id}-${f.id}">${f.label}</label>
       </div>`).join('')}
       <div class="checkbox-row">
@@ -542,6 +555,7 @@ function addConn(data){
         <div class="co-row">
           <select class="m-type" onchange="switchMappingType('${id}')">${opts(DOC_TYPES, firstMappingType(data))}</select>
           <label style="margin:0">Dòng tiêu đề</label><input class="m-hrow" type="number" min="1" style="max-width:80px">
+          <label style="margin:0" title="Dấu thập phân của số lưu dạng chữ trong file (VD &quot;1.15&quot;). Mặc định dấu chấm; chỉ đổi khi file ghi kiểu 1.234,56">Thập phân</label><select class="m-dec" onchange="formToJson()" style="max-width:120px"><option value="">. (mặc định)</option><option value=",">, (dấu phẩy)</option></select>
           <span class="spacer" style="flex:1"></span>
           <button class="mini" type="button" onclick="columnOrderResetDefault('${id}')">Khôi phục thứ tự</button>
         </div>
@@ -602,7 +616,7 @@ const EXTRA_STD = ["Extra","Extra1","Extra2","Extra3","Extra4","Extra5","Extra6"
 // mappingState[connId][type] = {headerRow, maps:[[erp,std]], defs:[[std,value]], fx:[[target,formula]]}
 const mappingState = {};
 function firstMappingType(data){ const m=(data.columnMapping||[]).find(x=>x&&x.type)||(data.columnOrder||[]).find(x=>x&&DEFAULT_COLUMNS[x.type]); return m?m.type:'GTGT'; }
-function emptyMapping(){ return {headerRow:1, maps:[], defs:[], fx:[]}; }
+function emptyMapping(){ return {headerRow:1, dec:'', maps:[], defs:[], fx:[]}; }
 // compose dạng cũ {date:[năm,tháng,ngày]} → công thức tương đương
 function dateToFormula(d){ const c=n=>/^[A-Za-z_][\w.]*$/.test(n)?n:'['+n+']';
   return '=TEXT('+c(d[0])+',"0000") & "-" & TEXT('+c(d[1])+',"00") & "-" & TEXT('+c(d[2])+',"00")'; }
@@ -614,6 +628,7 @@ function initMappingState(id, data){
     const t = m.type||'GTGT';
     st[t] = {
       headerRow: m.headerRow>1 ? m.headerRow : 1,
+      dec: m.decimalSeparator===',' ? ',' : '',
       maps: Object.entries(m.map||{}),
       defs: Object.entries(m.defaults||{}),
       fx: Object.entries(m.compose||{}).map(([k,v])=>[k, v&&v.formula ? v.formula : (v&&Array.isArray(v.date) ? dateToFormula(v.date) : '')]).filter(([k,f])=>f)
@@ -765,6 +780,7 @@ function renderMapping(id){
   const st = mappingState[id][type];
   conn.dataset.mtype = type;
   conn.querySelector('.m-hrow').value = st.headerRow || 1;
+  conn.querySelector('.m-dec').value = st.dec || '';
   conn.querySelector('.defs').innerHTML = '';
   // Cột chuẩn (có trong danh sách thứ tự cột) hiện ô "Tên thay thế" ngay trên dòng kéo-thả; còn lại → "Cột khác".
   const stdSet = new Set(orderFor(id, type).map(h=>h.toLowerCase()));
@@ -791,6 +807,7 @@ function syncMappingFromDom(id){
   const hr = parseInt(conn.querySelector('.m-hrow').value,10);
   mappingState[id][type] = {
     headerRow: hr>1 ? hr : 1,
+    dec: conn.querySelector('.m-dec').value===',' ? ',' : '',
     maps: alts.filter(([a])=>!isFormula(a)),
     defs: rows('defs'),
     fx: alts.filter(([a])=>isFormula(a)).map(([f,k])=>[k,f])
@@ -810,6 +827,7 @@ function collectMapping(id){
     if(!st) continue;
     const m = {type:t};
     if(st.headerRow>1) m.headerRow = st.headerRow;
+    if(st.dec===',') m.decimalSeparator = ',';
     if(st.maps.length) m.map = Object.fromEntries(st.maps);
     if(st.defs.length) m.defaults = Object.fromEntries(st.defs);
     if(st.fx.length) m.compose = Object.fromEntries(st.fx.map(([k,f])=>[k,{formula:f}]));
@@ -902,7 +920,7 @@ function collect(){
     for(const f of VNPT_CHECKBOXES){
       const cb = c.querySelector('.vf-multi[data-id="'+f.id+'"]');
       if(cb && cb.checked)
-        for(const key of f.keys) conn.customColumns.push({type:'GTGT', field:key});
+        for(const key of f.keys) conn.customColumns.push({type:cbType(f), field:key});
     }
     const specialOn = c.querySelector('.vf-special-toggle');
     if(specialOn && specialOn.checked){
