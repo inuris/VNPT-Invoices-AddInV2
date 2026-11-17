@@ -1,6 +1,6 @@
 {
-  "latestVersion": "2.8",
+  "latestVersion": "2.9",
   "downloadUrl": "https://inuris.github.io/VNPT-Invoices-AddInV2/",
-  "notes": "Hồ sơ đọc file ERP: cột tính bằng công thức kiểu Excel (+ - * /, &, TEXT).",
+  "notes": "PXK ngoại tệ (loại tiền, tỷ giá, HTTT), cột Fkey, file ERP: lỗi công thức chặn phát hành.",
   "mandatory": false
 }

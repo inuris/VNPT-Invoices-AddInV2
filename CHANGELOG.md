@@ -2,6 +2,24 @@
 
 ## [Unreleased]
 
+## [2.9] - 2026-11-17
+
+### Added
+- PXK: cột tùy chọn `LoaiTienTe`, `TyGia`, `HinhThucThanhToan` (phiếu xuất kho bằng ngoại tệ); không có cột thì VND như cũ
+- GTGT/PXK: cột tùy chọn `Fkey` làm khóa chứng từ (`<key>`), máy chủ chặn gửi trùng; trống thì tự sinh như cũ
+- Công thức `TEXT(ô, "dd/mm/yyyy")` hiểu ô ngày (định dạng ngày kiểu Excel); ô chữ giữ nguyên
+- Hồ sơ `columnMapping`: số lưu dạng chữ ở cột số mặc định hiểu `"."` là dấu thập phân (khai `decimalSeparator: ","` nếu file khác) — trước đây máy vùng miền Việt Nam đọc `"1.15"` thành 115
+
+### Fixed
+- File ERP (`columnMapping`): lỗi công thức (`compose.<Cột>.formula` sai cú pháp, thiếu cột, chữ trong phép tính) giờ chặn Tạo nháp/Tạo & phát hành/Xem XML và hiện danh sách lỗi; trước đây chuỗi `#LỖI công thức: …` có thể đi vào hóa đơn hoặc cột số bị coi là trống
+- File ERP: `map` khai cột nguồn → `STT` mà sheet không có cột đó (gõ sai tên, nhầm file) thì báo lỗi, không gộp cả sheet thành 1 hóa đơn. Không map cột nào sang `STT` vẫn tự thêm `STT = 1` như cũ, Kiểm tra dữ liệu ghi chú rõ
+- File ERP: không áp dụng được `columnMapping`/`textEncoding` thì dừng và báo lỗi thay vì đọc tiếp dữ liệu gốc
+- Hồ sơ `columnMapping` không khai `type` khi đọc CTT không còn bị thêm cột `STT`
+- PXK: luôn gửi thẻ `<TGia>` (cột TyGia trống ⇒ mặc định 1); trước đây thiếu thẻ thì máy chủ báo lỗi 1503
+
+### Changed
+- Kiểm tra dữ liệu: ghi chú các cột khai trong `map` nhưng không có trên sheet
+
 ## [2.8] - 2026-11-16
 
 ### Added
