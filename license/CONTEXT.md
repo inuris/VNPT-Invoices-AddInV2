@@ -157,9 +157,8 @@ nhận passcode mới." No extra inputs.
 - Timestamp was written as a `dd/MM/yyyy HH:mm:ss` string; the Sheet's
   locale (MM/dd) silently parsed days ≤ 12 into Dates with day/month swapped,
   so "Ngày yêu cầu" mixed dd/MM and MM/dd (2026-11-18). Fixed: `recordData_`
-  writes a real `Date` + number format `dd/MM/yyyy HH:mm:ss`. Old rows repaired
-  once via `fixTimestamps()` (guarded by Script Property `FIX_TS_DONE`; never
-  run again — it would swap rows written by the new code).
+  writes a real `Date` + number format `dd/MM/yyyy HH:mm:ss`. Old rows were
+  repaired once by a one-off `fixTimestamps()` (removed after running).
 
 ## Accepted limitations (not fixed, by design/low priority)
 
