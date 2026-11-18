@@ -2,6 +2,30 @@
 
 ## [Unreleased]
 
+## [2.10] - 2026-11-18
+
+### Changed
+- Tạo nháp / Tạo & phát hành: trong lúc chờ máy chủ VNPT trả lời hiện cửa sổ "Đang gửi…", Excel không còn đứng hình (trước đây treo tới 60 giây khi mạng chậm, dễ tưởng lỗi rồi bấm gửi lại)
+- Tạo nháp / Tạo & phát hành / Xem XML chặn cùng các lỗi như Kiểm tra dữ liệu: thiếu cột bắt buộc, ô ở cột số là chữ (GTGT/PXK), dòng CTT thiếu dữ liệu bắt buộc — báo danh sách dòng lỗi, không gửi chứng từ nào. Trước đây dòng CTT lỗi bị bỏ qua im lặng (chỉ gửi các dòng còn lại, báo thành công) và ô số là chữ bị coi như trống
+- Tạo nháp / Tạo & phát hành: sheet có chứng từ đã có Fkey ở cột `KetQua` (đã gửi trước đó) thì hỏi trước khi gửi: chỉ gửi chứng từ chưa có Fkey, gửi lại tất cả, hoặc hủy. Trước đây bấm lại là gửi trùng toàn bộ mà không hỏi
+- CTT: `Email`, `MaKhachHang`, `DDanh`, `QTich` không còn bắt buộc (khớp cấu hình). Dòng để trống các ô này, hoặc sheet không có các cột này, vẫn gửi được
+- Chuyển sheet và Kiểm tra dữ liệu nhẹ hơn: không đọc và giải mã lại file cấu hình kết nối khi file chưa đổi, trạng thái bản quyền chỉ tính 1 lần mỗi lần chuyển sheet
+- Cột `KetQua` chỉ ghi lại các dòng của chứng từ vừa gửi; Fkey của chứng từ không gửi lần này được giữ nguyên (trước đây cả cột bị xóa mỗi lần gửi)
+
+### Fixed
+- Cột `KetQua`: bảng dữ liệu không bắt đầu từ dòng 1 (phía trên có dòng trống) thì Fkey/lỗi vẫn ghi đúng dòng của hóa đơn; trước đây bị lệch lên trên đúng bằng số dòng trống
+- Cột `KetQua` với file ERP có `headerRow` > 1: tiêu đề `KetQua` đặt ở đúng dòng tiêu đề (trước đây nằm ở dòng 1 nên lần sau không tìm lại được cột)
+- Hồ sơ `columnMapping`: `headerRow` là số dòng trên sheet như đang thấy trong Excel; trước đây nếu dòng đầu sheet trống thì add-in đếm lệch và lấy nhầm dòng tiêu đề
+- Thông báo lỗi theo dòng (công thức, cột số, dòng CTT) ghi đúng số dòng trên sheet khi phía trên bảng có dòng trống
+- Sheet mẫu: chú thích "cột chữ ĐỎ = bắt buộc" chuyển vào ghi chú của ô tiêu đề đầu tiên; trước đây nằm ở một ô trên dòng tiêu đề nên cột `KetQua` bị đẩy ra xa. Sheet mẫu tạo từ bản cũ: cột `KetQua` được đặt ngay sau cột tiêu đề cuối
+- File cấu hình kết nối (`vnpt-profiles.json`) không đọc được (đổi máy/đổi tài khoản Windows, file hỏng): mở Cài đặt kết nối sẽ báo rõ, và khi lưu kết nối mới thì file cũ được sao lưu thành `vnpt-profiles.json.hong-<ngày giờ>` thay vì bị ghi đè mất
+- File cấu hình kết nối ghi qua file tạm rồi mới thay file chính, bản ngay trước đó giữ ở `vnpt-profiles.json.bak` (Excel tắt giữa chừng không làm hỏng file)
+- Import cấu hình: file sai định dạng hoặc không có kết nối nào thì báo lỗi, không còn báo "Đã tải cấu hình"
+- File log `addin.log` không còn to mãi: quá 1 MB thì chuyển thành `addin.log.1` và ghi file mới
+- Cài đặt kết nối: kéo đổi kích thước cửa sổ không còn đọc lại file cấu hình kết nối liên tục
+- Ô kiểu số ở cột chữ (mã số thuế, số điện thoại, số tài khoản, cột mở rộng…) gửi đi với dấu chấm thập phân, không phụ thuộc vùng miền máy, và không còn ra dạng `1.23E+15` với số dài
+- Nút báo có bản mới trên ribbon chỉ cập nhật trên luồng giao diện (tránh lỗi hiếm khi Excel vừa mở)
+
 ## [2.9] - 2026-11-17
 
 ### Added

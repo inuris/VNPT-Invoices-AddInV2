@@ -1,6 +1,6 @@
 {
-  "latestVersion": "2.9",
+  "latestVersion": "2.10",
   "downloadUrl": "https://inuris.github.io/VNPT-Invoices-AddInV2/",
-  "notes": "PXK ngoại tệ (loại tiền, tỷ giá, HTTT), cột Fkey, file ERP: lỗi công thức chặn phát hành.",
+  "notes": "Chặn gửi trùng (hỏi khi đã có mã tra cứu), chặn gửi khi dữ liệu lỗi, cửa sổ Đang gửi (Excel không treo), sửa ghi cột KetQua.",
   "mandatory": false
 }
