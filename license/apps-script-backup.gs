@@ -119,9 +119,13 @@ function doPost(e) {
 function recordData_(sheet, e) {
   var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
   var row = [];
+  var tsCol = 0;
   for (var i = 0; i < headers.length; i++) {
     if (headers[i] === 'Timestamp') {
-      row.push(Utilities.formatDate(new Date(), 'Asia/Ho_Chi_Minh', 'dd/MM/yyyy HH:mm:ss'));
+      // Ghi kiểu Date (không ghi chuỗi): Sheet locale en_US tự parse chuỗi "dd/MM/yyyy" có ngày <= 12
+      // thành MM/dd, làm Ngày yêu cầu lẫn lộn ngày/tháng.
+      tsCol = i + 1;
+      row.push(new Date());
     } else if (headers[i] === 'Passcode') {
       row.push(''); // không log passcode thật vào sheet theo dõi — chỉ dùng để xác thực, không lưu lại
     } else {
@@ -129,7 +133,39 @@ function recordData_(sheet, e) {
     }
   }
   sheet.appendRow(row);
-  return sheet.getLastRow();
+  var last = sheet.getLastRow();
+  if (tsCol) sheet.getRange(last, tsCol).setNumberFormat('dd/MM/yyyy HH:mm:ss');
+  return last;
+}
+
+// ====== Sửa 1 lần cột Timestamp cũ (chạy tay trong editor, NGAY sau khi dán code mới) ======
+// Trước bản sửa, Timestamp ghi dạng chuỗi "dd/MM/yyyy HH:mm:ss":
+//  - ngày > 12: Sheet giữ chuỗi -> đúng, chỉ chuyển sang kiểu Date;
+//  - ngày <= 12: Sheet parse nhầm thành MM/dd -> ô Date bị đảo ngày/tháng, đảo lại.
+// Có cờ FIX_TS_DONE để không chạy lần 2 (lần 2 sẽ đảo sai các dòng ghi bằng code mới).
+function fixTimestamps() {
+  var props = PropertiesService.getScriptProperties();
+  if (props.getProperty('FIX_TS_DONE')) throw new Error('fixTimestamps đã chạy rồi');
+  var sheet = SpreadsheetApp.openById(SS_ID).getSheetByName('Form');
+  var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  var col = headers.indexOf('Timestamp') + 1;
+  var n = sheet.getLastRow() - 1;
+  if (!col || n < 1) return;
+  var range = sheet.getRange(2, col, n, 1);
+  var values = range.getValues();
+  var fixed = values.map(function (r) {
+    var v = r[0];
+    if (Object.prototype.toString.call(v) === '[object Date]') {
+      return [new Date(v.getFullYear(), v.getDate() - 1, v.getMonth() + 1,
+                       v.getHours(), v.getMinutes(), v.getSeconds())];
+    }
+    var m = String(v).match(/^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})(?::(\d{2}))?/);
+    if (m) return [new Date(+m[3], +m[2] - 1, +m[1], +m[4], +m[5], +(m[6] || 0))];
+    return [v];
+  });
+  range.setValues(fixed);
+  range.setNumberFormat('dd/MM/yyyy HH:mm:ss');
+  props.setProperty('FIX_TS_DONE', '1');
 }
 
 function jsonResponse_(obj) {
