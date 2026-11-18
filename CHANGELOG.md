@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+## [2.11] - 2026-11-18
+
+### Added
+- Cài đặt kết nối: nút bánh răng cạnh nút xóa trên mỗi kết nối mở Cài đặt nâng cao của kết nối đó — đổi mã hóa chữ (Unicode/VNI), dòng tiêu đề và dấu thập phân cho từng loại (hóa đơn, phiếu xuất kho, chứng từ) mà không cần import lại file JSON
+
+### Changed
+- Tạo mẫu: kết nối có map cột (file ERP) thì sheet mẫu ra đúng dạng file ERP của khách: tên cột gốc, các cột dùng trong công thức (vd năm/tháng/ngày), tiêu đề ở đúng dòng khai trong hồ sơ. Trước đây luôn ra mẫu chuẩn, không đọc được bằng hồ sơ đó
+- Hồ sơ kết nối: bỏ thuộc tính `inputSource` (không còn tác dụng; file cũ có thuộc tính này vẫn import được)
+
 ## [2.10] - 2026-11-18
 
 ### Changed

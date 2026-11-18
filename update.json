@@ -1,6 +1,6 @@
 {
-  "latestVersion": "2.10",
+  "latestVersion": "2.11",
   "downloadUrl": "https://inuris.github.io/VNPT-Invoices-AddInV2/",
-  "notes": "Chặn gửi trùng (hỏi khi đã có mã tra cứu), chặn gửi khi dữ liệu lỗi, cửa sổ Đang gửi (Excel không treo), sửa ghi cột KetQua.",
+  "notes": "Tạo mẫu theo cột đã map của kết nối (file ERP), Cài đặt nâng cao kết nối (mã hóa chữ, dòng tiêu đề, dấu thập phân).",
   "mandatory": false
 }
