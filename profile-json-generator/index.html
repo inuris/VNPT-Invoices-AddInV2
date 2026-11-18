@@ -605,7 +605,7 @@ function addConn(data){
   renumber();
 }
 
-// ---------- Mã hóa chữ & file ERP (textEncoding / inputSource / columnMapping) ----------
+// ---------- Mã hóa chữ & file ERP (textEncoding / columnMapping) ----------
 const ENCODINGS = [
   {v:'', label:'Unicode (không chuyển mã)'},
   {v:'vni', label:'VNI'}
@@ -946,7 +946,7 @@ function collect(){
     const enc = val(c,'.f-enc');
     if(enc) conn.textEncoding = enc;
     const cm = collectMapping(c.id);
-    if(cm.length){ conn.inputSource = 'erp'; conn.columnMapping = cm; }
+    if(cm.length) conn.columnMapping = cm;
 
     out.push(conn);
   }
