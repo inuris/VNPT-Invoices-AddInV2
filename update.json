@@ -1,6 +1,6 @@
 {
-  "latestVersion": "2.11",
+  "latestVersion": "2.12",
   "downloadUrl": "https://inuris.github.io/VNPT-Invoices-AddInV2/",
-  "notes": "Tạo mẫu theo cột đã map của kết nối (file ERP), Cài đặt nâng cao kết nối (mã hóa chữ, dòng tiêu đề, dấu thập phân).",
+  "notes": "Cài đặt nâng cao chia tab theo loại chứng từ. Kiểm tra bản mới qua GitHub Release.",
   "mandatory": false
 }
