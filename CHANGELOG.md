@@ -2,66 +2,78 @@
 
 ## [Unreleased]
 
+## [2.13] - 2026-11-19
+
+### Changed
+- Bỏ hỗ trợ import file cấu hình kết nối định dạng cũ
+- Tối ưu cấu trúc mã nguồn
+
+### Security
+- Nhúng file cấu hình vào add-in
+
+### Fixed
+- Lỗi gọi sai tên loại chứng từ trong thông báo sau khi gửi
+
 ## [2.12] - 2026-11-19
 
 ### Changed
-- Cài đặt nâng cao: chia tab theo loại chứng từ
-- Kiểm tra bản mới qua GitHub Release (cần cho phép `github.com`, `release-assets.githubusercontent.com`)
+- Cài đặt nâng cao: hiển thị dạng tab theo loại chứng từ
+- Kiểm tra phiên bản mới qua GitHub Release (cần cho phép `github.com`, `release-assets.githubusercontent.com`)
 
 ## [2.11] - 2026-11-18
 
 ### Added
-- Cài đặt nâng cao cho từng kết nối
+- Bổ sung Cài đặt nâng cao cho từng kết nối
 
 ### Changed
-- Tạo mẫu đúng theo cột đã map
-- Thay đổi nhỏ trong cấu trúc profile
+- Tạo mẫu theo cột đã map
+- Cập nhật cấu trúc profile
 
 ## [2.10] - 2026-11-18
 
 ### Changed
-- Hiện "Đang gửi…" khi chờ máy chủ, Excel không còn đứng hình
-- Tạo nháp / Tạo & phát hành chặn dữ liệu lỗi như Kiểm tra dữ liệu
-- Hỏi trước khi gửi lại chứng từ đã có mã tra cứu
-- CTT: Email, MaKhachHang, DDanh, QTich không còn bắt buộc
-- Chuyển sheet nhanh hơn
+- Hiện "Đang gửi…" khi thao tác Tạo/Phát hành
+- Kiểm tra dữ liệu trước khi Tạo/Phát hành
+- Xác nhận khi gửi chứng từ/hóa đơn đã có mã tra cứu
+- CTT: Email, MaKhachHang, DDanh, QTich bỏ bắt buộc
+- Tối ưu chuyển sheet
 
 ### Fixed
-- Cột `KetQua` ghi lệch dòng khi bảng không bắt đầu từ dòng 1
-- Số dòng trong thông báo lỗi
-- Vị trí chú thích và cột `KetQua` trên sheet mẫu
-- Mất cấu hình kết nối khi file hỏng hoặc Excel tắt giữa chừng
-- Import file cấu hình sai vẫn báo thành công
-- File log to dần không giới hạn
-- Số dài ở cột chữ ra dạng `1.23E+15`
+- Lỗi ghi lệch dòng cột `KetQua`
+- Lỗi sai số dòng trong thông báo lỗi
+- Lỗi vị trí chú thích và cột `KetQua` trên sheet mẫu
+- Lỗi mất cấu hình kết nối khi file hỏng
+- Lỗi import file cấu hình sai vẫn báo thành công
+- Giới hạn dung lượng file log
+- Lỗi hiển thị số dài dạng `1.23E+15`
 
 ## [2.9] - 2026-11-17
 
 ### Added
-- PXK ngoại tệ (`LoaiTienTe`, `TyGia`, `HinhThucThanhToan`)
-- GTGT/PXK: cột `Fkey` tùy chọn
-- Công thức `TEXT` hiểu ô ngày
-- Chọn dấu thập phân cho file ERP
+- PXK: hỗ trợ ngoại tệ (`LoaiTienTe`, `TyGia`, `HinhThucThanhToan`)
+- GTGT/PXK: hỗ trợ cột `Fkey`
+- Công thức `TEXT` hỗ trợ ô ngày
+- Tùy chọn dấu thập phân cho file ERP
 
 ### Fixed
-- File ERP: lỗi công thức, map sai cột STT không còn gửi đi
+- Chặn gửi khi file ERP có lỗi công thức hoặc map sai
 - PXK: lỗi 1503 khi thiếu tỷ giá
 
 ## [2.8] - 2026-11-16
 
 ### Added
-- Cột tính bằng công thức trong profile
+- Hỗ trợ cột công thức trong profile
 
 ## [2.7] - 2026-11-16
 
 ### Added
-- GTGT: cột `Extra`, ngân hàng và số tài khoản người mua
-- Đọc file Excel xuất từ ERP khác (map cột)
-- Chuyển chữ VNI sang Unicode
+- GTGT: bổ sung cột `Extra`, ngân hàng và số tài khoản người mua
+- Hỗ trợ file Excel xuất từ ERP (map cột)
+- Hỗ trợ bảng mã VNI
 
 ### Fixed
-- Mất thứ tự cột khi lưu cấu hình kết nối
-- Kiểm tra dữ liệu không nhận cột mở rộng
+- Lỗi mất thứ tự cột khi lưu cấu hình kết nối
+- Lỗi Kiểm tra dữ liệu không nhận cột mở rộng
 
 ## [2.6] - 2026-10-12
 

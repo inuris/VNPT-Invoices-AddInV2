@@ -1,6 +1,6 @@
 {
-  "latestVersion": "2.12",
+  "latestVersion": "2.13",
   "downloadUrl": "https://inuris.github.io/VNPT-Invoices-AddInV2/",
-  "notes": "Cài đặt nâng cao chia tab theo loại chứng từ. Kiểm tra bản mới qua GitHub Release.",
+  "notes": "Tối ưu cấu trúc và bảo mật cấu hình. Lỗi tên loại chứng từ trong thông báo sau khi gửi.",
   "mandatory": false
 }
