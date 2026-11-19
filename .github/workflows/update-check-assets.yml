@@ -1,0 +1,41 @@
+# Tạo/cập nhật file kiểm tra bản mới cho add-in (từ 2.12): mỗi version có 1 file v{x.y}.json trong release
+# "update-check", nội dung = update.json. Add-in tải đúng file của version mình, GitHub đếm download_count
+# theo file => biết version nào còn được dùng (repo Source chụp số đếm hằng ngày, không gửi id/MST).
+# Chạy khi publish.ps1 đẩy update.json mới. Upload --clobber làm số đếm của file về 0 (repo Source tự xử lý).
+name: update-check-assets
+
+on:
+  push:
+    branches: [main]
+    paths: [update.json]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  assets:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: update-check
+      MIN_VERSION: "2.12"
+    steps:
+      - uses: actions/checkout@v5
+      - name: Tạo file theo version
+        run: |
+          set -euo pipefail
+          latest=$(jq -r .latestVersion update.json)
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --prerelease --title "Update check" \
+              --notes "File kiểm tra bản mới của add-in (tự sinh từ update.json). Không tải thủ công."
+          fi
+          # Version cần có file: các file đang có + bản mới nhất (nếu >= MIN_VERSION).
+          names=$(gh release view "$TAG" --json assets -q '.assets[].name' | grep -E '^v[0-9]+\.[0-9]+\.json$' || true)
+          if [ "$(printf '%s\n%s\n' "$MIN_VERSION" "$latest" | sort -V | head -1)" = "$MIN_VERSION" ]; then
+            names=$(printf '%s\nv%s.json\n' "$names" "$latest" | grep . | sort -uV)
+          fi
+          mkdir -p out
+          for n in $names; do cp update.json "out/$n"; done
+          ls out
+          if [ -n "$(ls out)" ]; then gh release upload "$TAG" out/*.json --clobber; fi
