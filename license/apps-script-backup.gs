@@ -143,6 +143,17 @@ function jsonResponse_(obj) {
 }
 
 // ====== Xác thực user theo tab Users ======
+// Users: A email, B passcode, C active (1/0), D retry (sai liên tiếp, reset_passcode xóa về 0),
+// E totalFail (sai cộng dồn, reset_passcode KHÔNG xóa; chỉ về 0 khi đăng nhập đúng).
+// totalFail >= MAX_TOTAL_FAIL ⇒ khóa hẳn: reset_passcode không mở được, admin phải sửa tay
+// (đặt E = 0, C = 1). Chặn vòng dò "reset → thử 10 lần → reset".
+var MAX_RETRY = 10;
+var MAX_TOTAL_FAIL = 30;
+
+function isHardLocked_(row) {
+  return (Number(row[4]) || 0) >= MAX_TOTAL_FAIL;
+}
+
 function authenticateUser_(email, passcode) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Users');
   var data = sheet.getDataRange().getValues();
@@ -151,17 +162,20 @@ function authenticateUser_(email, passcode) {
     if (String(row[0]).trim().toLowerCase() !== email.toLowerCase()) continue;
 
     var active = (row[2] === 1 || row[2] === '1' || row[2] === true);
-    if (!active) return { ok: false, reason: 'locked' };
+    if (!active || isHardLocked_(row)) return { ok: false, reason: 'locked' };
 
     var rowNum = i + 1;
     if (String(row[1]).trim() === passcode) {
       if (Number(row[3]) !== 0) sheet.getRange(rowNum, 4).setValue(0);
+      if (Number(row[4]) !== 0) sheet.getRange(rowNum, 5).setValue(0);
       return { ok: true };
     }
 
     var retry = (Number(row[3]) || 0) + 1;
+    var totalFail = (Number(row[4]) || 0) + 1;
     sheet.getRange(rowNum, 4).setValue(retry);
-    if (retry >= 10) sheet.getRange(rowNum, 3).setValue(0);
+    sheet.getRange(rowNum, 5).setValue(totalFail);
+    if (retry >= MAX_RETRY || totalFail >= MAX_TOTAL_FAIL) sheet.getRange(rowNum, 3).setValue(0);
     return { ok: false, reason: 'wrong' };
   }
   return { ok: false, reason: 'notfound' };
@@ -225,6 +239,7 @@ function handleResetPasscode_(email) {
   var data = sheet.getDataRange().getValues();
   for (var i = 1; i < data.length; i++) {
     if (String(data[i][0]).trim().toLowerCase() === email) {
+      if (isHardLocked_(data[i])) break; // khóa hẳn: không reset, không gửi mail (vẫn trả câu chung)
       var newCode = String(Math.floor(100000 + Math.random() * 900000));
       var rowNum = i + 1;
       sheet.getRange(rowNum, 2).setValue(newCode); // passcode mới

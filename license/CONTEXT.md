@@ -41,11 +41,16 @@ passcode; see Known issues/fixes).
 `COL_STATUS=7, COL_LICENSE=8, COL_EXP=9` (G/H/I) are fixed by position for
 writing the result after the fact (`setStatus_`/`writeResult_`).
 
-**Tab `Users`** — auth + lockout state. Columns A–D:
+**Tab `Users`** — auth + lockout state. Columns A–E:
 - A: email (username)
 - B: passcode
 - C: active (1/0)
-- D: retry (failed-attempt counter)
+- D: retry (consecutive failed attempts; reset_passcode clears it)
+- E: totalFail (cumulative failed attempts; reset_passcode does NOT clear it,
+  only a successful login does). `>= MAX_TOTAL_FAIL` (30) = hard lock: login
+  refused and reset_passcode neither unlocks nor emails. Admin unlocks by hand
+  (E = 0, C = 1). Blocks the "reset → 10 guesses → reset" brute-force loop
+  (added 2026-11-21).
 
 ## Flows
 
@@ -88,8 +93,9 @@ filter-by-MST and pagination (20/page) over the full returned set.
 - Matching email, `active` falsy (0/''/false) → `{ok:false, reason:'locked'}`
   (checked before passcode comparison).
 - Passcode matches → reset `retry` to 0 if nonzero, `{ok:true}`.
-- Passcode wrong → increment `retry`; if `retry>=10`, set `active=0`
-  (locks the account); `{ok:false, reason:'wrong'}`.
+- Passcode wrong → increment `retry` and `totalFail`; if `retry>=10` or
+  `totalFail>=30`, set `active=0`; `{ok:false, reason:'wrong'}`.
+- `totalFail>=30` → `{ok:false, reason:'locked'}` even if `active=1`.
 
 Callers map `reason==='locked'` to "Tài khoản đã bị khóa"; other reasons to
 a generic wrong-email-or-passcode message (doesn't distinguish
