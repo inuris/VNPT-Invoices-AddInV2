@@ -1,133 +1,48 @@
-# VNPT-Invoices-AddInV2 — Release & Update
+# VNPT Invoices Add-in
 
-Public repository hosting the **release artifacts**, the **ClickOnce install
-page** (GitHub Pages), and the **auto-update manifest** for the VNPT
-Invoices Excel add-in. (Source code is in a private repository.)
+Add-in cho Microsoft Excel giúp tạo và phát hành hóa đơn điện tử VNPT Invoice ngay trên bảng tính, gồm:
 
-Everything now lives on `main` — this repo no longer uses a separate
-`gh-pages` branch. **GitHub Pages must be set to serve from `main` / `/`
-(root)** in repo Settings → Pages.
+- Hóa đơn GTGT
+- Phiếu xuất kho
+- Chứng từ khấu trừ thuế TNCN
 
-Served at:
+Trang tải về: **https://inuris.github.io/VNPT-Invoices-AddInV2/**
 
-> https://inuris.github.io/VNPT-Invoices-AddInV2/
+## Yêu cầu
 
-## Layout
+- Windows có cài Microsoft Excel (Office 2010 trở lên)
+- .NET Framework 4.8
+- Tài khoản VNPT Invoice của doanh nghiệp
 
-```
-index.html                          ← trang tải
-assets/theme.css                    ← thiết kế dùng chung (tokens + component) cho MỌI trang —
-                                       sửa 1 file này để đổi giao diện toàn site
-.nojekyll                           ← tắt Jekyll (BẮT BUỘC để phục vụ mọi file)
-setup.exe                           ← bootstrapper cài đặt
-VNPT.Invoices.AddInV2.vsto          ← deployment manifest
-Application Files/…                 ← các bản build theo phiên bản (.deploy)
-VNPT.Invoices.AddInV2-Setup.exe     ← self-extracting installer, tự động (nút "Tải bộ cài")
-update.json                         ← auto-update manifest (add-in đọc khi khởi động)
-profile-json-generator/…            ← công cụ phụ trợ (dùng assets/theme.css)
-licgen/…                            ← trình tạo license, chỉ nội bộ (dùng assets/theme.css)
-```
+## Cài đặt
 
-Mỗi trang chỉ giữ CSS đặc thù riêng của nó (bố cục/kích thước) trong `<style>` tại
-chỗ; màu sắc, card, button, form, tabs… đều lấy từ `assets/theme.css`. Site cố ý
-**chỉ dùng giao diện sáng** — không có `prefers-color-scheme: dark`, nên không phụ
-thuộc theme hệ điều hành của người xem.
+1. Mở [trang tải về](https://inuris.github.io/VNPT-Invoices-AddInV2/) và bấm **Tải bộ cài**.
+2. Chạy file `VNPT.Invoices.AddInV2-Setup.exe` vừa tải.
+3. Nếu Windows báo không xác minh được nhà phát hành, chọn **Cài đặt** (Install) để tiếp tục.
+4. Mở lại Excel, add-in nằm ở thẻ **VNPT Invoice** trên thanh ribbon.
 
-**KHÔNG sửa tay** các file ClickOnce ở đây. Mỗi lần phát hành, chạy từ repo
-**source**:
+## Cập nhật
 
-```powershell
-powershell -ExecutionPolicy Bypass -File tools\deploy-to-pages.ps1 -PublishDir "C:\Code\VNPT-Invoices-Cursor\publish"
-```
+Khi có phiên bản mới, add-in hiện thông báo trên thanh ribbon. Bấm vào thông báo để mở trang tải về, tải bộ cài và
+chạy lại như lúc cài đặt. Không cần gỡ bản cũ, cấu hình kết nối được giữ nguyên.
 
-Script sẽ đồng bộ đầu ra Publish vào nhánh `main` (giữ `index.html` +
-`.nojekyll`) rồi push → Pages tự cập nhật.
+Nội dung từng phiên bản: [CHANGELOG.md](CHANGELOG.md).
 
-> Điều kiện để add-in **tự nâng cấp không cần gỡ bản cũ**: trong VS
-> **Publish → Installation Folder URL** phải đặt đúng
-> `https://inuris.github.io/VNPT-Invoices-AddInV2/` và Publish tới cùng URL
-> mỗi bản.
+## Bản quyền
 
-## Auto-update manifest
+Add-in có 30 ngày dùng thử cho mỗi mã số thuế. Để tiếp tục sử dụng, liên hệ bộ phận hỗ trợ để nhận mã kích hoạt, sau
+đó nhập vào mục **Đăng ký sử dụng** trong add-in.
 
-The add-in checks this file on startup:
+## Công cụ đi kèm
 
-- Manifest (raw): `https://raw.githubusercontent.com/inuris/VNPT-Invoices-AddInV2/main/update.json`
-- Releases: `https://github.com/inuris/VNPT-Invoices-AddInV2/releases/latest`
+- [Tạo JSON cấu hình kết nối](https://inuris.github.io/VNPT-Invoices-AddInV2/profile-json-generator/): tạo sẵn file
+  cấu hình kết nối để nhập vào add-in, tránh phải khai báo thủ công trên từng máy.
 
-`update.json` fields:
+## Hướng dẫn và hỗ trợ
 
-| Field | Meaning |
-|-------|---------|
-| `latestVersion` | Newest published version in short `x.y` form, e.g. `1.1` (matches the release build's major.minor). |
-| `downloadUrl` | Where the add-in opens when the user chooses to update (defaults to the latest release page). |
-| `notes` | Short change summary shown to the user. |
-| `mandatory` | `true` to re-notify even if the user dismissed this version. |
+- Hướng dẫn sử dụng: https://vnpt-invoice-addin.gitbook.io/vnpt-invoice-addin-v2
+- Hỗ trợ: TTKDGP — Phòng Giải pháp số
 
-## Install button on `index.html`
+---
 
-**"Tải bộ cài"** is the only button, and it's the primary/required install
-path for both new installs and updates — it links to
-`VNPT.Invoices.AddInV2-Setup.exe`, a **self-extracting installer (7-Zip SFX)**,
-right next to `index.html` on this same site.
-
-### Why SFX instead of a plain zip (tried first, replaced)
-
-A plain zip needs the user to extract it correctly before running
-`setup.exe`. In practice people ran `setup.exe` straight out of the zip/RAR
-viewer's temp extraction view instead — a different random temp path every
-single time. ClickOnce identifies a local install by the path `setup.exe`
-ran from, so each of those looked like a *conflicting* install rather than
-an upgrade, and blocked with `AddInAlreadyInstalledException` until the old
-one was manually uninstalled. Telling users "always extract to the same
-fixed folder" didn't hold up in practice.
-
-The SFX removes the failure mode instead of documenting around it: the
-install path (`%LocalAppData%\VNPT-AddIn` by default) is baked into the
-`.exe` itself via `tools/make-sfx.ps1` (source repo) — nothing for the user
-to choose or get wrong. Running the `.exe` extracts to that fixed path and
-launches `setup.exe` from there automatically, every time.
-
-**Why not just link `setup.exe`/the `.vsto` directly and skip packaging
-entirely?** Also tried — modern browsers download ClickOnce manifests
-instead of invoking them, which breaks ClickOnce's security-zone check
-(`file://` vs the `https://` the manifest expects). And a
-signed-but-untrusted manifest (see below) hits a hard, non-interactive
-`SecurityException` when activated that way. `setup.exe` run interactively
-(which is what the SFX does after extracting) sidesteps both — it goes
-through the normal "publisher can't be verified, install anyway?" prompt
-instead.
-
-**Signing**: the manifest is currently signed with Visual Studio's
-auto-generated temporary dev certificate — self-signed, not trusted on any
-machine but the one that created it. That's why the interactive "install
-anyway" prompt matters (an actual trusted CA cert wouldn't need it, and the
-SFX can't skip it either — that's ClickOnce's own trust check, not a
-packaging problem). Fine for this scale of internal rollout; a real
-code-signing certificate would remove the warning if that's ever worth the
-cost.
-
-ClickOnce's own **silent background self-update is disabled entirely**
-(`UpdateEnabled=false` in the add-in's csproj) — deliberately, not just
-deprioritized. It's a non-interactive activation path, and non-interactive
-is exactly what throws the cert `SecurityException` above with no prompt to
-click through. Leaving it on would mean it either fails invisibly forever
-(worse than no auto-update — false sense that it's current) or, in the
-best case, works but was never verified to. The only update path is
-re-running "Tải bộ cài"; the in-app ribbon "v{new} 🔼" indicator (no popup)
-is the only notification, and it just opens this page — no ClickOnce or
-cert code involved in that click at all.
-
-## Publishing a new version
-
-1. Run `tools\deploy-to-pages.ps1` from the source repo — pushes the new
-   ClickOnce build **and** rebuilds `VNPT.Invoices.AddInV2-Setup.exe` to
-   `main` in one step (needs `7zSD.sfx` from the **LZMA SDK** package —
-   *not* "7-Zip Extra", which stopped including it in 2014 — see
-   `tools/make-sfx.ps1`).
-2. Update `update.json` → set `latestVersion` to that version, refresh
-   `notes`, commit to `main`.
-
-Clients running an older build will see the update prompt on next Excel open.
-GitHub Releases are still fine to use for changelog/tag history if you want,
-just not required for either download button.
+Các file cài đặt trong repo được tạo tự động mỗi lần phát hành, vui lòng không chỉnh sửa trực tiếp.
