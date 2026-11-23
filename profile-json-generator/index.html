@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>VNPT — Tạo JSON cấu hình kết nối (import)</title>
+<title>VNPT - Tạo JSON cấu hình kết nối (import)</title>
 <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -186,7 +186,7 @@
           <b>Tài khoản WebService</b>: tài khoản Service tạo ở menu Phân Quyền.<br>
           <b>Loại chứng từ</b>: <code>CTT</code> / <code>GTGT</code> / <code>PXK</code>.<br>
           <b>Domain</b>: không cần nhập <code>http(s)</code>.<br>
-          <b>Cột mở rộng</b> (tùy chọn): thêm cột ghi vào thẻ <code>Extra</code>, <code>Extra1</code>…<code>Extra11</code> (cấp hóa đơn) hoặc <code>SP_Extra1</code>/<code>SP_Extra2</code> (cấp dòng). Kiểu: <code>string</code>/<code>numeric</code>/<code>datetime</code>. Tên cột mặc định là tên thẻ, đổi tên ở "Thứ tự &amp; tên cột".<br>
+          <b>Cột mở rộng</b> (tùy chọn): thêm cột ghi vào thẻ <code>Extra</code>, <code>Extra1</code>...<code>Extra11</code> (cấp hóa đơn) hoặc <code>SP_Extra1</code>/<code>SP_Extra2</code> (cấp dòng). Kiểu: <code>string</code>/<code>numeric</code>/<code>datetime</code>. Tên cột mặc định là tên thẻ, đổi tên ở "Thứ tự &amp; tên cột".<br>
           <b>Cột hóa đơn đặc thù</b> (tùy chọn): chọn loại hóa đơn đặc thù để mẫu Excel bổ sung các cột hàng hóa đặc trưng (VD: Biển kiểm soát).<br>
           <b>Chuyển mã sang Unicode</b>: để Unicode (không chuyển mã) cho file bình thường; chọn VNI nếu file dùng font VNI (VD: <code>Coâng ty</code>). Lưu ý: VNI áp cho mọi ô dữ liệu; file lẫn ô Unicode gõ tay (VD: <code>Công ty Hoàng Long</code>) có thể bị đổi sai, nên để cả file một kiểu. Tiêu đề cột không được chuyển: khai tên cột đúng như đang thấy trong file.<br>
           <b>Thứ tự &amp; tên cột</b> (tùy chọn): kéo-thả để đổi thứ tự cột trên mẫu Excel sinh ra; khai tên thay thế khi file của khách đặt tên cột khác mẫu (VD: xuất từ phần mềm khác), dòng tiêu đề, công thức tính cột (giống Excel) và giá trị mặc định khi ô trống.
@@ -202,7 +202,7 @@ const DOC_TYPES = ["CTT","GTGT","PXK"];
 const SLOTS = ["Extra","Extra1","Extra2","Extra3","Extra4","Extra5","Extra6","Extra7","Extra8","Extra9","Extra10","Extra11","SP_Extra1","SP_Extra2"];
 const DTYPES = ["string","numeric","datetime"];
 
-// Cột chuẩn VNPT ngoài Extra — khớp OptionalFieldCatalog bên add-in (Data/Template/OptionalFieldCatalog.cs).
+// Cột chuẩn VNPT ngoài Extra - khớp OptionalFieldCatalog bên add-in (Data/Template/OptionalFieldCatalog.cs).
 // Xuất ra {type:'GTGT', field:'<key>'} thay vì header/extraSlot; add-in tự lấy header/note/tag XML theo key.
 
 // Checkbox độc lập, mỗi cái bật ra 1 hoặc nhiều field cùng lúc.
@@ -216,7 +216,7 @@ const VNPT_CHECKBOXES = [
 ];
 const cbType = f => f.type || 'GTGT';
 
-// Hàng hóa đặc trưng: chọn 1 trong 3 loại (radio) — mỗi loại gắn cột HoaDonDacThu (Sample khác nhau)
+// Hàng hóa đặc trưng: chọn 1 trong 3 loại (radio) - mỗi loại gắn cột HoaDonDacThu (Sample khác nhau)
 // cấp hóa đơn + các cột cấp dòng tương ứng (cùng cấp SP_Extra, bắt buộc khi TinhChat = 5).
 const SPECIAL_GOODS_TYPES = [
   {id:'car', hddthuKey:'HDDThu_Car', label:'Hàng hóa là xe ô tô, xe mô tô', extraKeys:['SKhung','SMay']},
@@ -232,14 +232,14 @@ function fieldChecked(data, key, type){ return !!(data.customColumns||[]).some(c
 function anyFieldChecked(data, keys, type){ return keys.some(k=>fieldChecked(data,k,type)); }
 function selectedGoodsType(data){ return SPECIAL_GOODS_TYPES.find(t=>fieldChecked(data,t.hddthuKey)); }
 function specialSectionOpen(data){ return VNPT_CHECKBOXES.some(f=>anyFieldChecked(data,f.keys,cbType(f))) || !!selectedGoodsType(data); }
-// Cột chuẩn do checkbox đang bật thêm vào mẫu của loại t (VD PXK ngoại tệ → LoaiTienTe, TyGia, HinhThucThanhToan).
+// Cột chuẩn do checkbox đang bật thêm vào mẫu của loại t (VD PXK ngoại tệ -> LoaiTienTe, TyGia, HinhThucThanhToan).
 function checkboxHeaders(id, t){
   const conn=document.getElementById(id); if(!conn) return [];
   return VNPT_CHECKBOXES.filter(f=>cbType(f)===t && f.headers).filter(f=>{ const cb=conn.querySelector('.vf-multi[data-id="'+f.id+'"]'); return cb && cb.checked; })
     .reduce((a,f)=>a.concat(f.headers),[]);
 }
 
-// Thứ tự cột MẶC ĐỊNH khi "Tạo mẫu" (khớp vnpt-config.json → documentTypes[].excel[].header,
+// Thứ tự cột MẶC ĐỊNH khi "Tạo mẫu" (khớp vnpt-config.json -> documentTypes[].excel[].header,
 // đúng thứ tự). Khách kéo-thả để đổi thứ tự riêng; chỉ xuất ra columnOrder khi khác mặc định.
 const DEFAULT_COLUMNS = {
   GTGT: ["STT","NgayHoaDon","HinhThucThanhToan","LoaiTienTe","TyGia","MaKhachHang","TenDonVi","HoTenNguoiMuaHang","MaSoThue","DiaChi","SoDienThoai","Email","MaDVQHNSach","SoHoChieu","CCCD","MaHang","TenSanPham","DVT","SoLuong","DonGia","TyLeChietKhau","SoTienChietKhau","GTKCThue","ThanhTien","ThueSuat_Dong","TienThueGTGT_Dong","Cong_Dong","TinhChat","TgTCThue","TgTThue","TTCKTMai","TgTTTBSo","TgTTTBChu"],
@@ -287,7 +287,7 @@ function orderFor(id, t){
   for(const h of nat) if(!used.has(h.toLowerCase())) res.push(h);
   return res;
 }
-// Cột mở rộng đổi (thêm/xóa/đổi tên/đổi loại) → vẽ lại danh sách thứ tự & tên cột.
+// Cột mở rộng đổi (thêm/xóa/đổi tên/đổi loại) -> vẽ lại danh sách thứ tự & tên cột.
 function refreshOrderList(id){
   syncMappingFromDom(id);
   renderColumnOrderList(id);
@@ -316,7 +316,7 @@ function renderColumnOrderList(id){
   const headers = orderFor(id, type);
   columnOrderState[id][type] = headers;
   const extBy = new Map(extInfo(id, type).map(x=>[x.header.toLowerCase(), x]));
-  // Tên thay thế: lấy từ mappingState (map tên trong file → tên mặc định).
+  // Tên thay thế: lấy từ mappingState (map tên trong file -> tên mặc định).
   const altFor = {};
   const mst = (mappingState[id]||{})[type] || {maps:[], fx:[]};
   for(const [k,f] of (mst.fx||[])){ const lk=(k||'').toLowerCase(); if(!(lk in altFor)) altFor[lk]=f; } // công thức ưu tiên
@@ -361,7 +361,7 @@ function syncColumnOrderFromDom(list){
   columnOrderState[conn.id][type] = headers;
 }
 // FLIP: ghi vị trí "First", để DOM tự sắp lại ("Last"), rồi tween ngược từ First -> Last
-// bằng transform (GPU-only, không đụng layout) — mượt hơn hẳn so với việc các hàng "nhảy" tức thì.
+// bằng transform (GPU-only, không đụng layout) - mượt hơn hẳn so với việc các hàng "nhảy" tức thì.
 function flipReorder(list, mutate){
   const before = new Map([...list.children].map(el => [el, el.getBoundingClientRect()]));
   mutate();
@@ -385,7 +385,7 @@ function wireColumnOrderDrag(list){
 
   function onMove(e){
     if (!draggingEl) return;
-    // Cộng dồn theo delta từng bước (không phải so với điểm bắt đầu) — vì vị trí "gốc"
+    // Cộng dồn theo delta từng bước (không phải so với điểm bắt đầu) - vì vị trí "gốc"
     // (chưa transform) của hàng đang kéo thay đổi mỗi lần nó đổi chỗ trong DOM bên dưới.
     dragOffsetY += e.movementY;
     setTransform();
@@ -432,7 +432,7 @@ function wireColumnOrderDrag(list){
     window.addEventListener('pointerup', onUp);
   });
 
-  // Bàn phím: focus 1 hàng, mũi tên lên/xuống để đổi vị trí — cùng hiệu ứng FLIP.
+  // Bàn phím: focus 1 hàng, mũi tên lên/xuống để đổi vị trí - cùng hiệu ứng FLIP.
   list.addEventListener('keydown', e => {
     if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
     const li = e.target.closest('.co-item');
@@ -496,7 +496,7 @@ function addConn(data){
     </div>
 
     <div class="grid">
-      <div><label>Tên hiển thị <span class="req">*</span></label><input class="f-name" placeholder="VD: Công ty ABC — HN" value="${esc(data.displayName)}"></div>
+      <div><label>Tên hiển thị <span class="req">*</span></label><input class="f-name" placeholder="VD: Công ty ABC - HN" value="${esc(data.displayName)}"></div>
       <div><label>Mã số thuế (MST) <span class="req">*</span></label><input class="f-mst" placeholder="VD: 0315890356" value="${esc(data.mst)}"></div>
       <div><label>Domain <span class="req">*</span></label><input class="f-domain" placeholder="VD: abc.vnpt-invoice.com.vn" value="${esc(cleanDomain(data.domain))}"></div>
     </div>
@@ -588,7 +588,7 @@ function addConn(data){
   (data.customColumns||[])
     .filter(c=>!(c && c.field && KNOWN_FIELD_KEYS.has(c.field))) // các field chuẩn VNPT hiện qua checkbox, không lặp lại ở đây
     .forEach(c=>addExt(id,c));
-  // Hồ sơ cũ map thẳng cột file → thẻ Extra/ExtraN/SP_ExtraN (VD GoodsTitle → Extra) ⇒ hiện thành cột mở rộng tương đương.
+  // Hồ sơ cũ map thẳng cột file -> thẻ Extra/ExtraN/SP_ExtraN (VD GoodsTitle -> Extra) => hiện thành cột mở rộng tương đương.
   for(const m of (data.columnMapping||[])){
     const t = (m && m.type) || 'GTGT';
     for(const [erp, target] of Object.entries((m && m.map) || {})){
@@ -617,7 +617,7 @@ const EXTRA_STD = ["Extra","Extra1","Extra2","Extra3","Extra4","Extra5","Extra6"
 const mappingState = {};
 function firstMappingType(data){ const m=(data.columnMapping||[]).find(x=>x&&x.type)||(data.columnOrder||[]).find(x=>x&&DEFAULT_COLUMNS[x.type]); return m?m.type:'GTGT'; }
 function emptyMapping(){ return {headerRow:1, dec:'', maps:[], defs:[], fx:[]}; }
-// compose dạng cũ {date:[năm,tháng,ngày]} → công thức tương đương
+// compose dạng cũ {date:[năm,tháng,ngày]} -> công thức tương đương
 function dateToFormula(d){ const c=n=>/^[A-Za-z_][\w.]*$/.test(n)?n:'['+n+']';
   return '=TEXT('+c(d[0])+',"0000") & "-" & TEXT('+c(d[1])+',"00") & "-" & TEXT('+c(d[2])+',"00")'; }
 function initMappingState(id, data){
@@ -657,7 +657,7 @@ function addMapRow(id, kind, a, b){
     </div>`));
   }
 }
-// Kiểm tra cú pháp công thức (cùng ngữ pháp với ColumnFormula bên add-in) — trả về thông báo lỗi hoặc ''.
+// Kiểm tra cú pháp công thức (cùng ngữ pháp với ColumnFormula bên add-in) - trả về thông báo lỗi hoặc ''.
 function formulaError(text){
   const s=String(text||''); let i=0;
   const ws=()=>{ while(i<s.length && /\s/.test(s[i])) i++; };
@@ -692,12 +692,12 @@ function formulaError(text){
     return '';
   }catch(e){ return e.message; }
 }
-// Ô tên thay thế / công thức: bắt đầu bằng "=" là công thức → kiểm tra cú pháp, viền đỏ + liệt kê lỗi dưới danh sách.
+// Ô tên thay thế / công thức: bắt đầu bằng "=" là công thức -> kiểm tra cú pháp, viền đỏ + liệt kê lỗi dưới danh sách.
 function isFormula(v){ return String(v||'').trim().startsWith('='); }
 // ---------- Tooltip gợi ý công thức (giống gợi ý hàm của Excel, gọn) ----------
 let fxTipEl = null;
 function fxTip(){ if(!fxTipEl){ fxTipEl=document.createElement('div'); fxTipEl.className='fx-tip'; fxTipEl.hidden=true; fxTipEl.setAttribute('role','tooltip'); document.body.appendChild(fxTipEl); } return fxTipEl; }
-// Con trỏ đang trong TEXT( … ) thì trả về chỉ số tham số (0/1), không thì -1.
+// Con trỏ đang trong TEXT( ... ) thì trả về chỉ số tham số (0/1), không thì -1.
 function textArgAt(s){
   const st=[]; let inStr=false;
   for(let i=0;i<s.length;i++){
@@ -782,14 +782,14 @@ function renderMapping(id){
   conn.querySelector('.m-hrow').value = st.headerRow || 1;
   conn.querySelector('.m-dec').value = st.dec || '';
   conn.querySelector('.defs').innerHTML = '';
-  // Cột chuẩn (có trong danh sách thứ tự cột) hiện ô "Tên thay thế" ngay trên dòng kéo-thả; còn lại → "Cột khác".
+  // Cột chuẩn (có trong danh sách thứ tự cột) hiện ô "Tên thay thế" ngay trên dòng kéo-thả; còn lại -> "Cột khác".
   const stdSet = new Set(orderFor(id, type).map(h=>h.toLowerCase()));
   const seen = new Set(), otherMaps = [];
-  // Công thức cũng đi chung ô: cột chuẩn → ô trong dòng (ưu tiên công thức), cột khác → "Cột khác".
+  // Công thức cũng đi chung ô: cột chuẩn -> ô trong dòng (ưu tiên công thức), cột khác -> "Cột khác".
   for(const [k,f] of st.fx){ const lk=(k||'').toLowerCase(); if(stdSet.has(lk) && !seen.has(lk)) seen.add(lk); else otherMaps.push([f,k]); }
   for(const [a,b] of st.maps){ const k=(b||'').toLowerCase(); if(stdSet.has(k) && !seen.has(k)) seen.add(k); else otherMaps.push([a,b]); }
   renderColumnOrderList(id);
-  // Ánh xạ tới cột ngoài danh sách (hồ sơ cũ, VD GoodsTitle → Extra) không còn hiện — bỏ khi xuất lại.
+  // Ánh xạ tới cột ngoài danh sách (hồ sơ cũ, VD GoodsTitle -> Extra) không còn hiện - bỏ khi xuất lại.
   conn.querySelectorAll('.co-list .s-alt, .maps .alt-in').forEach(i=>{ const v=i.value.trim(); i.classList.toggle('is-fx',isFormula(v)); i.classList.toggle('bad',isFormula(v)&&!!formulaError(v)); });
   refreshFxErrors(conn);
   st.defs.forEach(([a,b])=>addMapRow(id,'defs',a,b));
@@ -953,7 +953,7 @@ function collect(){
   return out;
 }
 
-// Kết nối đang Ẩn không xuất ra JSON (Sao chép / Tải) — chỉ giữ lại trong form + localStorage.
+// Kết nối đang Ẩn không xuất ra JSON (Sao chép / Tải) - chỉ giữ lại trong form + localStorage.
 function collectVisible(){ return collect().filter(c=>!c.hidden); }
 
 function validate(data){
@@ -991,7 +991,7 @@ function loadFromStorage(){
   try{ return localStorage.getItem(STORAGE_KEY); }catch(e){ return null; }
 }
 
-// form -> json (đồng bộ JSON preview + localStorage ngay khi gõ; KHÔNG hiện cảnh báo ở đây — chỉ hiện khi bấm Sao chép/Tải)
+// form -> json (đồng bộ JSON preview + localStorage ngay khi gõ; KHÔNG hiện cảnh báo ở đây - chỉ hiện khi bấm Sao chép/Tải)
 function formToJson(){
   if(syncing) return;
   const data=collect();
@@ -1010,7 +1010,7 @@ function jsonToForm(){
     arr = raw==='' ? [] : JSON.parse(raw);
     if(!Array.isArray(arr)) arr=[arr];
   }catch(e){
-    return; // JSON chưa hợp lệ khi đang gõ — giữ nguyên form, không hiện cảnh báo
+    return; // JSON chưa hợp lệ khi đang gõ - giữ nguyên form, không hiện cảnh báo
   }
   syncing=true;
   document.getElementById('conns').innerHTML=''; seq=0;

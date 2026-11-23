@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>VNPT Invoice — License Generator</title>
+<title>VNPT Invoice - License Generator</title>
 <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,7 +39,7 @@
     </div>
     <div>
       <h1>License Generator</h1>
-      <p class="sub">Runs entirely in this browser — nothing is sent anywhere</p>
+      <p class="sub">Runs entirely in this browser - nothing is sent anywhere</p>
     </div>
   </header>
 
@@ -53,12 +53,12 @@
     <div class="card reveal">
       <label>Private Key (JWK)</label>
       <textarea id="priv" rows="3" placeholder="Paste your private key JWK here..." spellcheck="false"></textarea>
-      <p class="hint">Saved in this browser's local storage — you won't need to paste it again on
+      <p class="hint">Saved in this browser's local storage - you won't need to paste it again on
         this computer. <button class="link" type="button" onclick="clearSavedKey()">Clear saved key</button></p>
     </div>
 
     <div class="card reveal">
-      <label>Tax IDs (MST) — one per line, or comma/semicolon separated</label>
+      <label>Tax IDs (MST) - one per line, or comma/semicolon separated</label>
       <textarea id="msts" rows="3" placeholder="0315890356&#10;0301234567" spellcheck="false"></textarea>
 
       <div class="checkbox-row">
@@ -92,7 +92,7 @@
 
     <div class="card result" id="resultCard" style="display:none">
       <label>License Key</label>
-      <div id="lic" class="mono">—</div>
+      <div id="lic" class="mono">-</div>
       <div class="btn-row">
         <button class="sec" type="button" onclick="copyLic()">Copy</button>
       </div>
@@ -102,9 +102,9 @@
   <!-- ===== Tab: Key Pair ===== -->
   <section id="tab-keys" class="panel">
     <div class="callout">
-      Only needed once — a key pair is meant to be reused for every license. Generating a new
+      Only needed once - a key pair is meant to be reused for every license. Generating a new
       pair does <b>not</b> invalidate licenses already issued with the old one, but any
-      <i>new</i> license you generate afterward will only verify against the new Public Key —
+      <i>new</i> license you generate afterward will only verify against the new Public Key -
       make sure it's updated in the add-in's config before distributing new licenses.
     </div>
     <div class="card">
@@ -112,12 +112,12 @@
         <button class="primary" type="button" onclick="genKeys()">Generate New Key Pair</button>
       </div>
 
-      <label class="sub-label">Public Key — paste into the add-in's config
+      <label class="sub-label">Public Key - paste into the add-in's config
         (<code>appSettings.licensePublicKeyX</code> / <code>licensePublicKeyY</code>):</label>
-      <div id="pub" class="mono">—</div>
+      <div id="pub" class="mono">-</div>
 
-      <label class="sub-label">Private Key (JWK) — keep this secret:</label>
-      <div id="newPriv" class="mono">—</div>
+      <label class="sub-label">Private Key (JWK) - keep this secret:</label>
+      <div id="newPriv" class="mono">-</div>
 
       <div class="btn-row">
         <button class="sec" type="button" onclick="useGeneratedKey()">Use this key on the Generate License tab</button>
@@ -234,7 +234,7 @@ async function genLicense(){
 }
 function copyLic(){
   const t = document.getElementById('lic').textContent;
-  if (t && t !== '—') navigator.clipboard.writeText(t);
+  if (t && t !== '-') navigator.clipboard.writeText(t);
 }
 
 // ---- scroll-reveal ----

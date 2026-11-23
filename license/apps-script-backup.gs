@@ -1,6 +1,6 @@
 // Backup/reference copy of the Apps Script backing /license.
 // Lives in the real Google Apps Script project bound to the Google Sheet
-// (SS_ID below) — not executed from this repo. Kept here for version
+// (SS_ID below) - not executed from this repo. Kept here for version
 // history and context since Apps Script itself isn't git-tracked.
 // Snapshot taken: 2026-10-02.
 
@@ -49,7 +49,7 @@ function doGet(e) {
   }
 }
 
-// Sheet có thể tự parse Timestamp/ExpireDate thành kiểu Date dù ghi vào là string — ép lại cho chắc.
+// Sheet có thể tự parse Timestamp/ExpireDate thành kiểu Date dù ghi vào là string - ép lại cho chắc.
 function formatCell_(v, pattern) {
   var d;
   if (Object.prototype.toString.call(v) === '[object Date]') {
@@ -127,7 +127,7 @@ function recordData_(sheet, e) {
       tsCol = i + 1;
       row.push(new Date());
     } else if (headers[i] === 'Passcode') {
-      row.push(''); // không log passcode thật vào sheet theo dõi — chỉ dùng để xác thực, không lưu lại
+      row.push(''); // không log passcode thật vào sheet theo dõi - chỉ dùng để xác thực, không lưu lại
     } else {
       row.push(e.parameter[headers[i]] || '');
     }
@@ -145,8 +145,8 @@ function jsonResponse_(obj) {
 // ====== Xác thực user theo tab Users ======
 // Users: A email, B passcode, C active (1/0), D retry (sai liên tiếp, reset_passcode xóa về 0),
 // E totalFail (sai cộng dồn, reset_passcode KHÔNG xóa; chỉ về 0 khi đăng nhập đúng).
-// totalFail >= MAX_TOTAL_FAIL ⇒ khóa hẳn: reset_passcode không mở được, admin phải sửa tay
-// (đặt E = 0, C = 1). Chặn vòng dò "reset → thử 10 lần → reset".
+// totalFail >= MAX_TOTAL_FAIL => khóa hẳn: reset_passcode không mở được, admin phải sửa tay
+// (đặt E = 0, C = 1). Chặn vòng dò "reset -> thử 10 lần -> reset".
 var MAX_RETRY = 10;
 var MAX_TOTAL_FAIL = 30;
 
@@ -229,7 +229,7 @@ function handleResetPasscode_(email) {
   var genericMsg = { status: true, message: 'Nếu email có trong hệ thống, passcode mới đã được gửi.' };
   if (!email) return jsonResponse_(genericMsg);
 
-  // Chặn spam reset cho cùng 1 email trong 60s — tránh tốn quota MailApp và làm
+  // Chặn spam reset cho cùng 1 email trong 60s - tránh tốn quota MailApp và làm
   // phiền chủ tài khoản thật nếu bị gọi lặp lại liên tục (không tiết lộ gì khác qua response).
   var cache = CacheService.getScriptCache();
   var cacheKey = 'reset_cd_' + email;

@@ -1,12 +1,12 @@
 /* ==========================================================================
-   VNPT Invoices Add-in — Soft Structuralism theme
+   VNPT Invoices Add-in - Soft Structuralism theme
    Single source of truth for every page under this site (index.html, licgen/,
    profile-json-generator/). Edit tokens/components here to restyle globally;
    each page's own <style> block should only hold page-specific layout.
 
    Silver-grey substrate, bold grotesk display type, floating white panels on
    diffused ambient shadows, one indigo accent for the primary action only.
-   Squircle radii, pill buttons, spring motion — never linear.
+   Squircle radii, pill buttons, spring motion - never linear.
    ========================================================================== */
 
 :root{
@@ -21,7 +21,7 @@
   --text:      #16161A;
   --muted:     #6B6B76;
 
-  /* Accent — the ONLY color on the page. Primary action + focus only. */
+  /* Accent - the ONLY color on the page. Primary action + focus only. */
   --accent:    #4F46E5;
   --accent-ink:#3730A3;
 
@@ -41,18 +41,18 @@
 
   --mono-bg:   #F1F1F4;
 
-  /* Elevation — soft, heavily diffused, never harsh */
+  /* Elevation - soft, heavily diffused, never harsh */
   --shadow-card: 0 1px 1px rgba(16,16,24,.03), 0 30px 60px -28px rgba(16,16,24,.18);
   --shadow-btn:  0 14px 28px -12px rgba(79,70,229,.45);
   --ease: cubic-bezier(.32,.72,0,1);
 
-  /* Radii — exaggerated squircles */
+  /* Radii - exaggerated squircles */
   --r-lg: 28px;
   --r-md: 18px;
   --r-sm: 12px;
 }
 
-/* Light theme only, deliberately — no prefers-color-scheme:dark override. */
+/* Light theme only, deliberately - no prefers-color-scheme:dark override. */
 
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -158,7 +158,7 @@ code{background:var(--card-alt);border:0;padding:2px 6px;border-radius:6px;
 details{margin-top:8px}
 summary{cursor:pointer;color:var(--muted);font-size:12px}
 
-/* --- Breadcrumb back-link — floating pill, detached from content --- */
+/* --- Breadcrumb back-link - floating pill, detached from content --- */
 .crumb{
   display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:12px;
   font-weight:600;text-decoration:none;margin-bottom:18px;
@@ -199,7 +199,7 @@ summary{cursor:pointer;color:var(--muted);font-size:12px}
 .tab{
   appearance:none;background:none;border:0;flex:1;padding:11px 6px;
   font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border-radius:999px;
-  /* exception: background IS the tab-switch indicator, not decorative — kept animated */
+  /* exception: background IS the tab-switch indicator, not decorative - kept animated */
   transition:background 200ms var(--ease),color 200ms var(--ease);-webkit-tap-highlight-color:transparent;
 }
 .tab.active{color:#fff;background:linear-gradient(160deg,var(--accent),var(--accent-ink));

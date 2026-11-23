@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>VNPT Invoice — License Generator</title>
+<title>VNPT Invoice - License Generator</title>
 <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -242,7 +242,7 @@ async function loadRecords(){
     currentPage = 1;
     renderList();
   } catch (ex) {
-    listArea.innerHTML = '<div class="list-empty">Không tải được danh sách — kiểm tra lại Email/Passcode hoặc thử lại.</div>';
+    listArea.innerHTML = '<div class="list-empty">Không tải được danh sách - kiểm tra lại Email/Passcode hoặc thử lại.</div>';
   } finally {
     fetchBtn.disabled = false;
     fetchBtn.classList.remove('loading');

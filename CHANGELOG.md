@@ -32,7 +32,7 @@
 ## [2.10] - 2026-11-18
 
 ### Changed
-- Hiện "Đang gửi…" khi thao tác Tạo/Phát hành
+- Hiện "Đang gửi..." khi thao tác Tạo/Phát hành
 - Kiểm tra dữ liệu trước khi Tạo/Phát hành
 - Xác nhận khi gửi chứng từ/hóa đơn đã có mã tra cứu
 - CTT: Email, MaKhachHang, DDanh, QTich bỏ bắt buộc
