@@ -1,0 +1,1882 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>VNPT - Tạo JSON cấu hình kết nối (beta)</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/theme.css">
+<style>
+  .wrap{max-width:1200px;margin:0 auto;padding:24px 20px 60px}
+  header.site{margin-bottom:20px}
+  .cols{display:grid;grid-template-columns:1fr 420px;gap:18px}
+  @media(max-width:960px){.wrap{padding:16px 14px 48px}.cols{grid-template-columns:1fr}}
+  .left{min-width:0}
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px;align-items:center}
+  .btn-add-conn{width:48px;height:48px;min-height:48px;padding:0}
+  .btn-add-conn svg{width:20px;height:20px;stroke-width:1.5}
+  .toolbar{position:relative;z-index:30}
+  .add-wrap{position:relative}
+  .add-menu{position:absolute;top:calc(100% + 8px);left:0;z-index:20;min-width:250px;padding:6px;
+    background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);box-shadow:var(--shadow-card), 0 12px 28px -12px rgba(16,16,24,.25);
+    display:flex;flex-direction:column;gap:2px}
+  .add-menu[hidden]{display:none}
+  .add-menu button{display:flex;align-items:center;gap:10px;width:100%;justify-content:flex-start;text-align:left;
+    background:none;box-shadow:none;color:var(--text);padding:10px 12px;min-height:0;border-radius:8px;font-weight:500}
+  .add-menu button:hover,.add-menu button:focus-visible{background:var(--card-alt);transform:none;box-shadow:none}
+  .add-menu button svg{flex:none;width:18px;height:18px;color:var(--accent)}
+  .add-menu span{display:flex;flex-direction:column;gap:1px}
+  .add-menu b{font-size:13px;font-weight:700}
+  .add-menu small{font-size:11.5px;color:var(--muted)}
+
+  .conn{margin:0 0 16px}
+  .conn > .head{display:flex;align-items:center;gap:10px;margin:0 0 14px}
+  .conn > .head .idx{width:28px;height:28px;border-radius:999px;
+    background:var(--card-alt);color:var(--accent);
+    box-shadow:0 1px 2px rgba(16,16,24,.05);
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12.5px;flex:0 0 auto}
+  .conn > .head .name{font-weight:700;font-size:15px;color:var(--text);min-height:1.2em}
+  .conn > .head .spacer{flex:1}
+  .conn.collapsed > *:not(.head){display:none}
+  .conn.collapsed > .head{margin-bottom:0}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .grid.two{grid-template-columns:1fr 1fr}
+  @media(max-width:720px){.grid,.grid.two{grid-template-columns:1fr}}
+
+  .sec{margin:18px 0 0;border-top:1px solid var(--line);padding-top:16px}
+  .sec > .st{display:flex;align-items:center;gap:8px;margin:0 0 10px;flex-wrap:wrap}
+  .sec > .st h4{margin:0;font-size:11px;font-weight:700;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.1em}
+  .sec > .st h4.hl{color:var(--accent)}
+  .sec > .st .hint{color:var(--muted);font-size:11.5px}
+  summary.st{list-style:none}
+  summary.st::-webkit-details-marker{display:none}
+  summary.st .chev{margin-left:auto;flex:none;transition:transform .15s ease;color:var(--muted)}
+  details.sec[open] > summary.st .chev{transform:rotate(180deg)}
+
+  .row{display:grid;gap:8px;align-items:end;margin:0 0 8px}
+  .row.pat{grid-template-columns:1fr 1fr 130px 36px}
+  .row.ext{grid-template-columns:110px 140px 120px 1fr 36px}
+  @media(max-width:720px){.row.ext{grid-template-columns:1fr}}
+  @media(min-width:721px){.exts .row.ext:not(:first-child) label{display:none}}
+  @media(max-width:480px){.row.pat{grid-template-columns:1fr 1fr 88px 30px;gap:6px}}
+  .pats .row.pat:not(:first-child) label{display:none}
+  .row .del{padding:0}
+
+  .field-note{color:var(--muted);font-size:11.5px;margin-top:2px;line-height:1.6}
+
+  .co-list{list-style:none;margin:4px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+  .co-item .co-pill .std-name{flex:1;min-width:0;overflow-wrap:anywhere}
+  .ext-tag{font-size:10.5px;font-weight:600;color:var(--accent);background:rgba(79,70,229,.08);border-radius:999px;padding:1px 7px;margin-left:4px;vertical-align:1px}
+  .co-pill input.co-alt{flex:0 1 50%;min-width:0;height:28px;min-height:0;padding:4px 10px;font-size:12.5px;background:#fff;border:1px solid var(--line);border-radius:8px;cursor:text}
+  .co-pill input.co-alt::placeholder{color:#c4c4cc}
+  .co-item.renamed .co-pill .std-name{font-weight:700}
+  .co-item{display:flex;align-items:center;gap:8px;cursor:grab;font-size:13px;user-select:none;
+    touch-action:none;transition:transform 200ms var(--ease);will-change:transform}
+  .co-item:active{cursor:grabbing}
+  .co-item:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:var(--r-sm)}
+  .co-item.dragging{position:relative;z-index:5;transition:box-shadow 200ms var(--ease)}
+  .co-item.dragging .co-pill{background:#fff;box-shadow:0 16px 28px -10px rgba(16,16,24,.28)}
+  .co-letter{flex:none;width:18px;text-align:center;color:#ddd;font-weight:700;font-size:11.5px}
+  .co-pill{flex:1;display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--r-sm);
+    background:var(--card-alt);border:1px solid var(--line);min-width:0;transition:background 200ms var(--ease),box-shadow 200ms var(--ease)}
+  .co-handle{flex:none;color:var(--muted)}
+  .co-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:4px}
+  .co-row select{max-width:160px}
+
+  .row.map{grid-template-columns:1fr 1fr 36px}
+  .maps .row.map:not(:first-child) label,.defs .row.map:not(:first-child) label{display:none}
+  .fx-errs:empty{display:none}
+  .fx-tip{position:absolute;z-index:40;max-width:min(420px,calc(100vw - 32px));padding:8px 10px;border-radius:8px;
+    background:#fff;border:1px solid var(--line);box-shadow:0 10px 24px -10px rgba(16,16,24,.3);font-size:12px;line-height:1.55;color:var(--text);pointer-events:none}
+  .fx-tip[hidden]{display:none}
+  .fx-tip code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;background:none;padding:0}
+  .fx-tip .sig{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+  .fx-tip .sig b{text-decoration:underline}
+  .fx-tip .mut{color:var(--muted)}
+  .fx-tip .tip-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px}
+  .fx-tip .tip-list li{display:flex;flex-wrap:wrap;gap:2px 8px;align-items:baseline}
+  .fx-tip .tip-list li::before{content:"-";color:var(--muted)}
+  .fx-tip .err{color:var(--danger-text)}
+  input.is-fx{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  input.is-fx.bad{border-color:var(--danger-text) !important;box-shadow:0 0 0 2px rgba(220,38,38,.12)}
+  .erp-body{margin-top:8px}
+  .erp-body .st{display:flex;align-items:center;gap:8px;margin:14px 0 8px}
+  .erp-body .st h4{margin:0;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+
+  .out{position:sticky;top:20px}
+  .out.card{box-shadow:0 0 0 6px rgba(79,70,229,.12), inset 0 1px 0 rgba(255,255,255,.6), var(--shadow-card)}
+  @media(max-width:960px){.out{position:static}}
+  .out .oh{display:flex;align-items:center;gap:8px;margin:0 0 10px}
+  .out h3{margin:0;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.14em}
+  .out .oh .spacer{flex:1}
+  textarea#json{width:100%;min-height:400px;font-family:ui-monospace,Consolas,"Courier New",monospace;
+    font-size:12.5px;white-space:pre;tab-size:2;background:var(--mono-bg)}
+
+  /* ===== BETA: bảng cột kiểu Excel ===== */
+  .beta-tag{display:inline-block;vertical-align:middle;margin-left:8px;padding:3px 9px;border-radius:999px;background:#f59e0b;color:#fff;font-size:11px;font-weight:800;letter-spacing:.12em}
+  .beta-link{color:var(--accent);font-weight:600;text-decoration:none}
+  .beta-link:hover{text-decoration:underline}
+  .conn.reveal.in{transform:none;filter:none} /* transform/filter tạo khung chứa cho position:fixed của ngăn kéo */
+  .erp-body{min-width:0}
+  .erp-body .co-list{display:none}
+  .sh-sel-type{display:none}
+  .sh-summary{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 8px}
+  .sh-sum-text{font-size:13px;font-weight:600;color:var(--text)}
+  .sheet-host{min-width:0}
+  .sheet{--sh-line:#d6d9e0;--sh-head:#eceef2;--sh-rename:#e0ecfd;--sh-fx:#dff3e4;--sh-ext:#ece3fa;--sh-moved:#f59e0b;--sh-dup:#f97316;
+    background:#fff;border:1px solid var(--sh-line);border-radius:var(--r-sm);display:flex;flex-direction:column;min-width:0;max-width:100%;overflow:hidden}
+  .sh-grip{display:none;height:10px;cursor:ns-resize;touch-action:none;background:var(--sh-head);flex:none;position:relative}
+  .sh-grip::after{content:"";position:absolute;left:50%;top:3px;width:44px;height:4px;margin-left:-22px;border-radius:2px;background:#b9bdc8}
+  .sh-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 10px;border-bottom:1px solid var(--sh-line);background:#fafbfc}
+  .sh-bar label{margin:0;font-size:12px}
+  .sh-bar input[type=number]{max-width:70px;padding:6px 8px;min-height:0}
+  .sh-bar select{max-width:120px;padding:6px 8px;min-height:0}
+  .sh-bar .spacer{flex:1}
+  .sh-close{display:none}
+  .sh-fxbar{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid var(--sh-line);background:#fff}
+  .sh-namebox{flex:none;width:150px;padding:6px 8px;min-height:0;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;background:var(--card-alt);color:var(--muted)}
+  .sh-fxl{flex:none;font-style:italic;font-weight:700;color:var(--muted);font-family:Georgia,serif}
+  .sh-fxin{flex:1;min-width:0;padding:6px 8px;min-height:0;font-size:13px}
+  .sh-fxin.is-fx{font-family:ui-monospace,Menlo,Consolas,monospace}
+  .sh-fxin.bad{border-color:var(--danger-text) !important}
+  .sh-scroll{position:relative;overflow:auto;max-height:158px;outline:none;background:#fff;-webkit-overflow-scrolling:touch}
+  .sh-scroll:focus-visible{box-shadow:inset 0 0 0 2px var(--accent)}
+  .sheet.big .sh-scroll{flex:1;max-height:none;min-height:0}
+  .sh-table{border-collapse:separate;border-spacing:0;font-size:12.5px;table-layout:auto}
+  .sh-table th,.sh-table td{border-right:1px solid var(--sh-line);border-bottom:1px solid var(--sh-line);padding:0;height:24px;background:#fff;font-weight:400;text-align:left}
+  .sh-table .sh-letter{position:sticky;top:0;z-index:2;background:var(--sh-head);text-align:center;font-weight:600;color:var(--muted);font-size:12px;cursor:grab;user-select:none;touch-action:pan-x pan-y;height:22px}
+  .sh-table .sh-corner{position:sticky;top:0;left:0;z-index:4;background:var(--sh-head);min-width:34px}
+  .sh-table .sh-rn{position:sticky;left:0;z-index:1;background:var(--sh-head);text-align:center;color:var(--muted);font-size:11.5px;min-width:34px;padding:0 6px;user-select:none}
+  .sh-table .sh-letter.moved{box-shadow:inset 0 3px 0 var(--sh-moved)}
+  .sh-table .sh-letter.sel{background:#d3dcfb;color:var(--accent-ink)}
+  .sh-table .sh-rn.hl{background:#d3dcfb;color:var(--accent-ink);font-weight:700}
+  .sh-cell{min-width:90px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:3px 8px;line-height:18px}
+  .sh-above,.sh-blank{background:#fff}
+  .sh-above{background:#f7f8fa !important}
+  .sh-blank .sh-cell{min-height:18px}
+  .sh-defval{color:var(--muted);font-style:italic}
+  .sh-th{cursor:grab;user-select:none;touch-action:pan-x pan-y;font-weight:500}
+  .sh-th.renamed{background:var(--sh-rename);font-weight:700}
+  .sh-th.hasfx{background:var(--sh-fx)}
+  .sh-th.is-ext{background:var(--sh-ext)}
+  .sh-th.renamed.is-ext{background:var(--sh-rename)}
+  .sh-th.bad{box-shadow:inset 0 0 0 2px var(--danger-text)}
+  .sh-th.dup{box-shadow:inset 0 0 0 2px var(--sh-dup)}
+  .sh-th.sel{outline:2px solid var(--accent);outline-offset:-2px;z-index:1;position:relative}
+  .sh-th.editing .sh-cell{padding:0;overflow:visible;max-width:none}
+  .sh-th.editing{outline:2px solid var(--accent);outline-offset:-2px}
+  .sh-th.dragsrc,.sh-letter.dragsrc{opacity:.45}
+  .sh-fxi{display:inline-block;margin-left:5px;padding:0 4px;border-radius:4px;background:#16a34a;color:#fff;font-size:10px;font-style:italic;font-weight:700;line-height:14px;vertical-align:1px}
+  .sh-req{color:var(--req);font-weight:800;margin-left:2px}
+  .sh-ext{margin-left:5px;padding:0 6px;border-radius:999px;background:rgba(124,58,237,.14);color:#6d28d9;font-size:10px;font-weight:600;vertical-align:1px}
+  .sh-editor{width:100%;min-width:140px;height:24px;min-height:0;padding:2px 8px;border:0;border-radius:0;background:#fff;box-shadow:none;font-size:12.5px}
+  .sh-editor:focus{box-shadow:none}
+  .sh-editor.is-fx{font-family:ui-monospace,Menlo,Consolas,monospace}
+  .sh-editor.bad{background:#fdeceb}
+  .sh-editor.dup{background:#fff1e6}
+  .sh-ind{position:absolute;top:0;width:3px;margin-left:-1px;background:var(--accent);z-index:6;pointer-events:none;display:none;border-radius:2px}
+  .sh-ghost{position:fixed;z-index:80;pointer-events:none;opacity:.7;padding:4px 10px;border-radius:6px;background:#fff;border:1px solid var(--accent);box-shadow:0 8px 18px -8px rgba(16,16,24,.35);font-size:12.5px;font-weight:600;transform:translate(-50%,-120%)}
+  .sheet.dragging,.sheet.dragging *{cursor:grabbing !important}
+  .sh-legend{display:flex;flex-wrap:wrap;gap:4px 14px;padding:6px 10px;font-size:11.5px;color:var(--muted);border-top:1px solid var(--sh-line);background:#fafbfc}
+  .sh-legend span{display:inline-flex;align-items:center;gap:5px}
+  .sh-legend i{display:inline-block;width:14px;height:12px;border-radius:3px;border:1px solid var(--sh-line)}
+  .sh-tabs{display:flex;gap:2px;padding:0 6px;border-top:1px solid var(--sh-line);background:var(--sh-head);overflow-x:auto;flex:none}
+  .sh-tab{flex:none;min-height:0;padding:6px 14px;border-radius:0 0 8px 8px;background:transparent;box-shadow:none;color:var(--muted);font-size:12.5px;font-weight:600;border:0}
+  .sh-tab:hover{background:#e2e5ec;transform:none;box-shadow:none}
+  .sh-tab.on{background:#fff;color:var(--text);box-shadow:0 1px 0 #fff, 0 0 0 1px var(--sh-line);border-top:0}
+  .sh-tab .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--sh-moved);margin-left:6px;vertical-align:2px}
+  .sheet.big{position:fixed;left:0;right:0;bottom:0;height:60vh;z-index:35;border-radius:var(--r-md) var(--r-md) 0 0;border-bottom:0;box-shadow:0 -14px 40px -12px rgba(16,16,24,.35)}
+  .sheet.big .sh-grip{display:block}
+  .sheet.big .sh-close{display:inline-flex}
+  @media(max-width:700px){
+    .sheet.big{top:0;height:auto !important;border-radius:0}
+    .sheet.big .sh-grip{display:none}
+    .sh-namebox{width:90px}
+  }
+  .fx-tip.sh-tip{position:fixed;z-index:60}
+  .sh-menu{position:fixed;z-index:70;min-width:230px;max-width:calc(100vw - 16px);padding:6px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);box-shadow:var(--shadow-card), 0 12px 28px -12px rgba(16,16,24,.3);display:flex;flex-direction:column;gap:1px}
+  .sh-menu[hidden]{display:none}
+  .sh-menu button{display:block;width:100%;text-align:left;justify-content:flex-start;background:none;box-shadow:none;color:var(--text);padding:8px 12px;min-height:0;border-radius:8px;font-weight:500;font-size:13px}
+  .sh-menu button:hover,.sh-menu button:focus-visible{background:var(--card-alt);transform:none;box-shadow:none}
+  .sh-menu button.danger-i{color:var(--danger-text)}
+  .sh-menu .sh-mt{padding:4px 12px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+  .sh-menu .sh-sep{height:1px;margin:4px 6px;background:var(--line)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <a class="crumb" href="../../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    VNPT Invoices Add-in
+  </a>
+  <header class="site reveal">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+    </div>
+    <div>
+      <h1>Tạo JSON cấu hình kết nối <span class="beta-tag">BETA</span></h1>
+      <p class="sub">File json có chứa mật khẩu, nên gửi mail cho khách hàng. <a class="beta-link" href="../">Về bản chính</a></p>
+    </div>
+  </header>
+
+  <div class="cols">
+  <div class="left">
+    <div class="toolbar reveal">
+      <div class="add-wrap">
+        <button class="primary icon btn-add-conn" id="btn-add" title="Thêm kết nối" aria-label="Thêm kết nối" aria-haspopup="menu" aria-expanded="false" onclick="toggleAddMenu()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <div class="add-menu" id="add-menu" role="menu" hidden>
+          <button type="button" role="menuitem" onclick="addNewConn()">
+            <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+            <span><b>Mới</b><small>Thêm kết nối trống</small></span>
+          </button>
+          <button type="button" role="menuitem" onclick="pickImportJson()">
+            <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span><b>Nhập từ JSON</b><small>Thêm các kết nối từ file .json</small></span>
+          </button>
+        </div>
+        <input type="file" id="import-file" accept=".json,application/json" multiple hidden onchange="importJsonFiles(this)">
+      </div>
+      <span class="spacer" style="flex:1"></span>
+      <button onclick="reloadFromMain()" title="Nạp lại dữ liệu từ bản chính (không ghi vào bản chính)">
+        <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Lấy lại từ bản chính
+      </button>
+      <button class="danger" onclick="clearAll()">
+        <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+        Xóa tất cả
+      </button>
+    </div>
+    <div id="conns"></div>
+  </div>
+
+  <div>
+    <div class="out card reveal">
+      <div class="oh">
+        <h3>JSON</h3>
+        <span class="spacer"></span>
+        <button class="mini" onclick="copyJson()">
+          <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Sao chép
+        </button>
+        <button class="primary mini" onclick="downloadJson()">
+          <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Tải .json
+        </button>
+      </div>
+      <textarea id="json" spellcheck="false" placeholder='[]'></textarea>
+      <div id="msg" class="msg"></div>
+      <details>
+        <summary>Ghi chú các trường</summary>
+        <div class="field-note" style="margin-top:8px">
+          <b>Tài khoản CAdmin</b>: tài khoản đăng nhập link cadmin.<br>
+          <b>Tài khoản WebService</b>: tài khoản Service tạo ở menu Phân Quyền.<br>
+          <b>Loại chứng từ</b>: <code>CTT</code> / <code>GTGT</code> / <code>PXK</code>.<br>
+          <b>Domain</b>: không cần nhập <code>http(s)</code>.<br>
+          <b>Cột mở rộng</b> (tùy chọn): thêm cột ghi vào thẻ <code>Extra</code>, <code>Extra1</code>...<code>Extra11</code> (cấp hóa đơn) hoặc <code>SP_Extra1</code>/<code>SP_Extra2</code> (cấp dòng). Kiểu: <code>string</code>/<code>numeric</code>/<code>datetime</code>. Tên cột mặc định là tên thẻ, đổi tên ở "Thứ tự &amp; tên cột".<br>
+          <b>Cột hóa đơn đặc thù</b> (tùy chọn): chọn loại hóa đơn đặc thù để mẫu Excel bổ sung các cột hàng hóa đặc trưng (VD: Biển kiểm soát).<br>
+          <b>Chuyển mã sang Unicode</b>: để Unicode (không chuyển mã) cho file bình thường; chọn VNI nếu file dùng font VNI (VD: <code>Coâng ty</code>). Lưu ý: VNI áp cho mọi ô dữ liệu; file lẫn ô Unicode gõ tay (VD: <code>Công ty Hoàng Long</code>) có thể bị đổi sai, nên để cả file một kiểu. Tiêu đề cột không được chuyển: khai tên cột đúng như đang thấy trong file.<br>
+          <b>Thứ tự &amp; tên cột</b> (tùy chọn): kéo-thả để đổi thứ tự cột trên mẫu Excel sinh ra; khai tên thay thế khi file của khách đặt tên cột khác mẫu (VD: xuất từ phần mềm khác), dòng tiêu đề, công thức tính cột (giống Excel) và giá trị mặc định khi ô trống.
+        </div>
+      </details>
+    </div>
+  </div>
+  </div>
+</div>
+
+<script>
+const DOC_TYPES = ["CTT","GTGT","PXK"];
+const SLOTS = ["Extra","Extra1","Extra2","Extra3","Extra4","Extra5","Extra6","Extra7","Extra8","Extra9","Extra10","Extra11","SP_Extra1","SP_Extra2"];
+const DTYPES = ["string","numeric","datetime"];
+
+// Cột chuẩn VNPT ngoài Extra - khớp OptionalFieldCatalog bên add-in (Data/Template/OptionalFieldCatalog.cs).
+// Xuất ra {type:'GTGT', field:'<key>'} thay vì header/extraSlot; add-in tự lấy header/note/tag XML theo key.
+
+// Checkbox độc lập, mỗi cái bật ra 1 hoặc nhiều field cùng lúc.
+// type: loại chứng từ (mặc định GTGT); headers: cột chuẩn thêm vào "Thứ tự & tên cột" để đổi tên/công thức.
+const VNPT_CHECKBOXES = [
+  {id:'leasing', keys:['VATRate_Leasing'], label:'Hóa đơn cho thuê tài chính'},
+  {id:'discount', keys:['SBKe','NBKe'], label:'Hóa đơn chiết khấu thương mại'},
+  {id:'fkey-gtgt', type:'GTGT', keys:['Fkey'], headers:['Fkey'], label:'GTGT: khóa hóa đơn lấy từ cột Fkey (VNPT chặn gửi trùng)'},
+  {id:'pxk-currency', type:'PXK', keys:['LoaiTienTe','TyGia','HinhThucThanhToan'], headers:['LoaiTienTe','TyGia','HinhThucThanhToan'], label:'PXK bằng ngoại tệ: thêm cột LoaiTienTe, TyGia, HinhThucThanhToan'},
+  {id:'fkey-pxk', type:'PXK', keys:['Fkey'], headers:['Fkey'], label:'PXK: khóa phiếu lấy từ cột Fkey (VNPT chặn gửi trùng)'}
+];
+const cbType = f => f.type || 'GTGT';
+
+// Hàng hóa đặc trưng: chọn 1 trong 3 loại (radio) - mỗi loại gắn cột HoaDonDacThu (Sample khác nhau)
+// cấp hóa đơn + các cột cấp dòng tương ứng (cùng cấp SP_Extra, bắt buộc khi TinhChat = 5).
+const SPECIAL_GOODS_TYPES = [
+  {id:'car', hddthuKey:'HDDThu_Car', label:'Hàng hóa là xe ô tô, xe mô tô', extraKeys:['SKhung','SMay']},
+  {id:'transport', hddthuKey:'HDDThu_Transport', label:'Dịch vụ vận chuyển', extraKeys:['BKSPTVChuyen']},
+  {id:'ecommerce', hddthuKey:'HDDThu_Ecommerce', label:'Dịch vụ vận chuyển trên nền tảng số, TMĐT', extraKeys:['TNGHang','DCNGHang','MSTNGHang','MDDNGHang']}
+];
+
+const KNOWN_FIELD_KEYS = new Set([
+  ...VNPT_CHECKBOXES.reduce((a,f)=>a.concat(f.keys),[]),
+  ...SPECIAL_GOODS_TYPES.reduce((a,t)=>a.concat([t.hddthuKey], t.extraKeys),[])
+]);
+function fieldChecked(data, key, type){ return !!(data.customColumns||[]).some(c=>c && c.field===key && (!type || (c.type||'GTGT')===type)); }
+function anyFieldChecked(data, keys, type){ return keys.some(k=>fieldChecked(data,k,type)); }
+function selectedGoodsType(data){ return SPECIAL_GOODS_TYPES.find(t=>fieldChecked(data,t.hddthuKey)); }
+function specialSectionOpen(data){ return VNPT_CHECKBOXES.some(f=>anyFieldChecked(data,f.keys,cbType(f))) || !!selectedGoodsType(data); }
+// Cột chuẩn do checkbox đang bật thêm vào mẫu của loại t (VD PXK ngoại tệ -> LoaiTienTe, TyGia, HinhThucThanhToan).
+function checkboxHeaders(id, t){
+  const conn=document.getElementById(id); if(!conn) return [];
+  return VNPT_CHECKBOXES.filter(f=>cbType(f)===t && f.headers).filter(f=>{ const cb=conn.querySelector('.vf-multi[data-id="'+f.id+'"]'); return cb && cb.checked; })
+    .reduce((a,f)=>a.concat(f.headers),[]);
+}
+
+// Thứ tự cột MẶC ĐỊNH khi "Tạo mẫu" (khớp vnpt-config.json -> documentTypes[].excel[].header,
+// đúng thứ tự). Khách kéo-thả để đổi thứ tự riêng; chỉ xuất ra columnOrder khi khác mặc định.
+const DEFAULT_COLUMNS = {
+  GTGT: ["STT","NgayHoaDon","HinhThucThanhToan","LoaiTienTe","TyGia","MaKhachHang","TenDonVi","HoTenNguoiMuaHang","MaSoThue","DiaChi","SoDienThoai","Email","MaDVQHNSach","SoHoChieu","CCCD","MaHang","TenSanPham","DVT","SoLuong","DonGia","TyLeChietKhau","SoTienChietKhau","GTKCThue","ThanhTien","ThueSuat_Dong","TienThueGTGT_Dong","Cong_Dong","TinhChat","TgTCThue","TgTThue","TTCKTMai","TgTTTBSo","TgTTTBChu"],
+  PXK: ["STT","NgayLap","LenhDieuDong","PhuongTienVanChuyen","NguoiXuatHang","NguoiVanChuyen","DonViNhan","MaSoThue","DiaChiNhan","NguoiNhanHang","MaHang","TenHang","DonViTinh","SoLuong","DonGia","ThanhTien","TongTien"],
+  CTT: ["STT","NLap","MaKhachHang","DDanh","Ten","MST","DChi","SDThoai","QTich","CNCTru","Email","CMND","KTNhap","BHiem","TThang","DThang","Nam","TThien","SThue","TTNTThue","TTNCThue","GChu"]
+};
+// Bắt buộc + ghi chú theo cột (sinh từ vnpt-config.json -> documentTypes[].excel[]; CTT Email/MaKhachHang/DDanh/QTich không bắt buộc).
+const COLUMN_INFO = {
+  GTGT:{
+    STT:{req:true,note:'Số thứ tự hóa đơn. Để TRỐNG ở các dòng sản phẩm tiếp theo của cùng một hóa đơn.'},
+    NgayHoaDon:{req:true,note:'Ngày hóa đơn (yyyy-MM-dd).'},
+    HinhThucThanhToan:{req:true,note:'Hình thức thanh toán (TM/CK).'},
+    LoaiTienTe:{req:true,note:'Loại tiền tệ.'},
+    TyGia:{req:false,note:'Tỷ giá (bỏ trống nếu là VND).'},
+    MaKhachHang:{req:false,note:'Mã khách hàng.'},
+    TenDonVi:{req:false,note:'Tên đơn vị mua. Đi kèm Mã số thuế: nếu nhập ô này thì phải nhập MaSoThue (và ngược lại). Khách lẻ: để trống cả hai và nhập HoTenNguoiMuaHang.'},
+    HoTenNguoiMuaHang:{req:false,note:'Họ tên người mua hàng. Bắt buộc nếu không nhập TenDonVi/MaSoThue (khách lẻ).'},
+    MaSoThue:{req:false,note:'Mã số thuế người mua. Đi kèm TenDonVi (cả hai cùng nhập hoặc cùng trống).'},
+    DiaChi:{req:false,note:'Địa chỉ người mua. Bắt buộc khi có cả TenDonVi và MaSoThue; để trống vẫn xuất <CusAddress></CusAddress> rỗng.'},
+    SoDienThoai:{req:false,note:'Số điện thoại người mua.'},
+    Email:{req:false,note:'Email nhận hóa đơn.'},
+    MaDVQHNSach:{req:false,note:'Mã đơn vị quan hệ ngân sách người mua.'},
+    SoHoChieu:{req:false,note:'Số hộ chiếu người mua. Có thể bổ sung các cột thông tin liên quan NgayCapHoChieu, NgayHetHanHoChieu, QuocTich.'},
+    CCCD:{req:false,note:'Căn cước công dân người mua.'},
+    MaHang:{req:false,note:'Mã hàng hóa/dịch vụ.'},
+    TenSanPham:{req:true,note:'Tên hàng hóa/dịch vụ.'},
+    DVT:{req:false,note:'Đơn vị tính.'},
+    SoLuong:{req:false,note:'Số lượng.'},
+    DonGia:{req:false,note:'Đơn giá (chưa thuế).'},
+    TyLeChietKhau:{req:false,note:'Tỷ lệ chiết khấu dòng (%).'},
+    SoTienChietKhau:{req:false,note:'Số tiền chiết khấu dòng.'},
+    GTKCThue:{req:false,note:'Giảm trừ không chịu thuế (tùy chọn). Chỉ gửi khi ô có giá trị.'},
+    ThanhTien:{req:false,note:'Thành tiền dòng (chưa thuế).'},
+    ThueSuat_Dong:{req:false,note:'Thuế suất DÒNG: 0/5/8/10 hoặc KCT (không chịu thuế) / KKKNT (không kê khai nộp thuế).'},
+    TienThueGTGT_Dong:{req:false,note:'Tiền thuế GTGT của DÒNG (để trống -> tự tính = ThanhTien × ThueSuat).'},
+    Cong_Dong:{req:false,note:'Cộng dòng đã gồm thuế (HHDVu/TSThue). Để TRỐNG -> tự tính = ThanhTien + TienThueGTGT_Dong; có giá trị -> dùng đúng giá trị.'},
+    TinhChat:{req:false,note:'Tính chất dòng: 1=Hàng hóa/DV (mặc định nếu trống), 2=Khuyến mại, 3=Chiết khấu TM, 4=Ghi chú (KHÔNG tính vào tổng).'},
+    TgTCThue:{req:false,note:'Tổng tiền chưa thuế. Để TRỐNG -> tự tính = Σ ThanhTien (bỏ dòng Ghi chú).'},
+    TgTThue:{req:false,note:'Tổng tiền thuế. Để TRỐNG -> tự tính = Σ TienThueGTGT_Dong.'},
+    TTCKTMai:{req:false,note:'Tổng chiết khấu thương mại. Để TRỐNG -> tự tính = Σ SoTienChietKhau.'},
+    TgTTTBSo:{req:false,note:'Tổng tiền thanh toán. Để TRỐNG -> tự tính = TgTCThue + TgTThue - TTCKTMai.'},
+    TgTTTBChu:{req:false,note:'Tổng tiền thanh toán bằng chữ (tùy chọn). Chỉ gửi khi ô có giá trị; để trống -> không gửi (máy chủ tự sinh).'}
+  },
+  PXK:{
+    STT:{req:true,note:'Số thứ tự phiếu. Để TRỐNG ở các dòng sản phẩm tiếp theo của cùng một phiếu.'},
+    NgayLap:{req:true,note:'Ngày lập phiếu, định dạng yyyy-MM-dd.'},
+    LenhDieuDong:{req:true,note:'Số lệnh điều động nội bộ.'},
+    PhuongTienVanChuyen:{req:true,note:'Phương tiện vận chuyển (biển số xe).'},
+    NguoiXuatHang:{req:false,note:'Họ và tên người xuất hàng.'},
+    NguoiVanChuyen:{req:false,note:'Tên người vận chuyển.'},
+    DonViNhan:{req:true,note:'Kho/đơn vị nhận hàng.'},
+    MaSoThue:{req:false,note:'Mã số thuế đơn vị nhận.'},
+    DiaChiNhan:{req:true,note:'Địa chỉ nơi nhận.'},
+    NguoiNhanHang:{req:false,note:'Họ và tên người nhận hàng.'},
+    MaHang:{req:false,note:'Mã hàng.'},
+    TenHang:{req:true,note:'Tên hàng.'},
+    DonViTinh:{req:false,note:'Quy cách/đơn vị tính.'},
+    SoLuong:{req:false,note:'Số lượng.'},
+    DonGia:{req:false,note:'Đơn giá.'},
+    ThanhTien:{req:false,note:'Thành tiền.'},
+    TongTien:{req:true,note:'Tổng tiền.'},
+    LoaiTienTe:{req:false,note:'Loại tiền tệ (không có cột => VND).'},
+    TyGia:{req:false,note:'Tỷ giá (bỏ trống nếu là VND).'},
+    HinhThucThanhToan:{req:false,note:'Hình thức thanh toán (TM/CK).'}
+  },
+  CTT:{
+    STT:{req:false,note:'Số thứ tự (mỗi dòng là một chứng từ).'},
+    NLap:{req:true,note:'Ngày lập chứng từ, định dạng yyyy-MM-dd.'},
+    MaKhachHang:{req:false,note:'Mã khách hàng.'},
+    DDanh:{req:false,note:'Địa danh (trường mở rộng).'},
+    Ten:{req:true,note:'Họ và tên người nộp thuế.'},
+    MST:{req:false,note:'Mã số thuế (bắt buộc nếu không có CMND).'},
+    DChi:{req:true,note:'Địa chỉ.'},
+    SDThoai:{req:true,note:'Số điện thoại.'},
+    QTich:{req:false,note:'Quốc tịch.'},
+    CNCTru:{req:true,note:'Cá nhân cư trú: 1 = cư trú, 0 = không cư trú.'},
+    Email:{req:false,note:'Email.'},
+    CMND:{req:false,note:'Số CMND/CCCD (bắt buộc nếu không có MST).'},
+    KTNhap:{req:true,note:'Khoản thu nhập.'},
+    BHiem:{req:true,note:'Khoản đóng bảo hiểm bắt buộc.'},
+    TThang:{req:true,note:'Từ tháng.'},
+    DThang:{req:true,note:'Đến tháng.'},
+    Nam:{req:true,note:'Năm.'},
+    TThien:{req:true,note:'Khoản đóng từ thiện, nhân đạo, khuyến học.'},
+    SThue:{req:true,note:'Số thuế TNCN đã khấu trừ.'},
+    TTNTThue:{req:true,note:'Tổng thu nhập tính thuế.'},
+    TTNCThue:{req:true,note:'Tổng thu nhập chịu thuế.'},
+    GChu:{req:false,note:'Ghi chú.'}
+  }
+};
+// State kéo-thả hiện tại theo từng kết nối: columnOrderState[connId][docType] = [header,...].
+const columnOrderState = {};
+function initColumnOrderState(id, data){
+  const state = {};
+  for(const t of Object.keys(DEFAULT_COLUMNS)) state[t] = DEFAULT_COLUMNS[t].slice();
+  const saved = data.columnOrder || [];
+  for(const entry of saved){
+    if(!entry || !entry.type || !Array.isArray(entry.headers) || entry.headers.length===0) continue;
+    if(!DEFAULT_COLUMNS[entry.type]) continue;
+    state[entry.type] = entry.headers.slice(); // đối chiếu với cột mặc định + cột mở rộng ở orderFor()
+  }
+  columnOrderState[id] = state;
+}
+// Cột mở rộng (customColumns) đã khai cho loại chứng từ t, theo thứ tự khai. Tên cột = tên đổi ở
+// "Thứ tự & tên cột" (ô ẩn .e-header), để trống = chính tên thẻ (VD SP_Extra1).
+function extInfo(id, t){
+  const out=[], seen=new Set();
+  document.getElementById(id).querySelectorAll('.exts .row.ext').forEach(r=>{
+    if((val(r,'.e-type')||'GTGT')!==t) return;
+    const slot=val(r,'.e-slot'), rename=val(r,'.e-header'), header=rename||slot;
+    if(!header || seen.has(header.toLowerCase())) return;
+    seen.add(header.toLowerCase()); out.push({k:r.dataset.k, slot, rename, header});
+  });
+  return out;
+}
+function extHeaders(id, t){ return extInfo(id,t).map(x=>x.header); }
+// Thứ tự tự nhiên = cột mặc định + cột mở rộng (add-in nối cột mở rộng vào cuối mẫu).
+function naturalOrder(id, t){
+  const std=DEFAULT_COLUMNS[t]||[], have=new Set(std.map(h=>h.toLowerCase()));
+  const extra=[];
+  for(const h of checkboxHeaders(id,t).concat(extHeaders(id,t))) if(!have.has(h.toLowerCase())){ have.add(h.toLowerCase()); extra.push(h); }
+  return std.concat(extra);
+}
+// Thứ tự hiện tại: giữ thứ tự đã kéo của các cột còn tồn tại, cột mới (VD vừa thêm cột mở rộng) nối vào cuối.
+function orderFor(id, t){
+  const nat=naturalOrder(id,t), byKey=new Map(nat.map(h=>[h.toLowerCase(),h]));
+  const res=[], used=new Set();
+  for(const h of ((columnOrderState[id]||{})[t]||[])){ const k=String(h).toLowerCase(); if(byKey.has(k) && !used.has(k)){ used.add(k); res.push(byKey.get(k)); } }
+  for(const h of nat) if(!used.has(h.toLowerCase())) res.push(h);
+  return res;
+}
+// Cột mở rộng đổi (thêm/xóa/đổi tên/đổi loại) -> vẽ lại danh sách thứ tự & tên cột.
+function refreshOrderList(id){
+  syncMappingFromDom(id);
+  renderColumnOrderList(id);
+  formToJson();
+}
+// Chữ cột kiểu Excel (0-based): 0->A, 25->Z, 26->AA...
+function colLetter(i){
+  let s = '', n = i + 1;
+  while (n > 0) {
+    const rem = (n - 1) % 26;
+    s = String.fromCharCode(65 + rem) + s;
+    n = Math.floor((n - 1) / 26);
+  }
+  return s;
+}
+function refreshColumnLetters(list){
+  [...list.querySelectorAll('.co-item')].forEach((li, i) => {
+    const el = li.querySelector('.co-letter');
+    if (el) el.textContent = colLetter(i);
+  });
+}
+function renderColumnOrderList(id){
+  const conn = document.getElementById(id);
+  const type = conn.querySelector('.m-type').value;
+  const list = conn.querySelector('.co-list');
+  const headers = orderFor(id, type);
+  columnOrderState[id][type] = headers;
+  const extBy = new Map(extInfo(id, type).map(x=>[x.header.toLowerCase(), x]));
+  // Tên thay thế: lấy từ mappingState (map tên trong file -> tên mặc định).
+  const altFor = {};
+  const mst = (mappingState[id]||{})[type] || {maps:[], fx:[]};
+  for(const [k,f] of (mst.fx||[])){ const lk=(k||'').toLowerCase(); if(!(lk in altFor)) altFor[lk]=f; } // công thức ưu tiên
+  for(const [a,b] of mst.maps){ const k=(b||'').toLowerCase(); if(!(k in altFor)) altFor[k]=a; }
+  list.innerHTML = headers.map((h, i) => {
+    const ext = extBy.get(h.toLowerCase());
+    // Cột mở rộng: tên hiển thị = thẻ; ô bên phải = tên cột đã đổi (hoặc công thức).
+    const a = ext ? ((isFormula(altFor[h.toLowerCase()]) ? altFor[h.toLowerCase()] : '') || ext.rename) : (altFor[h.toLowerCase()]||'');
+    const shown = ext ? ext.slot : h;
+    return `
+    <li class="co-item ${a?'renamed':''} ${ext?'is-ext':''}" tabindex="0" data-header="${esc(h)}" ${ext?`data-ext="${ext.k}"`:''} aria-label="${esc(shown)}, kéo hoặc dùng phím mũi tên lên/xuống để đổi vị trí">
+      <span class="co-letter">${colLetter(i)}</span>
+      <span class="co-pill">
+        <svg class="co-handle" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="18" x2="16" y2="18"/></svg>
+        <span class="std-name">${esc(shown)}${ext?' <small class="ext-tag">mở rộng</small>':''}</span>
+        <input class="co-alt s-alt ${isFormula(a)?'is-fx':''} ${isFormula(a)&&formulaError(a)?'bad':''}" data-std="${esc(h)}" aria-label="Tên thay thế cho ${esc(shown)}" spellcheck="false" placeholder="${h==='STT'&&type!=='CTT'?'Trống = tự động (cả file 1 HĐ)':'Tên thay thế'}" value="${esc(a)}" oninput="altChanged(this)">
+      </span>
+    </li>`; }).join('');
+  refreshFxErrors(conn);
+  renderSheet(id); // beta: vẽ lại bảng cột
+}
+function columnOrderResetDefault(id){
+  const conn = document.getElementById(id);
+  const type = conn.querySelector('.m-type').value;
+  syncMappingFromDom(id); // giữ tên thay thế đã gõ
+  columnOrderState[id][type] = naturalOrder(id, type);
+  renderColumnOrderList(id);
+  formToJson();
+}
+function getDragAfterElement(list, y, dragEl){
+  const items = [...list.querySelectorAll('.co-item')].filter(el => el !== dragEl);
+  return items.reduce((closest, child) => {
+    const box = child.getBoundingClientRect();
+    const offset = y - box.top - box.height / 2;
+    if (offset < 0 && offset > closest.offset) return { offset, element: child };
+    return closest;
+  }, { offset: -Infinity, element: null }).element;
+}
+function syncColumnOrderFromDom(list){
+  const conn = list.closest('.conn');
+  const type = conn.querySelector('.m-type').value;
+  const headers = [...list.querySelectorAll('.co-item')].map(li => li.dataset.header);
+  columnOrderState[conn.id][type] = headers;
+}
+// FLIP: ghi vị trí "First", để DOM tự sắp lại ("Last"), rồi tween ngược từ First -> Last
+// bằng transform (GPU-only, không đụng layout) - mượt hơn hẳn so với việc các hàng "nhảy" tức thì.
+function flipReorder(list, mutate){
+  const before = new Map([...list.children].map(el => [el, el.getBoundingClientRect()]));
+  mutate();
+  for (const el of list.children){
+    const from = before.get(el);
+    if (!from) continue;
+    const to = el.getBoundingClientRect();
+    const dy = from.top - to.top;
+    if (!dy || el.classList.contains('dragging')) continue; // phần tử đang kéo tự có transform riêng
+    el.style.transition = 'none';
+    el.style.transform = `translateY(${dy}px)`;
+    requestAnimationFrame(() => {
+      el.style.transition = '';
+      el.style.transform = '';
+    });
+  }
+}
+function wireColumnOrderDrag(list){
+  let draggingEl = null, dragOffsetY = 0, pointerId = null;
+  const setTransform = () => { draggingEl.style.transform = `translateY(${dragOffsetY}px) scale(1.03) rotate(-1deg)`; };
+
+  function onMove(e){
+    if (!draggingEl) return;
+    // Cộng dồn theo delta từng bước (không phải so với điểm bắt đầu) - vì vị trí "gốc"
+    // (chưa transform) của hàng đang kéo thay đổi mỗi lần nó đổi chỗ trong DOM bên dưới.
+    dragOffsetY += e.movementY;
+    setTransform();
+    const after = getDragAfterElement(list, e.clientY, draggingEl);
+    const nextSibling = draggingEl.nextElementSibling;
+    const wouldMove = after ? (after !== nextSibling) : (nextSibling !== null);
+    if (wouldMove){
+      const beforeTop = draggingEl.getBoundingClientRect().top; // vị trí hiển thị hiện tại (đã gồm transform)
+      flipReorder(list, () => {
+        if (after == null) list.appendChild(draggingEl);
+        else list.insertBefore(draggingEl, after);
+      });
+      // DOM vừa đổi chỗ -> vị trí "gốc" của hàng đang kéo dịch theo, nhưng transform thì chưa đổi.
+      // Bù lại phần dịch đó để hàng vẫn đứng yên tại chỗ (không giật), rồi mới tiếp tục bám chuột.
+      const afterTop = draggingEl.getBoundingClientRect().top;
+      dragOffsetY += (beforeTop - afterTop);
+      setTransform();
+      refreshColumnLetters(list);
+    }
+  }
+  function onUp(){
+    if (!draggingEl) return;
+    if (pointerId != null) draggingEl.releasePointerCapture(pointerId);
+    draggingEl.classList.remove('dragging');
+    draggingEl.style.transition = '';
+    draggingEl.style.transform = '';
+    draggingEl = null;
+    refreshColumnLetters(list);
+    syncColumnOrderFromDom(list);
+    formToJson();
+    window.removeEventListener('pointermove', onMove);
+    window.removeEventListener('pointerup', onUp);
+  }
+  list.addEventListener('pointerdown', e => {
+    const li = e.target.closest('.co-item');
+    if (!li || e.button !== 0 || e.target.closest('input')) return;
+    draggingEl = li;
+    pointerId = e.pointerId;
+    dragOffsetY = 0;
+    li.setPointerCapture(pointerId);
+    li.style.transition = 'none'; // kéo bám chuột 1:1, không trễ do transition
+    li.classList.add('dragging');
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+  });
+
+  // Bàn phím: focus 1 hàng, mũi tên lên/xuống để đổi vị trí - cùng hiệu ứng FLIP.
+  list.addEventListener('keydown', e => {
+    if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+    const li = e.target.closest('.co-item');
+    if (!li || e.target !== li) return;
+    const sib = e.key === 'ArrowUp' ? li.previousElementSibling : li.nextElementSibling;
+    if (!sib) return;
+    e.preventDefault();
+    flipReorder(list, () => {
+      if (e.key === 'ArrowUp') list.insertBefore(li, sib);
+      else list.insertBefore(sib, li);
+    });
+    refreshColumnLetters(list);
+    syncColumnOrderFromDom(list);
+    formToJson();
+    li.focus();
+  });
+}
+const ICON_EYE='<svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+const ICON_EYE_OFF='<svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.86 21.86 0 0 1 5.06-6.06M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a21.8 21.8 0 0 1-3.22 4.44M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+function applyVisState(id, hiddenFlag){
+  const conn = document.getElementById(id);
+  conn.dataset.hidden = hiddenFlag ? '1' : '0';
+  conn.classList.toggle('collapsed', hiddenFlag);
+  const btn = conn.querySelector('.toggle-vis');
+  btn.innerHTML = hiddenFlag ? ICON_EYE_OFF : ICON_EYE;
+  btn.title = hiddenFlag ? 'Hiện lại' : 'Ẩn';
+  btn.setAttribute('aria-label', btn.title);
+}
+function toggleVis(id){
+  const conn = document.getElementById(id);
+  applyVisState(id, conn.dataset.hidden !== '1');
+  formToJson();
+}
+let seq = 0;
+let syncing = false; // chặn vòng lặp form <-> json
+
+// ---- scroll-reveal (also observes connection cards added dynamically) ----
+const revealIO = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting){ e.target.classList.add('in'); revealIO.unobserve(e.target); } });
+}, { threshold: .1 });
+document.querySelectorAll('.reveal').forEach((elm, i) => {
+  elm.style.transitionDelay = (i * 60) + 'ms';
+  revealIO.observe(elm);
+});
+
+function el(html){ const t=document.createElement('template'); t.innerHTML=html.trim(); return t.content.firstChild; }
+function opts(arr, sel){ return arr.map(v=>`<option value="${v}" ${v===sel?'selected':''}>${v}</option>`).join(''); }
+function cleanDomain(s){ return (s==null?'':String(s)).trim().replace(/^https?:\/\//i,'').replace(/\/+$/,'').trim(); }
+
+function addConn(data){
+  data = data || {};
+  const id = 'c'+(++seq);
+  const node = el(`
+  <div class="conn card reveal" id="${id}">
+    <div class="head">
+      <div class="idx"></div>
+      <div class="name"></div>
+      <div class="spacer"></div>
+      <button class="mini icon toggle-vis" title="Ẩn" aria-label="Ẩn" onclick="toggleVis('${id}')"></button>
+      <button class="mini danger icon" title="Xóa kết nối" aria-label="Xóa kết nối" onclick="this.closest('.conn').remove();renumber();formToJson()"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+
+    <div class="grid">
+      <div><label>Tên hiển thị <span class="req">*</span></label><input class="f-name" placeholder="VD: Công ty ABC - HN" value="${esc(data.displayName)}"></div>
+      <div><label>Mã số thuế (MST) <span class="req">*</span></label><input class="f-mst" placeholder="VD: 0315890356" value="${esc(data.mst)}"></div>
+      <div><label>Domain <span class="req">*</span></label><input class="f-domain" placeholder="VD: abc.vnpt-invoice.com.vn" value="${esc(cleanDomain(data.domain))}"></div>
+    </div>
+
+    <div class="sec">
+      <div class="st"><h4 class="hl">Tài khoản CAdmin</h4></div>
+      <div class="grid two">
+        <div><label>CAdmin User<span class="req">*</span></label><input class="f-uca" placeholder="tài khoản CAdmin" value="${esc(gp(data,'account','userCAdmin'))}"></div>
+        <div><label>CAdmin Password <span class="opt">(có thể để trống)</span></label><input class="f-pca" placeholder="mật khẩu CAdmin" value="${esc(gp(data,'account','passwordCAdmin'))}"></div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="st"><h4 class="hl">Tài khoản WebService</h4></div>
+      <div class="grid two">
+        <div><label>WebService User<span class="req">*</span></label><input class="f-uws" placeholder="tài khoản Service" value="${esc(gp(data,'account','userWebService'))}"></div>
+        <div><label>WebService Password <span class="opt">(có thể để trống)</span></label><input class="f-pws" placeholder="mật khẩu Service" value="${esc(gp(data,'account','passwordWebService'))}"></div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="st"><h4 class="hl">Mẫu / Ký hiệu</h4>
+        <button class="mini" onclick="addPat('${id}');formToJson()"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Thêm mẫu</button></div>
+      <div class="pats"></div>
+    </div>
+
+    <div class="sec">
+      <div class="st"><h4>Cột mở rộng (tùy chọn)</h4><span class="spacer" style="flex:1"></span>
+        <button class="mini" onclick="addExt('${id}');refreshOrderList('${id}')"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Thêm cột</button></div>
+      <div class="exts"></div>
+    </div>
+
+    <details class="sec" ${specialSectionOpen(data)?'open':''}>
+      <summary class="st" style="cursor:pointer"><h4>Cột hóa đơn đặc thù</h4><svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+      ${VNPT_CHECKBOXES.map(f=>`
+      <div class="checkbox-row">
+        <input type="checkbox" class="vf-multi" data-id="${f.id}" id="${id}-${f.id}" onchange="${f.headers?`refreshOrderList('${id}')`:'formToJson()'}" ${anyFieldChecked(data,f.keys,cbType(f))?'checked':''}>
+        <label for="${id}-${f.id}">${f.label}</label>
+      </div>`).join('')}
+      <div class="checkbox-row">
+        <input type="checkbox" class="vf-special-toggle" id="${id}-special" onchange="toggleSpecialGoods('${id}')" ${selectedGoodsType(data)?'checked':''}>
+        <label for="${id}-special">Hàng hóa đặc trưng</label>
+      </div>
+      <div class="specialgoods-fields" style="display:${selectedGoodsType(data)?'block':'none'};padding-left:29px;margin-top:4px">
+        ${SPECIAL_GOODS_TYPES.map(t=>`
+        <div class="checkbox-row">
+          <input type="radio" name="${id}-goods-type" class="vf-goods-type" value="${t.id}" id="${id}-${t.id}" onchange="formToJson()" ${(selectedGoodsType(data)||{}).id===t.id?'checked':''}>
+          <label for="${id}-${t.id}">${t.label}</label>
+        </div>`).join('')}
+      </div>
+    </details>
+
+    <details class="sec erp-sec" ${((data.columnMapping||[]).length||(data.columnOrder||[]).length)?'open':''}>
+      <summary class="st" style="cursor:pointer"><h4>Thứ tự &amp; tên cột</h4><svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+      <div class="erp-body">
+        <div class="sh-summary">
+          <span class="sh-sum-text" aria-live="polite"></span>
+          <span class="spacer" style="flex:1"></span>
+          <button class="mini sh-big-btn" type="button" onclick="sheetToggleBig('${id}')">Mở bảng cột</button>
+        </div>
+        <div class="field-note" style="margin:0 0 8px">Kéo tên cột để đổi vị trí. Nháy đúp để đổi tên, gõ <code>=</code> để nhập công thức. Chuột phải để xem thêm.</div>
+        <div class="sheet-host">
+        <div class="sheet" role="group" aria-label="Bảng cột mẫu Excel">
+          <div class="sh-grip" aria-hidden="true"></div>
+          <div class="sh-bar">
+            <select class="m-type sh-sel-type" tabindex="-1" aria-hidden="true" onchange="switchMappingType('${id}')">${opts(DOC_TYPES, firstMappingType(data))}</select>
+            <label>Dòng tiêu đề</label><input class="m-hrow" type="number" min="1">
+            <label title="Dấu thập phân của số lưu dạng chữ trong file (VD &quot;1.15&quot;). Mặc định dấu chấm; chỉ đổi khi file ghi kiểu 1.234,56">Thập phân</label><select class="m-dec" onchange="formToJson()"><option value="">. (mặc định)</option><option value=",">, (dấu phẩy)</option></select>
+            <span class="spacer"></span>
+            <button class="mini" type="button" onclick="columnOrderResetDefault('${id}')">Khôi phục thứ tự</button>
+            <button class="mini" type="button" onclick="sheetRestoreAll('${id}')">Khôi phục tất cả</button>
+            <button class="mini sh-close" type="button" onclick="sheetToggleBig('${id}',false)">Đóng</button>
+          </div>
+          <div class="sh-fxbar">
+            <input class="sh-namebox" readonly tabindex="-1" aria-label="Tên mặc định của cột đang chọn" placeholder="Chọn cột">
+            <span class="sh-fxl" aria-hidden="true">fx</span>
+            <input class="sh-fxin alt-in" spellcheck="false" disabled aria-label="Tên thay thế hoặc công thức của cột đang chọn" placeholder="Chọn một cột để đổi tên">
+          </div>
+          <div class="sh-scroll" tabindex="0" aria-label="Bảng cột"><div class="sh-tablewrap"></div><div class="sh-ind"></div></div>
+          <div class="sh-legend" aria-hidden="true">
+            <span><i style="background:#e0ecfd"></i>Đổi tên</span>
+            <span><i style="background:#dff3e4"></i>Công thức</span>
+            <span><i style="background:#ece3fa"></i>Cột mở rộng</span>
+            <span><b style="color:var(--req)">*</b>Bắt buộc</span>
+            <span><i style="background:#fff;box-shadow:inset 0 3px 0 #f59e0b"></i>Đã dời khỏi vị trí mặc định</span>
+          </div>
+          <div class="sh-tabs" role="tablist"></div>
+        </div>
+        </div>
+        <ul class="co-list"></ul>
+        <div class="fx-errs msg err" style="margin-top:8px"></div>
+        <div class="st"><h4>Giá trị mặc định (khi ô trống)</h4><span class="spacer" style="flex:1"></span>
+          <button class="mini" type="button" onclick="addMapRow('${id}','defs');formToJson()"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Thêm</button></div>
+        <div class="defs"></div>
+        <datalist id="${id}-std"></datalist>
+      </div>
+    </details>
+
+    <details class="sec enc-sec" ${data.textEncoding?'open':''}>
+      <summary class="st" style="cursor:pointer"><h4>Chuyển mã sang Unicode</h4><svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+      <div class="grid two">
+        <div><label>Chọn bảng mã đang dùng trong Excel</label><select class="f-enc">${ENCODINGS.map(e=>`<option value="${e.v}" ${(data.textEncoding||'')===e.v?'selected':''}>${e.label}</option>`).join('')}</select>
+</div>
+      </div>
+    </details>
+  </div>`);
+  document.getElementById('conns').appendChild(node);
+  const pos = document.getElementById('conns').children.length - 1;
+  node.style.transitionDelay = Math.min(pos, 6) * 60 + 'ms'; // cap so long lists don't lag a single add
+  revealIO.observe(node);
+  applyVisState(id, !!data.hidden);
+
+  const pats = (data.patterns && data.patterns.length) ? data.patterns : [{}];
+  pats.forEach(p=>addPat(id,p));
+  (data.customColumns||[])
+    .filter(c=>!(c && c.field && KNOWN_FIELD_KEYS.has(c.field))) // các field chuẩn VNPT hiện qua checkbox, không lặp lại ở đây
+    .forEach(c=>addExt(id,c));
+  // Hồ sơ cũ map thẳng cột file -> thẻ Extra/ExtraN/SP_ExtraN (VD GoodsTitle -> Extra) => hiện thành cột mở rộng tương đương.
+  for(const m of (data.columnMapping||[])){
+    const t = (m && m.type) || 'GTGT';
+    for(const [erp, target] of Object.entries((m && m.map) || {})){
+      const slot = SLOTS.find(x=>x.toLowerCase()===String(target||'').trim().toLowerCase());
+      if(!slot || !erp || (DEFAULT_COLUMNS[t]||[]).some(h=>h.toLowerCase()===slot.toLowerCase())) continue;
+      if((data.customColumns||[]).some(c=>c && (c.type||'GTGT')===t && String(c.header||'').toLowerCase()===erp.toLowerCase())) continue;
+      addExt(id, {type:t, header:erp, extraSlot:slot});
+    }
+  }
+  initColumnOrderState(id, data);
+  initMappingState(id, data);
+  renderMapping(id); // vẽ cả danh sách thứ tự cột + tên thay thế
+  wireColumnOrderDrag(node.querySelector('.co-list'));
+  wireSheet(id);
+  renumber();
+}
+
+// ---------- Mã hóa chữ & file ERP (textEncoding / columnMapping) ----------
+const ENCODINGS = [
+  {v:'', label:'Unicode (không chuyển mã)'},
+  {v:'vni', label:'VNI'}
+];
+// Cột chuẩn gợi ý khi đổi tên (ngoài DEFAULT_COLUMNS): Extra*, cột tùy chọn add-in đọc theo tên cố định.
+const EXTRA_STD = ["Extra","Extra1","Extra2","Extra3","Extra4","Extra5","Extra6","Extra7","Extra8","Extra9","Extra10","Extra11","SP_Extra1","SP_Extra2",
+  "NganHangNguoiMua","SoTaiKhoanNguoiMua","HoaDonDacThu","TinhChatHoaDon","SBKE","NBKE","NgayCapHoChieu","NgayHetHanHoChieu","QuocTich","SoTienQuyDoi","GiamThueGTGT"];
+// mappingState[connId][type] = {headerRow, maps:[[erp,std]], defs:[[std,value]], fx:[[target,formula]]}
+const mappingState = {};
+function firstMappingType(data){ const m=(data.columnMapping||[]).find(x=>x&&x.type)||(data.columnOrder||[]).find(x=>x&&DEFAULT_COLUMNS[x.type]); return m?m.type:'GTGT'; }
+function emptyMapping(){ return {headerRow:1, dec:'', maps:[], defs:[], fx:[]}; }
+// compose dạng cũ {date:[năm,tháng,ngày]} -> công thức tương đương
+function dateToFormula(d){ const c=n=>/^[A-Za-z_][\w.]*$/.test(n)?n:'['+n+']';
+  return '=TEXT('+c(d[0])+',"0000") & "-" & TEXT('+c(d[1])+',"00") & "-" & TEXT('+c(d[2])+',"00")'; }
+function initMappingState(id, data){
+  const st = {};
+  for(const t of DOC_TYPES) st[t] = emptyMapping();
+  for(const m of (data.columnMapping||[])){
+    if(!m || !st[m.type||'GTGT']) continue;
+    const t = m.type||'GTGT';
+    st[t] = {
+      headerRow: m.headerRow>1 ? m.headerRow : 1,
+      dec: m.decimalSeparator===',' ? ',' : '',
+      maps: Object.entries(m.map||{}),
+      defs: Object.entries(m.defaults||{}),
+      fx: Object.entries(m.compose||{}).map(([k,v])=>[k, v&&v.formula ? v.formula : (v&&Array.isArray(v.date) ? dateToFormula(v.date) : '')]).filter(([k,f])=>f)
+    };
+  }
+  mappingState[id] = st;
+}
+const ICON_X='<svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+// maps: a = tên thay thế hoặc "=công thức", b = tên mặc định (hiện b trước). defs: a = cột, b = giá trị.
+function addMapRow(id, kind, a, b){
+  const box = document.getElementById(id).querySelector('.'+kind);
+  const del = `<div class="del"><button class="mini danger icon" title="Xóa" aria-label="Xóa" onclick="this.closest('.row').remove();formToJson()">${ICON_X}</button></div>`;
+  if(kind==='maps'){
+    box.appendChild(el(`
+    <div class="row map">
+      <div><label>Tên mặc định</label><input class="m-b" list="${id}-std" placeholder="VD: Extra1" value="${esc(b)}"></div>
+      <div><label>Tên thay thế hoặc =công thức</label><input class="m-a alt-in" spellcheck="false" placeholder="VD: GhiChu" value="${esc(a)}" oninput="altChanged(this)"></div>
+      ${del}
+    </div>`));
+  } else {
+    box.appendChild(el(`
+    <div class="row map">
+      <div><label>Cột</label><input class="m-a" list="${id}-std" placeholder="VD: LoaiTienTe" value="${esc(a)}"></div>
+      <div><label>Giá trị</label><input class="m-b" placeholder="VD: VND" value="${esc(b)}"></div>
+      ${del}
+    </div>`));
+  }
+}
+// Kiểm tra cú pháp công thức (cùng ngữ pháp với ColumnFormula bên add-in) - trả về thông báo lỗi hoặc ''.
+function formulaError(text){
+  const s=String(text||''); let i=0;
+  const ws=()=>{ while(i<s.length && /\s/.test(s[i])) i++; };
+  const eat=c=>{ ws(); if(s[i]===c){ i++; return true; } return false; };
+  const fail=m=>{ throw new Error(m); };
+  function concat(){ add(); while(eat('&')) add(); }
+  function add(){ mul(); while(eat('+')||eat('-')) mul(); }
+  function mul(){ unary(); while(eat('*')||eat('/')) unary(); }
+  function unary(){ if(eat('-')||eat('+')) return unary(); primary(); }
+  function primary(){
+    ws(); if(i>=s.length) fail('thiếu giá trị ở cuối công thức');
+    const c=s[i];
+    if(c==='('){ i++; concat(); if(!eat(')')) fail('thiếu dấu )'); return; }
+    if(c==='"'){ i++; for(;;){ if(i>=s.length) fail('thiếu dấu " đóng chuỗi'); if(s[i++]==='"'){ if(s[i]==='"'){ i++; continue; } return; } } }
+    if(/[0-9.]/.test(c)){ const m=/^[0-9.]+/.exec(s.slice(i))[0]; if(isNaN(Number(m))) fail('số không hợp lệ "'+m+'"'); i+=m.length; return; }
+    if(c==='['){ const e=s.indexOf(']',i+1); if(e<0) fail('thiếu dấu ] cho tên cột'); if(!s.slice(i+1,e).trim()) fail('tên cột trống trong []'); i=e+1; return; }
+    if(/[\p{L}_]/u.test(c)){
+      const m=/^[\p{L}\p{N}_.]+/u.exec(s.slice(i))[0]; i+=m.length; ws();
+      if(s[i]==='('){ i++; let n=0; ws();
+        if(!eat(')')){ do{ concat(); n++; }while(eat(',')); if(!eat(')')) fail('thiếu dấu ) của hàm '+m.toUpperCase()); }
+        if(m.toUpperCase()!=='TEXT') fail('hàm '+m.toUpperCase()+' chưa hỗ trợ (chỉ có TEXT)');
+        if(n!==2) fail('TEXT cần 2 tham số: TEXT(giá trị, "định dạng")');
+      }
+      return;
+    }
+    fail('không hiểu ký tự "'+c+'"');
+  }
+  try{
+    ws(); if(s[i]==='='){ i++; ws(); }
+    if(i>=s.length) fail('công thức trống');
+    concat(); ws(); if(i<s.length) fail('ký tự thừa "'+s.slice(i)+'"');
+    return '';
+  }catch(e){ return e.message; }
+}
+// Ô tên thay thế / công thức: bắt đầu bằng "=" là công thức -> kiểm tra cú pháp, viền đỏ + liệt kê lỗi dưới danh sách.
+function isFormula(v){ return String(v||'').trim().startsWith('='); }
+// ---------- Tooltip gợi ý công thức (giống gợi ý hàm của Excel, gọn) ----------
+let fxTipEl = null;
+function fxTip(){ if(!fxTipEl){ fxTipEl=document.createElement('div'); fxTipEl.className='fx-tip'; fxTipEl.hidden=true; fxTipEl.setAttribute('role','tooltip'); document.body.appendChild(fxTipEl); } return fxTipEl; }
+// Con trỏ đang trong TEXT( ... ) thì trả về chỉ số tham số (0/1), không thì -1.
+function textArgAt(s){
+  const st=[]; let inStr=false;
+  for(let i=0;i<s.length;i++){
+    const c=s[i];
+    if(c==='"'){ inStr=!inStr; continue; }
+    if(inStr) continue;
+    if(c==='('){ const m=/([\p{L}_][\p{L}\p{N}_.]*)\s*$/u.exec(s.slice(0,i)); st.push({fn:m?m[1].toUpperCase():'', arg:0}); }
+    else if(c===')') st.pop();
+    else if(c===',' && st.length) st[st.length-1].arg++;
+  }
+  const top=st[st.length-1];
+  return top && top.fn==='TEXT' ? top.arg : -1;
+}
+function updateFxTip(inp){
+  const tip=fxTip(), v=inp.value;
+  if(document.activeElement!==inp || !isFormula(v)){ tip.hidden=true; return; }
+  const arg=textArgAt(v.slice(0, inp.selectionStart==null ? v.length : inp.selectionStart));
+  let html;
+  if(arg>=0){
+    html = `<div class="sig">TEXT(${arg===0?'<b>giá trị</b>':'giá trị'}, ${arg>=1?'<b>"định dạng"</b>':'"định dạng"'})</div>`
+      + `<div class="mut">${arg===0?'Tên cột hoặc phép tính, VD: <code>IYear</code>':'Định dạng số, VD: <code>"0000"</code>, <code>"00"</code>, <code>"#,##0.00"</code>'}</div>`;
+  } else {
+    html = `<ul class="tip-list">`
+      + `<li><code>=Cột1 + Cột2</code> <span class="mut">cộng, trừ, nhân, chia: + - * /</span></li>`
+      + `<li><code>=Cột1 &amp; "-" &amp; Cột2</code> <span class="mut">nối chữ bằng &amp;, chữ đặt trong " "</span></li>`
+      + `<li><code>=TEXT(Cột, "00")</code> <span class="mut">định dạng số</span></li>`
+      + `<li><code>[Tên cột]</code> <span class="mut">tên cột có khoảng trắng</span></li>`
+      + `</ul>`;
+  }
+  const err = v.trim()!=='=' ? formulaError(v) : '';
+  if(err && !/cuối công thức|đóng chuỗi|thiếu dấu \)/.test(err)) html += `<div class="err">${esc(err)}</div>`; // lỗi do đang gõ dở thì thôi
+  tip.innerHTML = html; tip.hidden=false;
+  const r=inp.getBoundingClientRect();
+  const left=Math.max(16, Math.min(r.left, window.innerWidth - tip.offsetWidth - 16));
+  tip.style.left = (left + window.scrollX) + 'px';
+  tip.style.top = (r.bottom + window.scrollY + 6) + 'px';
+}
+document.addEventListener('focusin', e=>{ if(e.target.matches && e.target.matches('.s-alt, .alt-in')) updateFxTip(e.target); });
+document.addEventListener('focusout', e=>{ if(e.target.matches && e.target.matches('.s-alt, .alt-in')) fxTip().hidden=true; });
+document.addEventListener('keyup', e=>{ if(e.target.matches && e.target.matches('.s-alt, .alt-in')) updateFxTip(e.target); });
+document.addEventListener('click', e=>{ if(e.target.matches && e.target.matches('.s-alt, .alt-in')) updateFxTip(e.target); });
+window.addEventListener('scroll', ()=>{ const a=document.activeElement; if(a && a.matches && a.matches('.s-alt, .alt-in')) updateFxTip(a); }, {passive:true});
+
+function altChanged(inp){
+  const v=inp.value.trim(), fx=isFormula(v), err=fx?formulaError(v):'';
+  inp.classList.toggle('is-fx', fx);
+  inp.classList.toggle('bad', !!err);
+  inp.title = err ? 'Công thức chưa đúng: '+err : '';
+  const li=inp.closest('.co-item'); if(li) li.classList.toggle('renamed', !!v);
+  const conn=inp.closest('.conn');
+  if(li && li.dataset.ext){
+    // Cột mở rộng: đổi tên = đổi customColumns.header (công thức thì cột giữ tên thẻ).
+    const row=conn.querySelector('.row.ext[data-k="'+li.dataset.ext+'"]');
+    if(row){
+      row.querySelector('.e-header').value = fx ? '' : v;
+      const nh = (fx ? '' : v) || val(row,'.e-slot'), oh = li.dataset.header;
+      if(nh !== oh){
+        const t = conn.querySelector('.m-type').value, arr = columnOrderState[conn.id][t]||[];
+        const i = arr.indexOf(oh); if(i>=0) arr[i]=nh;
+        li.dataset.header = nh;
+      }
+    }
+  }
+  refreshFxErrors(conn);
+  updateFxTip(inp);
+}
+function refreshFxErrors(conn){
+  if(!conn) return;
+  const box=conn.querySelector('.fx-errs'); if(!box) return;
+  const errs=[...conn.querySelectorAll('.co-list .s-alt, .maps .alt-in')].filter(i=>isFormula(i.value)).map(i=>{
+    const e=formulaError(i.value); if(!e) return '';
+    const name=i.dataset.std || val(i.closest('.row'),'.m-b') || '?';
+    return ICON_WARN+'Công thức cột '+esc(name)+': '+esc(e);
+  }).filter(Boolean);
+  box.innerHTML=errs.join('<br>');
+}
+function renderMapping(id){
+  const conn = document.getElementById(id);
+  const type = conn.querySelector('.m-type').value;
+  const st = mappingState[id][type];
+  conn.dataset.mtype = type;
+  conn.querySelector('.m-hrow').value = st.headerRow || 1;
+  conn.querySelector('.m-dec').value = st.dec || '';
+  conn.querySelector('.defs').innerHTML = '';
+  // Cột chuẩn (có trong danh sách thứ tự cột) hiện ô "Tên thay thế" ngay trên dòng kéo-thả; còn lại -> "Cột khác".
+  const stdSet = new Set(orderFor(id, type).map(h=>h.toLowerCase()));
+  const seen = new Set(), otherMaps = [];
+  // Công thức cũng đi chung ô: cột chuẩn -> ô trong dòng (ưu tiên công thức), cột khác -> "Cột khác".
+  for(const [k,f] of st.fx){ const lk=(k||'').toLowerCase(); if(stdSet.has(lk) && !seen.has(lk)) seen.add(lk); else otherMaps.push([f,k]); }
+  for(const [a,b] of st.maps){ const k=(b||'').toLowerCase(); if(stdSet.has(k) && !seen.has(k)) seen.add(k); else otherMaps.push([a,b]); }
+  renderColumnOrderList(id);
+  // Ánh xạ tới cột ngoài danh sách (hồ sơ cũ, VD GoodsTitle -> Extra) không còn hiện - bỏ khi xuất lại.
+  conn.querySelectorAll('.co-list .s-alt, .maps .alt-in').forEach(i=>{ const v=i.value.trim(); i.classList.toggle('is-fx',isFormula(v)); i.classList.toggle('bad',isFormula(v)&&!!formulaError(v)); });
+  refreshFxErrors(conn);
+  st.defs.forEach(([a,b])=>addMapRow(id,'defs',a,b));
+  conn.querySelector('datalist').innerHTML = (DEFAULT_COLUMNS[type]||[]).concat(type==='CTT'?[]:EXTRA_STD).map(h=>`<option value="${esc(h)}">`).join('');
+  renderSheet(id); // beta: cập nhật dòng giá trị mặc định
+}
+// DOM (loại chứng từ đang hiện) -> mappingState
+function syncMappingFromDom(id){
+  const conn = document.getElementById(id);
+  const type = conn.dataset.mtype;
+  if(!type || !mappingState[id]) return;
+  const rows = sel => [...conn.querySelectorAll('.'+sel+' .row.map')].map(r=>[val(r,'.m-a'), val(r,'.m-b')]).filter(([a,b])=>a&&b);
+  const alts = [...conn.querySelectorAll('.co-list .co-item')].map(li=>{ const i=li.querySelector('.s-alt'), v=i.value.trim();
+      return li.dataset.ext ? (isFormula(v) ? [v, li.dataset.header] : ['','']) : [v, li.dataset.header]; })
+    .filter(([a])=>a);
+  const hr = parseInt(conn.querySelector('.m-hrow').value,10);
+  mappingState[id][type] = {
+    headerRow: hr>1 ? hr : 1,
+    dec: conn.querySelector('.m-dec').value===',' ? ',' : '',
+    maps: alts.filter(([a])=>!isFormula(a)),
+    defs: rows('defs'),
+    fx: alts.filter(([a])=>isFormula(a)).map(([f,k])=>[k,f])
+  };
+}
+function switchMappingType(id){
+  syncMappingFromDom(id);
+  renderMapping(id);
+  formToJson();
+}
+// mappingState -> JSON columnMapping (chỉ loại có khai gì đó)
+function collectMapping(id){
+  syncMappingFromDom(id);
+  const out = [];
+  for(const t of DOC_TYPES){
+    const st = mappingState[id] && mappingState[id][t];
+    if(!st) continue;
+    const m = {type:t};
+    if(st.headerRow>1) m.headerRow = st.headerRow;
+    if(st.dec===',') m.decimalSeparator = ',';
+    if(st.maps.length) m.map = Object.fromEntries(st.maps);
+    if(st.defs.length) m.defaults = Object.fromEntries(st.defs);
+    if(st.fx.length) m.compose = Object.fromEntries(st.fx.map(([k,f])=>[k,{formula:f}]));
+    if(Object.keys(m).length>1) out.push(m);
+  }
+  return out;
+}
+
+function addPat(id, p){
+  p = p || {};
+  const box = document.getElementById(id).querySelector('.pats');
+  const row = el(`
+    <div class="row pat">
+      <div><label>Mẫu số (Pattern)</label><input class="p-pat" placeholder="VD: 1/001" value="${esc(p.pattern)}"></div>
+      <div><label>Ký hiệu (Serial)</label><input class="p-ser" placeholder="VD: C25TAA" value="${esc(p.serial)}"></div>
+      <div><label>Loại</label><select class="p-type">${opts(DOC_TYPES, p.type||'CTT')}</select></div>
+      <div class="del"><button class="mini danger icon" title="Xóa mẫu" aria-label="Xóa mẫu" onclick="this.closest('.row').remove();formToJson()"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    </div>`);
+  box.appendChild(row);
+}
+
+let extSeq = 0;
+function addExt(id, c){
+  c = c || {};
+  const box = document.getElementById(id).querySelector('.exts');
+  const slot = c.extraSlot||'Extra9';
+  const rename = c.header && c.header !== slot ? c.header : '';
+  const row = el(`
+    <div class="row ext" data-k="${++extSeq}">
+      <div><label>Loại CT</label><select class="e-type">${opts(DOC_TYPES, c.type||'GTGT')}</select></div>
+      <div><label>Thẻ Extra</label><select class="e-slot" data-prev="${esc(slot)}">${opts(SLOTS, slot)}</select><input type="hidden" class="e-header" value="${esc(rename)}"></div>
+      <div><label>Kiểu</label><select class="e-dtype">${opts(DTYPES, c.dataType||'string')}</select></div>
+      <div><label>Ghi chú</label><input class="e-note" placeholder="VD: Nhập số hợp đồng 0-9" value="${esc(c.note)}"></div>
+      <div class="del"><button class="mini danger icon" title="Xóa cột" aria-label="Xóa cột" onclick="const c=this.closest('.conn').id;this.closest('.row').remove();refreshOrderList(c)"><svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    </div>`);
+  box.appendChild(row);
+}
+
+function toggleSpecialGoods(id){
+  const conn = document.getElementById(id);
+  const on = conn.querySelector('.vf-special-toggle').checked;
+  conn.querySelector('.specialgoods-fields').style.display = on ? 'block' : 'none';
+  formToJson();
+}
+
+function renumber(){
+  const cs = [...document.querySelectorAll('.conn')];
+  cs.forEach((c,i)=>{
+    c.querySelector('.idx').textContent = i+1;
+    const nm = c.querySelector('.f-name').value.trim();
+    c.querySelector('.name').textContent = nm; // để trống nếu chưa nhập Tên hiển thị
+  });
+}
+
+function val(root,sel){ const n=root.querySelector(sel); return n?n.value.trim():''; }
+
+function collect(){
+  const out=[];
+  for(const c of document.querySelectorAll('.conn')){
+    const conn={
+      displayName: val(c,'.f-name'),
+      mst: val(c,'.f-mst'),
+      domain: cleanDomain(val(c,'.f-domain')),
+      account:{
+        userCAdmin: val(c,'.f-uca'),
+        passwordCAdmin: val(c,'.f-pca'),
+        userWebService: val(c,'.f-uws'),
+        passwordWebService: val(c,'.f-pws')
+      },
+      patterns: [],
+      customColumns: []
+    };
+    if(c.dataset.hidden==='1') conn.hidden = true;
+    for(const r of c.querySelectorAll('.row.pat')){
+      const pat=val(r,'.p-pat'), ser=val(r,'.p-ser'), ty=val(r,'.p-type')||'CTT';
+      if(pat||ser) conn.patterns.push({pattern:pat, serial:ser, type:ty});
+    }
+    if(conn.patterns.length===0) conn.patterns.push({pattern:'', serial:'', type:'CTT'});
+    for(const r of c.querySelectorAll('.row.ext')){
+      const h=val(r,'.e-header')||val(r,'.e-slot');
+      if(!h) continue;
+      conn.customColumns.push({
+        type: val(r,'.e-type')||'GTGT',
+        header: h,
+        extraSlot: val(r,'.e-slot'),
+        dataType: val(r,'.e-dtype')||'string',
+        note: val(r,'.e-note')
+      });
+    }
+    for(const f of VNPT_CHECKBOXES){
+      const cb = c.querySelector('.vf-multi[data-id="'+f.id+'"]');
+      if(cb && cb.checked)
+        for(const key of f.keys) conn.customColumns.push({type:cbType(f), field:key});
+    }
+    const specialOn = c.querySelector('.vf-special-toggle');
+    if(specialOn && specialOn.checked){
+      const picked = c.querySelector('.vf-goods-type:checked');
+      const type = picked && SPECIAL_GOODS_TYPES.find(t=>t.id===picked.value);
+      if(type){
+        conn.customColumns.push({type:'GTGT', field:type.hddthuKey});
+        for(const key of type.extraKeys) conn.customColumns.push({type:'GTGT', field:key});
+      }
+    }
+    if(conn.customColumns.length===0) delete conn.customColumns;
+
+    const order = [];
+    const state = columnOrderState[c.id] || {};
+    for(const t of Object.keys(DEFAULT_COLUMNS)){
+      if(!state[t]) continue;
+      const cur = orderFor(c.id, t);
+      if(JSON.stringify(cur) !== JSON.stringify(naturalOrder(c.id, t)))
+        order.push({type:t, headers:cur});
+    }
+    if(order.length) conn.columnOrder = order;
+
+    const enc = val(c,'.f-enc');
+    if(enc) conn.textEncoding = enc;
+    const cm = collectMapping(c.id);
+    if(cm.length) conn.columnMapping = cm;
+
+    out.push(conn);
+  }
+  return out;
+}
+
+// Kết nối đang Ẩn không xuất ra JSON (Sao chép / Tải) - chỉ giữ lại trong form + localStorage.
+function collectVisible(){ return collect().filter(c=>!c.hidden); }
+
+function validate(data){
+  const errs=[];
+  data.forEach((c,i)=>{
+    const w='Kết nối '+(i+1)+(c.displayName?' ('+c.displayName+')':'');
+    if(!c.displayName) errs.push(w+': thiếu Tên hiển thị.');
+    if(!c.mst) errs.push(w+': thiếu MST.');
+    if(!c.domain) errs.push(w+': thiếu Domain.');
+    if(!c.account||!c.account.userCAdmin) errs.push(w+': thiếu CAdmin User.');
+    if(!c.account||!c.account.userWebService) errs.push(w+': thiếu WebService User.');
+  });
+  return errs;
+}
+
+const ICON_WARN='<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px;flex:none"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+const ICON_CHECK='<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px;flex:none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 17.01"/></svg>';
+const ICON_DOWNLOAD='<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px;flex:none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
+
+function showValidity(data){
+  const msg=document.getElementById('msg');
+  if(!Array.isArray(data)||data.length===0){ msg.className='msg'; msg.textContent='Chưa có kết nối nào.'; return; }
+  const errs=validate(data);
+  if(errs.length){ msg.className='msg err'; msg.innerHTML=errs.map(e=>ICON_WARN+e).join('<br>'); }
+  else { msg.className='msg ok'; msg.innerHTML=ICON_CHECK+data.length+' kết nối hợp lệ.'; }
+}
+
+// --- Lưu tự động vào localStorage (đến khi bấm "Xóa tất cả") ---
+// JSON textarea đã đồng bộ 2 chiều với form, nên chỉ cần lưu đúng 1 chuỗi này.
+const STORAGE_KEY='vnpt-jsongen-connections-beta';
+const MAIN_STORAGE_KEY='vnpt-jsongen-connections'; // chỉ đọc, beta không bao giờ ghi vào key này
+function persist(){
+  try{ localStorage.setItem(STORAGE_KEY, document.getElementById('json').value); }catch(e){}
+}
+function loadFromStorage(){
+  try{
+    const v=localStorage.getItem(STORAGE_KEY);
+    return v===null ? localStorage.getItem(MAIN_STORAGE_KEY) : v; // lần đầu mở beta: lấy dữ liệu bản chính làm ban đầu
+  }catch(e){ return null; }
+}
+// Nạp lại dữ liệu từ bản chính (chỉ đọc key chính), rồi lưu vào key beta.
+function reloadFromMain(){
+  let raw=null;
+  try{ raw=localStorage.getItem(MAIN_STORAGE_KEY); }catch(e){}
+  const msg=document.getElementById('msg');
+  if(!raw || !raw.trim() || raw.trim()==='[]'){ msg.className='msg err'; msg.innerHTML=ICON_WARN+'Bản chính chưa có dữ liệu.'; return; }
+  if(!confirm('Thay dữ liệu đang có ở bản beta bằng dữ liệu của bản chính?')) return;
+  document.getElementById('json').value=raw;
+  jsonToForm();
+  formToJson(); // chuẩn hóa lại và lưu vào key beta
+  flash(ICON_CHECK+'Đã lấy lại dữ liệu từ bản chính.');
+}
+
+// form -> json (đồng bộ JSON preview + localStorage ngay khi gõ; KHÔNG hiện cảnh báo ở đây - chỉ hiện khi bấm Sao chép/Tải)
+function formToJson(){
+  if(syncing) return;
+  const data=collect();
+  syncing=true;
+  document.getElementById('json').value=JSON.stringify(data,null,2);
+  syncing=false;
+  persist();
+}
+
+// json -> form
+function jsonToForm(){
+  if(syncing) return;
+  const raw=document.getElementById('json').value.trim();
+  let arr;
+  try{
+    arr = raw==='' ? [] : JSON.parse(raw);
+    if(!Array.isArray(arr)) arr=[arr];
+  }catch(e){
+    return; // JSON chưa hợp lệ khi đang gõ - giữ nguyên form, không hiện cảnh báo
+  }
+  syncing=true;
+  document.getElementById('conns').innerHTML=''; seq=0;
+  arr.forEach(addConn);
+  syncing=false;
+}
+
+// Xóa tất cả kết nối (form + JSON + localStorage)
+function clearAll(){
+  if(!confirm('Xóa tất cả kết nối? Không thể hoàn tác.')) return;
+  document.getElementById('conns').innerHTML=''; seq=0;
+  try{ localStorage.setItem(STORAGE_KEY,'[]'); }catch(e){} // '[]' (không xóa key) để lần mở sau không nạp lại dữ liệu bản chính
+  document.getElementById('json').value='[]';
+  const msg=document.getElementById('msg'); msg.className='msg'; msg.textContent='Đã xóa tất cả kết nối.';
+}
+
+// đồng bộ tức thời
+document.addEventListener('input', e=>{
+  if(e.target.id==='json'){ jsonToForm(); persist(); return; }
+  if(e.target.closest('.conn')){
+    if(e.target.classList.contains('f-name')) renumber();
+    if(e.target.closest('.exts')){
+      const conn=e.target.closest('.conn');
+      if(e.target.classList.contains('e-slot')){
+        const row=e.target.closest('.row.ext'), prev=e.target.dataset.prev, cur=e.target.value;
+        if(!val(row,'.e-header') && prev && prev!==cur)
+          for(const t of Object.keys(columnOrderState[conn.id]||{})){ const arr=columnOrderState[conn.id][t]; const i=arr.indexOf(prev); if(i>=0) arr[i]=cur; }
+        e.target.dataset.prev=cur;
+      }
+      refreshOrderList(conn.id);
+    }
+    else formToJson();
+  }
+});
+// rời ô Domain -> chuẩn hóa (bỏ http(s):// và '/')
+document.addEventListener('focusout', e=>{
+  if(e.target.classList && e.target.classList.contains('f-domain')){
+    const c=cleanDomain(e.target.value);
+    if(c!==e.target.value){ e.target.value=c; formToJson(); }
+  }
+});
+
+function copyJson(){
+  formToJson();
+  const data=collectVisible();
+  const errs=validate(data);
+  const text=JSON.stringify(data,null,2);
+  navigator.clipboard.writeText(text)
+    .then(()=>{ errs.length ? showValidity(data) : flash(ICON_CHECK+'Đã sao chép JSON.'); })
+    .catch(()=>flash('Sao chép lỗi, thử lại.'));
+}
+function hasAnyPassword(data){
+  return data.some(c => c.account && (c.account.passwordCAdmin || c.account.passwordWebService));
+}
+function downloadJson(){
+  formToJson();
+  const data=collectVisible();
+  const errs=validate(data);
+  const json=JSON.stringify(data,null,2);
+  const blob=new Blob([json],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='vnpt-connections.json'; a.click(); URL.revokeObjectURL(a.href);
+  errs.length ? showValidity(data) : flash(ICON_DOWNLOAD+'Đã tải vnpt-connections.json');
+  if (hasAnyPassword(data)) alert('File json có chứa mật khẩu, cần bảo mật, chỉ nên gửi mail cho khách hàng');
+}
+function flash(html){ const m=document.getElementById('msg'); m.className='msg ok'; m.innerHTML=html; }
+
+function esc(s){ return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+function gp(o,a,b){ return (o&&o[a]&&o[a][b])||''; }
+
+// ---------- Nút Thêm: Mới / Nhập từ JSON ----------
+function toggleAddMenu(force){
+  const m=document.getElementById('add-menu'), b=document.getElementById('btn-add');
+  const open = force===undefined ? m.hidden : force;
+  m.hidden=!open; b.setAttribute('aria-expanded', open?'true':'false');
+  if(open) m.querySelector('button').focus();
+}
+function addNewConn(){
+  toggleAddMenu(false);
+  addConn(); formToJson();
+  const last=document.querySelector('#conns > .conn:last-child');
+  if(last) last.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function pickImportJson(){
+  toggleAddMenu(false);
+  const inp=document.getElementById('import-file'); inp.value=''; inp.click();
+}
+// Đọc 1 hoặc nhiều file .json (mảng kết nối hoặc 1 object) và THÊM vào cuối danh sách, không xóa kết nối đang có.
+async function importJsonFiles(inp){
+  const files=[...(inp.files||[])]; if(!files.length) return;
+  const added=[], errs=[];
+  for(const f of files){
+    try{
+      let arr=JSON.parse((await f.text()).replace(/^\uFEFF/,''));
+      if(!Array.isArray(arr)) arr=[arr];
+      const ok=arr.filter(x=>x && typeof x==='object' && !Array.isArray(x));
+      if(!ok.length) throw new Error('không có kết nối nào');
+      added.push(...ok);
+    }catch(e){ errs.push(esc(f.name)+': '+(e instanceof SyntaxError?'JSON không hợp lệ':esc(e.message))); }
+  }
+  const before=document.querySelectorAll('#conns > .conn').length;
+  added.forEach(d=>addConn(d));
+  if(added.length) formToJson();
+  const first=document.querySelectorAll('#conns > .conn')[before];
+  if(first) first.scrollIntoView({behavior:'smooth',block:'start'});
+  const m=document.getElementById('msg');
+  if(errs.length){ m.className='msg err'; m.innerHTML=(added.length?ICON_CHECK+'Đã nhập '+added.length+' kết nối.<br>':'')+errs.map(e=>ICON_WARN+e).join('<br>'); }
+  else flash(ICON_CHECK+'Đã nhập '+added.length+' kết nối từ '+(files.length>1?files.length+' file':esc(files[0].name))+'.');
+  inp.value='';
+}
+document.addEventListener('click', e=>{
+  const m=document.getElementById('add-menu');
+  if(!m.hidden && !e.target.closest('.add-wrap')) toggleAddMenu(false);
+});
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape' && !document.getElementById('add-menu').hidden){ toggleAddMenu(false); document.getElementById('btn-add').focus(); }
+});
+
+// ---------- BETA: bảng cột kiểu Excel ----------
+// Bảng chỉ là "view": dữ liệu vẫn nằm ở ul.co-list (ẩn) + .row.ext + mappingState như bản chính. Mọi thao tác
+// trên bảng ghi ngược vào các phần tử đó (altChanged / columnOrderState) rồi gọi formToJson.
+const TYPE_NAMES = {GTGT:'Hóa đơn', PXK:'Phiếu xuất kho', CTT:'Chứng từ'};
+const TAB_NAMES = {GTGT:'Hóa đơn (GTGT)', PXK:'Phiếu xuất kho (PXK)', CTT:'Chứng từ (CTT)'};
+const COLUMN_INFO_LC = {};
+for(const t of Object.keys(COLUMN_INFO)){ COLUMN_INFO_LC[t]={}; for(const h of Object.keys(COLUMN_INFO[t])) COLUMN_INFO_LC[t][h.toLowerCase()]=COLUMN_INFO[t][h]; }
+const sheetState = {}; // connId -> {sel: header|null, edit: {h,orig,t}|null, hh: chiều cao ngăn kéo (px)}
+function shSt(id){ return sheetState[id] || (sheetState[id]={sel:null, edit:null, hh:0}); }
+function shSheet(id){ const c=document.getElementById(id); return c ? c.querySelector('.sheet') : null; }
+function shType(id){ return document.getElementById(id).querySelector('.m-type').value; }
+
+// Mô hình các cột của loại đang chọn, đọc từ DOM ẩn.
+function shModel(id){
+  const conn=document.getElementById(id), type=shType(id);
+  const nat=naturalOrder(id,type), natIdx=new Map(nat.map((h,i)=>[h.toLowerCase(),i]));
+  const extBy=new Map(extInfo(id,type).map(x=>[x.header.toLowerCase(),x]));
+  const info=COLUMN_INFO_LC[type]||{};
+  const defs=new Map();
+  conn.querySelectorAll('.defs .row.map').forEach(r=>{ const a=val(r,'.m-a'), b=val(r,'.m-b'); if(a&&b) defs.set(a.toLowerCase(), b); });
+  const cols=[...conn.querySelectorAll('.co-list .co-item')].map((li,i)=>{
+    const h=li.dataset.header, alt=li.querySelector('.s-alt').value.trim(), fx=isFormula(alt);
+    const ext=extBy.get(h.toLowerCase());
+    const def=ext?ext.slot:h, ci=ext?null:info[def.toLowerCase()];
+    let note=ci?ci.note:'';
+    if(ext){ const r=conn.querySelector('.row.ext[data-k="'+ext.k+'"]'); note=r?val(r,'.e-note'):''; }
+    const ni=natIdx.get(h.toLowerCase());
+    return {i, h, def, alt, fx, fxErr:fx?formulaError(alt):'', ext:!!ext, k:ext?ext.k:null,
+      shown:(!fx&&alt)?alt:def, req:!!(ci&&ci.req), note, moved:ni!==i, from:ni==null?'':colLetter(ni), defVal:defs.get(def.toLowerCase())||''};
+  });
+  const by=new Map();
+  cols.forEach(c=>{ const k=c.shown.toLowerCase(); if(!by.has(k)) by.set(k,[]); by.get(k).push(c); });
+  cols.forEach(c=>{ c.dup=by.get(c.shown.toLowerCase()).filter(x=>x!==c).map(x=>colLetter(x.i)).join(', '); });
+  const hr=parseInt(conn.querySelector('.m-hrow').value,10);
+  return {type, cols, nat, hrow:hr>1?Math.min(hr,50):1};
+}
+function shTypeChanged(id,t){
+  const conn=document.getElementById(id);
+  if(t===shType(id)) return [...conn.querySelectorAll('.co-list .s-alt')].some(i=>i.value.trim()) || JSON.stringify(orderFor(id,t))!==JSON.stringify(naturalOrder(id,t));
+  const st=(mappingState[id]||{})[t];
+  return !!(st && (st.maps.length||st.fx.length)) || JSON.stringify(orderFor(id,t))!==JSON.stringify(naturalOrder(id,t)) || extInfo(id,t).some(x=>x.rename);
+}
+
+// Vẽ lại bảng (gọi ở cuối renderColumnOrderList / renderMapping và sau mỗi thao tác trên bảng).
+function renderSheet(id){
+  const conn=document.getElementById(id), sh=shSheet(id);
+  if(!conn || !sh) return;
+  const st=shSt(id), m=shModel(id);
+  if(st.sel && !m.cols.some(c=>c.h===st.sel)) st.sel=null;
+  const cols=m.cols, n=cols.length, hrow=m.hrow;
+  let h='<table class="sh-table" role="grid" aria-label="Cột mẫu Excel"><thead><tr role="row"><th class="sh-corner" role="presentation"></th>';
+  cols.forEach(c=>{ h+=`<th class="sh-letter ${c.moved?'moved':''} ${st.sel===c.h?'sel':''}" role="presentation" data-i="${c.i}">${colLetter(c.i)}</th>`; });
+  h+='</tr></thead><tbody>';
+  const emptyRow=(rn,cls,title,defs)=>{
+    let r=`<tr role="row"><th class="sh-rn" role="rowheader">${rn}</th>`;
+    cols.forEach(c=>{ r+=`<td class="${cls}" role="gridcell" data-i="${c.i}" ${title?`title="${esc(title)}"`:''}><div class="sh-cell ${defs&&c.defVal?'sh-defval':''}">${defs&&c.defVal?esc(c.defVal):''}</div></td>`; });
+    return r+'</tr>';
+  };
+  for(let r=1;r<hrow;r++) h+=emptyRow(r,'sh-above','Dòng trên tiêu đề (add-in bỏ qua)');
+  h+=`<tr role="row"><th class="sh-rn ${st.sel?'hl':''}" role="rowheader">${hrow}</th>`;
+  cols.forEach(c=>{
+    const stat=[]; if(c.fx) stat.push('công thức'); else if(c.alt) stat.push('đã đổi tên'); if(c.req) stat.push('bắt buộc'); if(c.moved) stat.push('đã dời'); if(c.ext) stat.push('cột mở rộng');
+    const aria='Cột '+colLetter(c.i)+', tên hiển thị '+c.shown+', tên mặc định '+c.def+(stat.length?', '+stat.join(', '):'');
+    h+=`<td class="sh-th ${c.alt&&!c.fx?'renamed':''} ${c.fx?'hasfx':''} ${c.ext?'is-ext':''} ${c.fx&&c.fxErr?'bad':''} ${c.dup?'dup':''} ${st.sel===c.h?'sel':''}" role="columnheader" data-i="${c.i}" aria-selected="${st.sel===c.h?'true':'false'}" aria-label="${esc(aria)}"><div class="sh-cell">${esc(c.shown)}${c.fx?'<i class="sh-fxi">fx</i>':''}${c.req?'<b class="sh-req">*</b>':''}${c.ext?'<small class="sh-ext">mở rộng</small>':''}</div></td>`;
+  });
+  h+='</tr>';
+  h+=emptyRow(hrow+1,'sh-blank','',true)+emptyRow(hrow+2,'sh-blank')+emptyRow(hrow+3,'sh-blank');
+  h+='</tbody></table>';
+  sh.querySelector('.sh-tablewrap').innerHTML=h;
+  // dòng tóm tắt
+  const ren=cols.filter(c=>c.alt&&!c.fx).length, fxn=cols.filter(c=>c.fx).length;
+  const reord=JSON.stringify(cols.map(c=>c.h))!==JSON.stringify(m.nat);
+  const parts=[n+' cột']; if(ren) parts.push(ren+' đổi tên'); if(fxn) parts.push(fxn+' công thức'); if(reord) parts.push('đã đổi thứ tự');
+  conn.querySelector('.sh-sum-text').textContent=TYPE_NAMES[m.type]+': '+parts.join(', ');
+  // tab loại
+  sh.querySelector('.sh-tabs').innerHTML=DOC_TYPES.map(t=>`<button type="button" class="sh-tab ${t===m.type?'on':''}" role="tab" aria-selected="${t===m.type?'true':'false'}" data-t="${t}">${TAB_NAMES[t]}${shTypeChanged(id,t)?'<span class="dot" title="Có thay đổi so với mặc định"></span>':''}</button>`).join('');
+  shUpdateFxbar(id,false);
+}
+function shUpdateFxbar(id,force){
+  const sh=shSheet(id), fx=sh.querySelector('.sh-fxin'), nb=sh.querySelector('.sh-namebox'), st=shSt(id);
+  if(!force && document.activeElement===fx) return;
+  const m=shModel(id), c=st.sel?m.cols.find(x=>x.h===st.sel):null;
+  if(!c){ fx.value=''; fx.disabled=true; fx.dataset.h=''; fx.dataset.orig=''; nb.value=''; fx.classList.remove('is-fx','bad'); return; }
+  fx.disabled=false; fx.value=c.alt; fx.dataset.h=c.h; fx.dataset.orig=c.alt; fx.dataset.t=m.type; nb.value=c.def;
+  fx.placeholder=(c.def==='STT'&&m.type!=='CTT')?'Trống = tự động (cả file 1 hóa đơn)':'Trống = tên mặc định';
+  fx.classList.toggle('is-fx',c.fx); fx.classList.toggle('bad',c.fx&&!!c.fxErr);
+}
+
+// ---- chọn cột ----
+function shSelect(id,h){
+  const sh=shSheet(id), st=shSt(id), m=shModel(id);
+  const c=m.cols.find(x=>x.h===h); st.sel=c?c.h:null;
+  sh.querySelectorAll('.sh-letter,.sh-th').forEach(el=>{ const on=!!c && +el.dataset.i===c.i; el.classList.toggle('sel',on); if(el.classList.contains('sh-th')) el.setAttribute('aria-selected',on?'true':'false'); });
+  const rn=sh.querySelector('.sh-th'); if(rn){ const th=rn.parentNode.querySelector('.sh-rn'); if(th) th.classList.toggle('hl',!!c); }
+  shUpdateFxbar(id,true);
+  if(c){ const cell=[...sh.querySelectorAll('.sh-th')].find(el=>+el.dataset.i===c.i); if(cell) cell.scrollIntoView({block:'nearest',inline:'nearest'}); }
+}
+function shCell(id,h){
+  const sh=shSheet(id), m=shModel(id), c=m.cols.find(x=>x.h===h);
+  return c ? [...sh.querySelectorAll('.sh-th')].find(el=>+el.dataset.i===c.i) : null;
+}
+function shMoveSel(id,delta){
+  const m=shModel(id), st=shSt(id); if(!m.cols.length) return;
+  let i=st.sel==null?-1:m.cols.findIndex(c=>c.h===st.sel);
+  i=Math.max(0,Math.min(m.cols.length-1,i+delta));
+  shSelect(id,m.cols[i].h);
+}
+
+// ---- ghi thay đổi về DOM ẩn ----
+function shCommit(id,h,value){
+  const conn=document.getElementById(id), st=shSt(id);
+  const li=[...conn.querySelectorAll('.co-list .co-item')].find(x=>x.dataset.header===h);
+  if(!li) return;
+  const m=shModel(id), c=m.cols.find(x=>x.h===h);
+  let v=String(value).trim();
+  if(c && !isFormula(v) && v.toLowerCase()===c.def.toLowerCase()) v=''; // gõ trùng tên mặc định = trống
+  const inp=li.querySelector('.s-alt');
+  if(inp.value.trim()!==v){ inp.value=v; altChanged(inp); formToJson(); }
+  if(st.sel===h) st.sel=li.dataset.header; // cột mở rộng đổi tên thì header đổi theo
+  renderSheet(id);
+}
+// Đổi thứ tự: ghi vào columnOrderState rồi vẽ lại như bản chính (giữ tên thay thế đã gõ).
+function shSetOrder(id,headers){
+  syncMappingFromDom(id);
+  columnOrderState[id][shType(id)]=headers;
+  renderColumnOrderList(id);
+  formToJson();
+}
+function shMoveCol(id,i,to){
+  const m=shModel(id), hs=m.cols.map(c=>c.h);
+  if(i<0||i>=hs.length) return;
+  to=Math.max(0,Math.min(hs.length-1,to)); if(to===i) return;
+  const h=hs.splice(i,1)[0]; hs.splice(to,0,h);
+  shSetOrder(id,hs); shSelect(id,h);
+}
+function shRestorePos(id,h){
+  const m=shModel(id), hs=m.cols.map(c=>c.h), i=hs.indexOf(h); if(i<0) return;
+  const k=m.nat.indexOf(h); if(k<0) return;
+  hs.splice(i,1); hs.splice(Math.min(k,hs.length),0,h);
+  shSetOrder(id,hs); shSelect(id,h);
+}
+function shUsedSlots(id,t){ const used=new Set(); document.getElementById(id).querySelectorAll('.exts .row.ext').forEach(r=>{ if((val(r,'.e-type')||'GTGT')===t) used.add(val(r,'.e-slot')); }); return used; }
+function shFreeSlots(id,t){ const u=shUsedSlots(id,t); return SLOTS.filter(s=>!u.has(s)); }
+function shInsertExt(id,h,side){
+  const t=shType(id), free=shFreeSlots(id,t); if(!free.length) return;
+  const slot=free[0];
+  addExt(id,{type:t, extraSlot:slot});
+  refreshOrderList(id); // vẽ lại: cột mới nằm cuối
+  const m=shModel(id), hs=m.cols.map(c=>c.h).filter(x=>x!==slot);
+  const i=hs.indexOf(h);
+  hs.splice(i<0?hs.length:(side==='left'?i:i+1),0,slot);
+  shSetOrder(id,hs);
+  shSelect(id,slot);
+  shStartEdit(id,slot);
+}
+function shDeleteExt(id,h){
+  const m=shModel(id), c=m.cols.find(x=>x.h===h); if(!c||!c.ext) return;
+  const row=document.getElementById(id).querySelector('.row.ext[data-k="'+c.k+'"]'); if(!row) return;
+  shSt(id).sel=null;
+  row.remove(); refreshOrderList(id);
+}
+function shSwapSlot(id,h,slot){
+  const m=shModel(id), c=m.cols.find(x=>x.h===h); if(!c||!c.ext) return;
+  const row=document.getElementById(id).querySelector('.row.ext[data-k="'+c.k+'"]'); if(!row) return;
+  const sel=row.querySelector('.e-slot'); sel.value=slot;
+  sel.dispatchEvent(new Event('input',{bubbles:true})); // chạy luồng cũ (remap thứ tự + refreshOrderList)
+  shSt(id).sel=val(row,'.e-header')||slot;
+  renderSheet(id); shSelect(id,shSt(id).sel);
+}
+function sheetRestoreAll(id){
+  const t=shType(id);
+  if(!confirm('Khôi phục thứ tự và xóa mọi tên thay thế, công thức của "'+TYPE_NAMES[t]+'"?')) return;
+  shSt(id).edit=null;
+  document.getElementById(id).querySelectorAll('.co-list .s-alt').forEach(i=>{ if(i.value.trim()){ i.value=''; altChanged(i); } });
+  columnOrderResetDefault(id);
+}
+
+// ---- sửa tại ô ----
+function shStartEdit(id,h,init){
+  shFlush(id);
+  const sh=shSheet(id), st=shSt(id), m=shModel(id), c=m.cols.find(x=>x.h===h); if(!c) return;
+  st.sel=h;
+  renderSheet(id);
+  shSelect(id,h);
+  const cell=shCell(id,h); if(!cell) return;
+  const box=cell.querySelector('.sh-cell');
+  st.edit={h, orig:c.alt, t:m.type};
+  cell.classList.add('editing');
+  box.innerHTML='<input class="sh-editor alt-in" spellcheck="false" aria-label="Sửa tên cột '+esc(c.def)+'">';
+  const inp=box.firstChild;
+  inp.placeholder=(c.def==='STT'&&m.type!=='CTT')?'Trống = tự động (cả file 1 hóa đơn)':'Tên mặc định: '+c.def;
+  inp.value=init===undefined?c.alt:init;
+  inp.focus();
+  if(init===undefined) inp.select(); else inp.setSelectionRange(inp.value.length,inp.value.length);
+  shEditorState(id,inp);
+  updateFxTip(inp);
+}
+function shEditorState(id,inp){
+  const st=shSt(id), ed=st.edit; if(!ed) return;
+  const v=inp.value.trim(), fx=isFormula(v);
+  inp.classList.toggle('is-fx',fx); inp.classList.toggle('bad',fx&&!!formulaError(v));
+  const m=shModel(id), me=m.cols.find(x=>x.h===ed.h);
+  const name=(!fx&&v)?v:(me?me.def:'');
+  const other=m.cols.filter(x=>x.h!==ed.h && x.shown.toLowerCase()===name.toLowerCase());
+  const dup=!!name && other.length>0;
+  inp.classList.toggle('dup',dup);
+  inp.title=dup?'Trùng tên với cột '+other.map(x=>colLetter(x.i)).join(', '):'';
+}
+// Kết thúc sửa: save=true thì ghi, false thì hủy. move: dịch ô chọn sau khi lưu (Enter/Tab).
+function shEndEdit(id,save,move){
+  const st=shSt(id), ed=st.edit; if(!ed) return;
+  const sh=shSheet(id), inp=sh.querySelector('.sh-editor'), value=inp?inp.value:ed.orig;
+  st.edit=null;
+  const m=shModel(id), i=m.cols.findIndex(c=>c.h===ed.h);
+  const nextH=(move && i>=0 && m.cols[i+move]) ? m.cols[i+move].h : null;
+  if(save) shCommit(id,ed.h,value); else renderSheet(id);
+  if(nextH) shSelect(id,nextH);
+  sh.querySelector('.sh-scroll').focus({preventScroll:true});
+}
+// Ghi nốt thay đổi đang dở (ô đang sửa hoặc thanh công thức) trước khi làm việc khác.
+function shFlush(id){
+  const sh=shSheet(id), st=shSt(id); if(!sh) return;
+  if(st.edit){ const ed=st.edit, inp=sh.querySelector('.sh-editor'); st.edit=null; shCommit(id,ed.h,inp?inp.value:ed.orig); }
+  const fx=sh.querySelector('.sh-fxin');
+  if(fx && !fx.disabled && fx.dataset.h && fx.value.trim()!==fx.dataset.orig && fx.dataset.t===shType(id)) shCommit(id,fx.dataset.h,fx.value);
+}
+
+// ---- tooltip khi rê chuột ----
+let shTipEl=null, shTipTimer=null, shTipCur=null;
+function shTip(){ if(!shTipEl){ shTipEl=document.createElement('div'); shTipEl.className='fx-tip sh-tip'; shTipEl.hidden=true; shTipEl.setAttribute('role','tooltip'); document.body.appendChild(shTipEl); } return shTipEl; }
+function shHideTip(){ clearTimeout(shTipTimer); shTipTimer=null; shTipCur=null; if(shTipEl) shTipEl.hidden=true; }
+function shShowTip(id,cell){
+  const st=shSt(id); if(st.edit || shDrag || (shMenuEl && !shMenuEl.hidden)) return;
+  const m=shModel(id), c=m.cols[+cell.dataset.i]; if(!c) return;
+  const li=[];
+  li.push('<li>'+(c.ext?'Thẻ: ':'Mặc định: ')+'<code>'+esc(c.def)+'</code></li>');
+  if(c.fx) li.push('<li>Công thức: <code>'+esc(c.alt)+'</code></li>'); else if(c.alt) li.push('<li>Đổi tên thành <code>'+esc(c.alt)+'</code></li>');
+  if(c.fx && c.fxErr) li.push('<li class="err">'+esc(c.fxErr)+'</li>');
+  if(c.ext) li.push('<li>Cột mở rộng</li>');
+  if(c.req) li.push('<li>Bắt buộc</li>');
+  if(c.moved) li.push('<li>Đã dời từ cột '+esc(c.from)+'</li>');
+  if(c.dup) li.push('<li class="err">Trùng tên với cột '+esc(c.dup)+'</li>');
+  if(c.note) li.push('<li class="mut">'+esc(c.note)+'</li>');
+  const tip=shTip();
+  tip.innerHTML='<ul class="tip-list">'+li.join('')+'</ul>';
+  tip.hidden=false;
+  const r=cell.getBoundingClientRect();
+  tip.style.left=Math.max(8,Math.min(r.left,window.innerWidth-tip.offsetWidth-8))+'px';
+  let top=r.bottom+6; if(top+tip.offsetHeight>window.innerHeight-8) top=Math.max(8,r.top-tip.offsetHeight-6);
+  tip.style.top=top+'px';
+}
+
+// ---- menu chuột phải ----
+let shMenuEl=null, shMenuCtx=null, shMenuT=0;
+function shMenu(){
+  if(!shMenuEl){
+    shMenuEl=document.createElement('div'); shMenuEl.className='sh-menu'; shMenuEl.hidden=true; shMenuEl.setAttribute('role','menu');
+    shMenuEl.addEventListener('click',e=>{
+      const b=e.target.closest('button[data-ix]'); if(!b||!shMenuCtx) return;
+      const it=shMenuCtx.items[+b.dataset.ix]; if(!it) return;
+      if(it.keep){ it.act(); return; }
+      shCloseMenu(); it.act();
+    });
+    shMenuEl.addEventListener('keydown',e=>{
+      const bs=[...shMenuEl.querySelectorAll('button[data-ix]')], i=bs.indexOf(document.activeElement);
+      if(e.key==='ArrowDown'){ e.preventDefault(); bs[(i+1)%bs.length].focus(); }
+      else if(e.key==='ArrowUp'){ e.preventDefault(); bs[(i-1+bs.length)%bs.length].focus(); }
+      else if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); shCloseMenu(); }
+      else if(e.key==='Tab'){ e.preventDefault(); shCloseMenu(); }
+    });
+    document.body.appendChild(shMenuEl);
+  }
+  return shMenuEl;
+}
+function shCloseMenu(){
+  if(!shMenuEl || shMenuEl.hidden) return;
+  const ctx=shMenuCtx; shMenuEl.hidden=true; shMenuCtx=null;
+  if(ctx){ const sc=shSheet(ctx.id); if(sc) sc.querySelector('.sh-scroll').focus({preventScroll:true}); }
+}
+function shMenuItems(id,h,sub){
+  const m=shModel(id), c=m.cols.find(x=>x.h===h); if(!c) return [];
+  const n=m.cols.length, items=[], free=shFreeSlots(id,m.type);
+  if(sub==='slot'){
+    items.push({title:'Chọn thẻ mới'});
+    free.forEach(s=>items.push({label:s, act:()=>shSwapSlot(id,h,s)}));
+    return items;
+  }
+  items.push({label:'Đổi tên', act:()=>shStartEdit(id,h)});
+  items.push({label:'Nhập công thức', act:()=>shStartEdit(id,h,c.fx?c.alt:'=')});
+  if(c.alt) items.push({label:'Khôi phục tên mặc định', act:()=>shCommit(id,h,'')});
+  if(c.moved) items.push({label:'Khôi phục vị trí', act:()=>shRestorePos(id,h)});
+  if(c.i>0) items.push({label:'Đưa về đầu', act:()=>shMoveCol(id,c.i,0)});
+  if(c.i<n-1) items.push({label:'Đưa về cuối', act:()=>shMoveCol(id,c.i,n-1)});
+  if(m.type!=='CTT' && free.length){
+    items.push({sep:true});
+    items.push({label:'Chèn cột mở rộng bên trái', act:()=>shInsertExt(id,h,'left')});
+    items.push({label:'Chèn cột mở rộng bên phải', act:()=>shInsertExt(id,h,'right')});
+  }
+  if(c.ext){
+    items.push({sep:true});
+    if(free.length) items.push({label:'Đổi thẻ mở rộng', keep:true, act:()=>shOpenMenu(id,h,shMenuCtx.x,shMenuCtx.y,'slot')});
+    items.push({label:'Xóa cột', danger:true, act:()=>shDeleteExt(id,h)});
+  }
+  return items;
+}
+function shOpenMenu(id,h,x,y,sub){
+  shHideTip();
+  const items=shMenuItems(id,h,sub); if(!items.length) return;
+  const el=shMenu();
+  shMenuCtx={id,h,x,y,items}; shMenuT=Date.now();
+  el.innerHTML=items.map((it,ix)=>it.sep?'<div class="sh-sep" role="separator"></div>':it.title?`<div class="sh-mt">${esc(it.title)}</div>`:`<button type="button" role="menuitem" data-ix="${ix}" class="${it.danger?'danger-i':''}">${esc(it.label)}${it.keep?' ...':''}</button>`).join('');
+  el.hidden=false;
+  const w=el.offsetWidth, hh=el.offsetHeight;
+  el.style.left=Math.max(8,Math.min(x,window.innerWidth-w-8))+'px';
+  let top=y; if(top+hh>window.innerHeight-8) top=y-hh;
+  el.style.top=Math.max(8,top)+'px';
+  const first=el.querySelector('button[data-ix]'); if(first) first.focus({preventScroll:true});
+}
+
+// ---- kéo-thả đổi thứ tự (pointer events) ----
+let shDrag=null, shGhost=null;
+function shDropIndex(d){
+  const ls=[...shSheet(d.id).querySelectorAll('.sh-letter')];
+  let k=ls.length;
+  for(let j=0;j<ls.length;j++){ const r=ls[j].getBoundingClientRect(); if(d.x<r.left+r.width/2){ k=j; break; } }
+  return k;
+}
+function shDragIndicator(d){
+  const sh=shSheet(d.id), sc=sh.querySelector('.sh-scroll'), ind=sh.querySelector('.sh-ind');
+  const ls=[...sh.querySelectorAll('.sh-letter')]; if(!ls.length) return;
+  const k=shDropIndex(d), r=k<ls.length?ls[k].getBoundingClientRect():ls[ls.length-1].getBoundingClientRect();
+  const x=k<ls.length?r.left:r.right, sr=sc.getBoundingClientRect();
+  ind.style.display='block'; ind.style.left=(x-sr.left+sc.scrollLeft)+'px'; ind.style.top=sc.scrollTop+'px'; ind.style.height=sc.clientHeight+'px';
+}
+function shDragLoop(){
+  const d=shDrag; if(!d||!d.active) return;
+  const sc=shSheet(d.id).querySelector('.sh-scroll'), r=sc.getBoundingClientRect();
+  if(d.x<r.left+60) sc.scrollLeft-=14; else if(d.x>r.right-40) sc.scrollLeft+=14;
+  shDragIndicator(d);
+  requestAnimationFrame(shDragLoop);
+}
+function shDragActivate(d){
+  d.active=true; clearTimeout(d.menuTimer);
+  shHideTip();
+  const sh=shSheet(d.id); sh.classList.add('dragging');
+  shGhost=document.createElement('div'); shGhost.className='sh-ghost'; shGhost.textContent=d.name; document.body.appendChild(shGhost);
+  sh.querySelectorAll('[data-i="'+d.i+'"]').forEach(el=>el.classList.add('dragsrc'));
+  window.addEventListener('touchmove',shTouchBlock,{passive:false});
+  requestAnimationFrame(shDragLoop);
+}
+function shTouchBlock(e){ if(shDrag && shDrag.active && e.cancelable) e.preventDefault(); }
+function shCancelDrag(){
+  const d=shDrag; if(!d) return;
+  clearTimeout(d.timer); clearTimeout(d.menuTimer);
+  shDrag=null;
+  window.removeEventListener('pointermove',shPointerMove); window.removeEventListener('pointerup',shPointerUp); window.removeEventListener('pointercancel',shPointerCancel);
+  window.removeEventListener('touchmove',shTouchBlock);
+  if(shGhost){ shGhost.remove(); shGhost=null; }
+  const sh=shSheet(d.id);
+  if(sh){ sh.classList.remove('dragging'); sh.querySelectorAll('.dragsrc').forEach(el=>el.classList.remove('dragsrc')); const ind=sh.querySelector('.sh-ind'); if(ind) ind.style.display='none'; }
+}
+function shPointerMove(e){
+  const d=shDrag; if(!d||e.pointerId!==d.pid) return;
+  d.x=e.clientX; d.y=e.clientY;
+  const dist=Math.hypot(d.x-d.x0,d.y-d.y0);
+  if(!d.active){
+    if(d.touch && !d.armed){ if(dist>8) shCancelDrag(); return; }
+    if(dist<5) return;
+    shDragActivate(d);
+  }
+  if(shGhost){ shGhost.style.left=e.clientX+'px'; shGhost.style.top=e.clientY+'px'; }
+}
+function shPointerUp(e){
+  const d=shDrag; if(!d||e.pointerId!==d.pid) return;
+  const was=d.active, k=was?shDropIndex(d):-1, id=d.id, i=d.i;
+  shCancelDrag();
+  if(was && k>=0) shMoveCol(id,i,k>i?k-1:k);
+}
+function shPointerCancel(e){ if(shDrag && e.pointerId===shDrag.pid) shCancelDrag(); }
+function shPointerDown(e){
+  const sh=e.currentTarget, id=sh.closest('.conn').id;
+  if(e.target.closest('.sh-editor,.sh-fxin,.sh-bar,.sh-grip')) return;
+  shFlush(id); shHideTip();
+  const cell=e.target.closest('.sh-th,.sh-letter');
+  if(!cell) return;
+  const m=shModel(id), c=m.cols[+cell.dataset.i]; if(!c) return;
+  shSelect(id,c.h);
+  if(e.button!==0) return;
+  shCancelDrag();
+  const touch=e.pointerType!=='mouse';
+  const d=shDrag={id,i:c.i,x0:e.clientX,y0:e.clientY,x:e.clientX,y:e.clientY,touch,active:false,armed:false,pid:e.pointerId,name:c.shown,timer:null,menuTimer:null};
+  if(touch){
+    d.timer=setTimeout(()=>{ if(shDrag===d) d.armed=true; },250);
+    d.menuTimer=setTimeout(()=>{ if(shDrag===d && !d.active){ const h=c.h, x=d.x, y=d.y; shCancelDrag(); shOpenMenu(id,h,x,y); } },500);
+  }
+  window.addEventListener('pointermove',shPointerMove); window.addEventListener('pointerup',shPointerUp); window.addEventListener('pointercancel',shPointerCancel);
+}
+
+// ---- ngăn kéo (dạng lớn) ----
+function sheetToggleBig(id,force){
+  const sh=shSheet(id), host=sh.parentNode, st=shSt(id);
+  const big=force===undefined?!sh.classList.contains('big'):force;
+  shFlush(id); shCloseMenu(); shHideTip();
+  if(big){
+    document.querySelectorAll('.sheet.big').forEach(o=>{ if(o!==sh) sheetToggleBig(o.closest('.conn').id,false); });
+    host.style.minHeight=host.offsetHeight+'px';
+    sh.classList.add('big');
+    sh.style.height=st.hh?st.hh+'px':'';
+  } else {
+    sh.classList.remove('big'); sh.style.height=''; host.style.minHeight='';
+  }
+  shPadBody();
+  const btn=document.getElementById(id).querySelector('.sh-big-btn'); if(btn) btn.textContent=big?'Thu nhỏ bảng':'Mở bảng cột';
+  if(big) sh.querySelector('.sh-scroll').focus({preventScroll:true});
+}
+function shPadBody(){
+  const b=document.querySelector('.sheet.big');
+  document.body.style.paddingBottom=(b && window.innerWidth>=700)?b.offsetHeight+'px':'';
+}
+window.addEventListener('resize',shPadBody);
+
+// ---- nối sự kiện cho 1 kết nối ----
+function wireSheet(id){
+  const conn=document.getElementById(id), sh=conn.querySelector('.sheet'), sc=sh.querySelector('.sh-scroll');
+  sh.addEventListener('pointerdown',shPointerDown);
+  sh.addEventListener('dblclick',e=>{ const cell=e.target.closest('.sh-th'); if(!cell||e.target.closest('.sh-editor')) return; const c=shModel(id).cols[+cell.dataset.i]; if(c) shStartEdit(id,c.h); });
+  sh.addEventListener('contextmenu',e=>{
+    const cell=e.target.closest('.sh-th,.sh-letter'); if(!cell) return;
+    e.preventDefault(); shFlush(id);
+    const c=shModel(id).cols[+cell.dataset.i]; if(!c) return;
+    shCancelDrag(); shSelect(id,c.h); shOpenMenu(id,c.h,e.clientX,e.clientY);
+  });
+  sh.querySelector('.sh-tabs').addEventListener('click',e=>{
+    const b=e.target.closest('.sh-tab'); if(!b) return;
+    shFlush(id); shCloseMenu(); shSt(id).sel=null;
+    conn.querySelector('.m-type').value=b.dataset.t;
+    switchMappingType(id);
+    sc.focus({preventScroll:true});
+  });
+  // tooltip rê chuột
+  sh.addEventListener('mouseover',e=>{
+    const cell=e.target.closest('.sh-th'); if(cell===shTipCur) return;
+    shHideTip();
+    if(!cell || e.target.closest('.sh-editor')) return;
+    shTipCur=cell; shTipTimer=setTimeout(()=>shShowTip(id,cell),300);
+  });
+  sh.addEventListener('mouseout',e=>{ const cell=e.target.closest('.sh-th'); if(cell && !(e.relatedTarget && cell.contains(e.relatedTarget))) shHideTip(); });
+  sc.addEventListener('scroll',shHideTip,{passive:true});
+  // ô đang sửa
+  sh.addEventListener('keydown',e=>{
+    const ed=e.target.closest('.sh-editor');
+    if(ed){
+      if(e.key==='Enter'){ e.preventDefault(); shEndEdit(id,true,1); }
+      else if(e.key==='Tab'){ e.preventDefault(); shEndEdit(id,true,e.shiftKey?-1:1); }
+      else if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); shEndEdit(id,false); }
+      return;
+    }
+    if(e.target.closest('.sh-fxin')){
+      if(e.key==='Enter'){ e.preventDefault(); e.target.blur(); }
+      else if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); e.target.value=e.target.dataset.orig||''; e.target.blur(); sc.focus({preventScroll:true}); }
+      return;
+    }
+    if(e.target!==sc) return;
+    const st=shSt(id), m=shModel(id), i=st.sel==null?-1:m.cols.findIndex(c=>c.h===st.sel);
+    if(e.key==='ArrowLeft'||e.key==='ArrowRight'){
+      e.preventDefault();
+      const dx=e.key==='ArrowLeft'?-1:1;
+      if(e.altKey){ if(i>=0) shMoveCol(id,i,i+dx); } else shMoveSel(id,i<0?(dx>0?1:0):dx);
+    } else if(e.key==='Home'||e.key==='End'){ e.preventDefault(); if(m.cols.length) shSelect(id,m.cols[e.key==='Home'?0:m.cols.length-1].h); }
+    else if(i>=0 && (e.key==='F2'||e.key==='Enter')){ e.preventDefault(); shStartEdit(id,m.cols[i].h); }
+    else if(i>=0 && (e.key==='ContextMenu'||(e.key==='F10'&&e.shiftKey))){
+      e.preventDefault();
+      const cell=shCell(id,m.cols[i].h), r=cell.getBoundingClientRect();
+      shOpenMenu(id,m.cols[i].h,r.left+8,r.bottom);
+    }
+    else if(i>=0 && e.key.length===1 && !e.ctrlKey && !e.metaKey && !e.altKey){ e.preventDefault(); shStartEdit(id,m.cols[i].h,e.key); }
+  });
+  sh.addEventListener('input',e=>{ const ed=e.target.closest('.sh-editor'); if(ed) shEditorState(id,ed); });
+  sh.addEventListener('focusout',e=>{
+    const ed=e.target.closest('.sh-editor'); if(!ed) return;
+    const st=shSt(id); if(!st.edit) return;
+    const edit=st.edit; st.edit=null; shCommit(id,edit.h,ed.value);
+  });
+  // thanh công thức: ghi khi rời ô / Enter
+  sh.querySelector('.sh-fxin').addEventListener('change',e=>{
+    const fx=e.target; if(!fx.dataset.h || fx.dataset.t!==shType(id)) return;
+    if(fx.value.trim()===fx.dataset.orig) return;
+    shCommit(id,fx.dataset.h,fx.value);
+  });
+  sh.querySelector('.sh-fxin').addEventListener('input',e=>{ const v=e.target.value.trim(), fx=isFormula(v); e.target.classList.toggle('is-fx',fx); e.target.classList.toggle('bad',fx&&!!formulaError(v)); });
+  // thanh kéo đổi chiều cao ngăn kéo
+  const grip=sh.querySelector('.sh-grip');
+  grip.addEventListener('pointerdown',e=>{
+    e.preventDefault(); grip.setPointerCapture(e.pointerId);
+    const mv=ev=>{ const h=Math.max(220,Math.min(window.innerHeight-60,window.innerHeight-ev.clientY)); shSt(id).hh=h; sh.style.height=h+'px'; shPadBody(); };
+    const up=()=>{ grip.removeEventListener('pointermove',mv); grip.removeEventListener('pointerup',up); };
+    grip.addEventListener('pointermove',mv); grip.addEventListener('pointerup',up);
+  });
+  // Dòng tiêu đề / giá trị mặc định đổi -> vẽ lại bảng
+  conn.querySelector('.m-hrow').addEventListener('input',()=>renderSheet(id));
+  const defs=conn.querySelector('.defs');
+  defs.addEventListener('input',()=>renderSheet(id));
+  new MutationObserver(()=>renderSheet(id)).observe(defs,{childList:true});
+  renderSheet(id);
+}
+document.addEventListener('pointerdown',e=>{
+  if(shMenuEl && !shMenuEl.hidden && !e.target.closest('.sh-menu')) shCloseMenu();
+},true);
+window.addEventListener('scroll',()=>{ if(shMenuEl && !shMenuEl.hidden && Date.now()-shMenuT>150) shCloseMenu(); },true);
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape') return;
+  if(shMenuEl && !shMenuEl.hidden) return;
+  if(e.target.closest && e.target.closest('.sh-editor,.sh-fxin')) return;
+  const big=document.querySelector('.sheet.big'); if(big) sheetToggleBig(big.closest('.conn').id,false);
+});
+
+// khởi tạo: khôi phục từ localStorage nếu có, không thì 1 kết nối mẫu
+const savedJson = loadFromStorage();
+if (savedJson && savedJson.trim() && savedJson.trim() !== '[]') {
+  document.getElementById('json').value = savedJson;
+  jsonToForm();
+} else {
+  addConn();
+  formToJson();
+}
+</script>
+</body>
+</html>
