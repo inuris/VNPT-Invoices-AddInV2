@@ -41,7 +41,7 @@ Add-in có 30 ngày dùng thử cho mỗi mã số thuế. Để tiếp tục s�
 ## Hướng dẫn và hỗ trợ
 
 - Hướng dẫn sử dụng: https://vnpt-invoice-addin.gitbook.io/vnpt-invoice-addin-v2
-- Hỗ trợ: TTKDGP — Phòng Giải pháp số
+- Hỗ trợ: TTKDGP - Phòng Giải pháp số
 
 ---
 
