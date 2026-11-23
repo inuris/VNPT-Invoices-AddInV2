@@ -30,7 +30,7 @@ Nội dung từng phiên bản: [CHANGELOG.md](CHANGELOG.md).
 
 ## Bản quyền
 
-Add-in có 30 ngày dùng thử cho mỗi mã số thuế. Để tiếp tục sử dụng, liên hệ bộ phận hỗ trợ để nhận mã kích hoạt, sau
+Add-in có 30 ngày dùng thử cho mỗi mã số thuế. Để tiếp tục sử dụng, liên hệ AM phụ trách để nhận mã kích hoạt, sau
 đó nhập vào mục **Đăng ký sử dụng** trong add-in.
 
 ## Công cụ đi kèm
