@@ -117,7 +117,7 @@
   textarea#json{width:100%;min-height:400px;font-family:ui-monospace,Consolas,"Courier New",monospace;
     font-size:12.5px;white-space:pre;tab-size:2;background:var(--mono-bg)}
 
-  /* ===== BETA: bảng cột kiểu Excel (bố cục v2) ===== */
+  /* ===== BETA: bảng cột kiểu Excel (bố cục v3) ===== */
   .beta-tag{display:inline-block;vertical-align:middle;margin-left:8px;padding:3px 9px;border-radius:999px;background:#f59e0b;color:#fff;font-size:11px;font-weight:800;letter-spacing:.12em}
   .beta-link{color:var(--accent);font-weight:600;text-decoration:none}
   .beta-link:hover{text-decoration:underline}
@@ -135,25 +135,24 @@
   .sh-chip.renamed{background:#e0ecfd}
   .sh-chip.hasfx{background:#dff3e4}
   .sh-chip.is-ext{background:#ece3fa}
-  .sh-chip.moved{box-shadow:inset 0 3px 0 #f59e0b}
   .sh-open-btn{display:inline-flex;align-items:center;gap:8px}
 
   .sheet-ov{position:fixed;inset:0;z-index:50;background:#fff;display:flex}
   .sheet-ov[hidden]{display:none}
   .fx-tip{z-index:120}
   .fx-tip.sh-tip{position:fixed;z-index:121}
-  .sheet{--sh-line:#d6d9e0;--sh-head:#eceef2;--sh-rename:#e0ecfd;--sh-fx:#dff3e4;--sh-ext:#ece3fa;--sh-moved:#f59e0b;--sh-dup:#f97316;
+  .sheet{--sh-line:#d6d9e0;--sh-head:#eceef2;--sh-rename:#e0ecfd;--sh-fx:#dff3e4;--sh-ext:#ece3fa;--sh-dup:#f97316;
     display:flex;flex-direction:column;width:100%;height:100%;min-width:0;background:#fff}
   .sh-top,.sh-bar2{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 16px}
   .sh-top{border-bottom:1px solid var(--sh-line)}
   .sh-bar2{border-bottom:1px solid var(--sh-line);background:#fafbfc;padding-top:8px;padding-bottom:8px}
   .sh-top .spacer,.sh-bar2 .spacer{flex:1}
-  .sh-title{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:34vw}
+  .sh-title{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:30vw}
   .sh-seg{display:inline-flex;background:var(--sh-head);border-radius:999px;padding:3px;gap:2px}
   .sh-seg button{min-height:0;padding:6px 14px;border-radius:999px;background:transparent;box-shadow:none;color:var(--muted);font-size:12.5px;font-weight:600}
   .sh-seg button:hover{transform:none;box-shadow:none;background:#e0e3ea}
   .sh-seg button.on{background:#fff;color:var(--text);box-shadow:0 1px 3px rgba(16,16,24,.15)}
-  .sh-seg .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--sh-moved);margin-left:6px;vertical-align:2px}
+  .sh-seg .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent);margin-left:6px;vertical-align:2px}
   .sh-typesel{display:none;width:auto;max-width:170px;padding:7px 10px;min-height:0}
   .sh-search{width:180px;padding:7px 12px;min-height:0}
   .sh-search.hit-none{box-shadow:0 0 0 2px var(--danger-text)}
@@ -162,10 +161,6 @@
   .sh-bar2 label{margin:0;font-size:12px}
   .sh-bar2 input[type=number]{max-width:70px;padding:6px 8px;min-height:0}
   .sh-bar2 select{width:auto;max-width:130px;padding:6px 8px;min-height:0}
-  .sh-filter{display:inline-flex;background:var(--sh-head);border-radius:999px;padding:3px;gap:2px}
-  .sh-filter button{min-height:0;padding:5px 12px;border-radius:999px;background:transparent;box-shadow:none;color:var(--muted);font-size:12px;font-weight:600}
-  .sh-filter button:hover{transform:none;box-shadow:none;background:#e0e3ea}
-  .sh-filter button.on{background:#fff;color:var(--text);box-shadow:0 1px 3px rgba(16,16,24,.15)}
   .sh-main{flex:1;display:flex;min-height:0;position:relative}
   .sh-left{flex:1;min-width:0;display:flex;flex-direction:column}
   .sh-fxbar{display:flex;align-items:center;gap:8px;padding:6px 16px;border-bottom:1px solid var(--sh-line)}
@@ -178,31 +173,51 @@
   .sh-scroll:focus-visible{box-shadow:inset 0 0 0 2px var(--accent)}
   .sh-table{border-collapse:separate;border-spacing:0;font-size:12.5px;table-layout:auto}
   .sh-table th,.sh-table td{border-right:1px solid var(--sh-line);border-bottom:1px solid var(--sh-line);padding:0;height:24px;background:#fff;font-weight:400;text-align:left}
-  .sh-table .sh-letter{position:sticky;top:0;z-index:3;background:var(--sh-head);text-align:center;font-weight:600;color:var(--muted);font-size:12px;cursor:grab;user-select:none;touch-action:pan-x pan-y;height:22px}
-  .sh-table .sh-corner{position:sticky;top:0;left:0;z-index:5;background:var(--sh-head);min-width:44px}
-  .sh-table .sh-rn{position:sticky;left:0;z-index:2;background:var(--sh-head);text-align:center;color:var(--muted);font-size:11.5px;min-width:44px;padding:0 6px;user-select:none}
-  .sh-table .sh-letter.moved{box-shadow:inset 0 3px 0 var(--sh-moved)}
-  .sh-table .sh-letter.sel{background:#d3dcfb;color:var(--accent-ink)}
-  .sh-table .sh-rn.hl{background:#d3dcfb;color:var(--accent-ink);font-weight:700}
-  .sh-table .sh-mau-l{font-size:11px;font-weight:700;color:var(--muted)}
-  .sh-cell{min-width:120px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:3px 8px;line-height:18px}
+  .sh-table .sh-letter{background:var(--sh-head);text-align:center;font-weight:600;color:var(--muted);font-size:12px;cursor:grab;user-select:none;touch-action:pan-x pan-y;height:22px}
+  .sh-table .sh-corner{background:var(--sh-head)}
+  .sh-table .sh-rn{position:sticky;left:0;z-index:2;background:var(--sh-head);text-align:center;color:var(--muted);font-size:11.5px;min-width:64px;padding:0 6px;user-select:none;white-space:nowrap}
+  .sh-cell{position:relative;min-width:120px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:3px 8px;line-height:18px}
+  .sh-table .sh-lbl{font-size:11px;font-weight:700;text-align:left;padding:0 8px;color:var(--text)}
   .sh-th .sh-cell{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:break-word;min-height:24px}
-  .sh-mau{background:#f7f8fa !important;color:#7b8090;font-size:11.5px;font-family:ui-monospace,Menlo,Consolas,monospace;position:sticky;top:22px;z-index:3}
-  .sh-mau.hit,.sh-th.hit,.sh-letter.hit{background:#fff4c2 !important}
+  .sh-hit,.sh-table .hit{background:#fff4c2 !important}
   .sh-above{background:repeating-linear-gradient(45deg,#f7f8fa,#f7f8fa 4px,#eceef2 4px,#eceef2 8px) !important}
-  .sh-dv .sh-cell{color:var(--muted);font-style:italic;cursor:text;min-height:24px}
   .sh-th{cursor:grab;user-select:none;touch-action:pan-x pan-y;font-weight:700}
-  .sh-th.plain{font-weight:500;color:#9aa0ad}
+  .sh-th.isreq .sh-cell{color:var(--req)}
+  .sh-orig{background:#e9ebf0 !important;color:#4b5160;cursor:grab;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px}
+  .sh-orig.is-ext{background:#fff !important;color:var(--text);cursor:text;font-family:inherit;font-size:12.5px}
+  .sh-orig .ph{color:#9aa0ad;font-family:ui-monospace,Menlo,Consolas,monospace}
+  .sh-orig.is-ext .sh-cell{padding-right:24px}
+  .sh-alt,.sh-val{cursor:text}
+  .sh-alt.hasfx{background:var(--sh-fx)}
+  .sh-alt.bad{box-shadow:inset 0 0 0 2px var(--danger-text)}
+  .sh-alt.dup{box-shadow:inset 0 0 0 2px var(--sh-dup)}
+  .sh-demo .sh-cell{color:#2b2f3a}
+  .sh-x{position:absolute;right:3px;top:3px;width:18px;height:18px;min-height:0;padding:2px;border-radius:5px;background:#fff;border:1px solid var(--sh-line);box-shadow:none;color:var(--danger-text);display:flex;align-items:center;justify-content:center;opacity:0;cursor:pointer}
+  .sh-x svg{width:11px;height:11px}
+  .sh-orig.is-ext:hover .sh-x,.sh-orig.is-ext.colsel .sh-x{opacity:1}
+  @media(hover:none){.sh-x{opacity:1}}
+  .sh-split>th,.sh-split>td{border-top:3px solid #4b5563}
+  .sh-table td.colsel,.sh-table th.colsel{background-image:linear-gradient(rgba(79,110,247,.11),rgba(79,110,247,.11))}
+  .sh-table th.sh-letter.colsel{background:#d3dcfb;color:var(--accent-ink)}
+  .sh-table .sh-alt.colsel,.sh-table .sh-val.colsel{background-color:#f4f6ff}
+  .sh-orig.editing,.sh-alt.editing,.sh-val.editing{outline:2px solid var(--accent);outline-offset:-2px;background:#fff !important;position:relative;z-index:1}
+  .sh-orig.editing .sh-cell,.sh-alt.editing .sh-cell,.sh-val.editing .sh-cell{padding:0;overflow:visible;max-width:none;display:block}
+  .sh-letter.dragsrc,.sh-th.dragsrc,.sh-orig.dragsrc{opacity:.45}
+  .sh-exit{min-height:0}
+  .sh-reset svg{width:12px;height:12px;vertical-align:-1px;margin-left:4px}
+  .sh-notice{color:var(--danger-text);font-weight:600}
+  .in-sec.focus{box-shadow:0 0 0 2px var(--accent);border-radius:8px;padding:8px;margin:-8px}
+  .sh-dlg{position:absolute;inset:0;z-index:60;background:rgba(16,16,24,.35);display:flex;align-items:center;justify-content:center;padding:16px}
+  .sh-dlg[hidden]{display:none}
+  .sh-dlg-box{background:#fff;border-radius:14px;padding:20px 22px;width:100%;max-width:360px;box-shadow:0 20px 50px -16px rgba(16,16,24,.5)}
+  .sh-dlg-box p{margin:0 0 16px;font-size:15px;font-weight:600}
+  .sh-dlg-btns{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
   .sh-th.renamed{background:var(--sh-rename)}
   .sh-th.hasfx{background:var(--sh-fx)}
   .sh-th.is-ext{background:var(--sh-ext)}
   .sh-th.renamed.is-ext{background:var(--sh-rename)}
   .sh-th.bad{box-shadow:inset 0 0 0 2px var(--danger-text)}
   .sh-th.dup{box-shadow:inset 0 0 0 2px var(--sh-dup)}
-  .sh-th.sel,.sh-dv.sel{outline:2px solid var(--accent);outline-offset:-2px;z-index:1;position:relative}
-  .sh-th.editing .sh-cell,.sh-dv.editing .sh-cell{padding:0;overflow:visible;max-width:none;display:block}
-  .sh-th.editing,.sh-dv.editing{outline:2px solid var(--accent);outline-offset:-2px}
-  .sh-th.dragsrc,.sh-letter.dragsrc{opacity:.45}
   .sh-fxi{display:inline-block;margin-right:4px;padding:0 4px;border-radius:4px;background:#16a34a;color:#fff;font-size:10px;font-style:italic;font-weight:700;line-height:14px;vertical-align:1px}
   .sh-fxtxt{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px;font-weight:500}
   .sh-req{color:var(--req);font-weight:800;margin-left:2px}
@@ -222,7 +237,6 @@
   .sh-legend i{display:inline-block;width:14px;height:12px;border-radius:3px;border:1px solid var(--sh-line)}
   .sh-foot .spacer{flex:1}
   .sh-foot-sum{font-weight:600;color:var(--text)}
-  .sh-filtnote{color:var(--sh-dup);font-weight:600}
 
   .sh-insp{width:300px;flex:none;border-left:1px solid var(--sh-line);overflow:auto;background:#fff;padding:14px;display:flex;flex-direction:column;gap:14px}
   .sh-insp-head{display:flex;align-items:center;gap:8px}
@@ -235,7 +249,6 @@
   .in-badges{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
   .in-badge{font-size:10.5px;font-weight:700;padding:1px 8px;border-radius:999px;background:var(--card-alt);color:var(--muted)}
   .in-badge.req{background:#fdeceb;color:var(--req)}
-  .in-badge.mv{background:#fef3c7;color:#92400e}
   .in-badge.ex{background:#ece3fa;color:#6d28d9}
   .in-note{margin-top:6px;font-size:12px;color:var(--muted);line-height:1.55}
   .in-sec input,.in-sec select{padding:8px 10px;min-height:0}
@@ -265,7 +278,10 @@
   @media(max-width:700px){
     .sh-top{gap:8px;padding:8px 10px}
     .sh-title,.sh-seg{display:none}
+    .sh-table .sh-rn{min-width:58px;padding:0 4px}
+    .sh-table .sh-lbl{font-size:10px;padding:0 4px}
     .sh-typesel{display:block}
+    .sh-top .sh-exit{order:-2}
     .sh-top .sh-done{order:-1}
     .sheet .sh-searchbtn,.sheet .sh-more,.sheet .sh-legbtn{display:inline-flex;align-items:center;justify-content:center}
     .sh-search{display:none;width:100%;order:10}
@@ -418,86 +434,93 @@ const DEFAULT_COLUMNS = {
 // Bắt buộc + ghi chú theo cột (sinh từ vnpt-config.json -> documentTypes[].excel[]; CTT Email/MaKhachHang/DDanh/QTich không bắt buộc).
 const COLUMN_INFO = {
   GTGT:{
-    STT:{req:true,note:'Số thứ tự hóa đơn. Để TRỐNG ở các dòng sản phẩm tiếp theo của cùng một hóa đơn.'},
-    NgayHoaDon:{req:true,note:'Ngày hóa đơn (yyyy-MM-dd).'},
-    HinhThucThanhToan:{req:true,note:'Hình thức thanh toán (TM/CK).'},
-    LoaiTienTe:{req:true,note:'Loại tiền tệ.'},
-    TyGia:{req:false,note:'Tỷ giá (bỏ trống nếu là VND).'},
-    MaKhachHang:{req:false,note:'Mã khách hàng.'},
-    TenDonVi:{req:false,note:'Tên đơn vị mua. Đi kèm Mã số thuế: nếu nhập ô này thì phải nhập MaSoThue (và ngược lại). Khách lẻ: để trống cả hai và nhập HoTenNguoiMuaHang.'},
-    HoTenNguoiMuaHang:{req:false,note:'Họ tên người mua hàng. Bắt buộc nếu không nhập TenDonVi/MaSoThue (khách lẻ).'},
-    MaSoThue:{req:false,note:'Mã số thuế người mua. Đi kèm TenDonVi (cả hai cùng nhập hoặc cùng trống).'},
-    DiaChi:{req:false,note:'Địa chỉ người mua. Bắt buộc khi có cả TenDonVi và MaSoThue; để trống vẫn xuất <CusAddress></CusAddress> rỗng.'},
-    SoDienThoai:{req:false,note:'Số điện thoại người mua.'},
-    Email:{req:false,note:'Email nhận hóa đơn.'},
-    MaDVQHNSach:{req:false,note:'Mã đơn vị quan hệ ngân sách người mua.'},
-    SoHoChieu:{req:false,note:'Số hộ chiếu người mua. Có thể bổ sung các cột thông tin liên quan NgayCapHoChieu, NgayHetHanHoChieu, QuocTich.'},
-    CCCD:{req:false,note:'Căn cước công dân người mua.'},
-    MaHang:{req:false,note:'Mã hàng hóa/dịch vụ.'},
-    TenSanPham:{req:true,note:'Tên hàng hóa/dịch vụ.'},
-    DVT:{req:false,note:'Đơn vị tính.'},
-    SoLuong:{req:false,note:'Số lượng.'},
-    DonGia:{req:false,note:'Đơn giá (chưa thuế).'},
-    TyLeChietKhau:{req:false,note:'Tỷ lệ chiết khấu dòng (%).'},
-    SoTienChietKhau:{req:false,note:'Số tiền chiết khấu dòng.'},
-    GTKCThue:{req:false,note:'Giảm trừ không chịu thuế (tùy chọn). Chỉ gửi khi ô có giá trị.'},
-    ThanhTien:{req:false,note:'Thành tiền dòng (chưa thuế).'},
-    ThueSuat_Dong:{req:false,note:'Thuế suất DÒNG: 0/5/8/10 hoặc KCT (không chịu thuế) / KKKNT (không kê khai nộp thuế).'},
-    TienThueGTGT_Dong:{req:false,note:'Tiền thuế GTGT của DÒNG (để trống -> tự tính = ThanhTien × ThueSuat).'},
-    Cong_Dong:{req:false,note:'Cộng dòng đã gồm thuế (HHDVu/TSThue). Để TRỐNG -> tự tính = ThanhTien + TienThueGTGT_Dong; có giá trị -> dùng đúng giá trị.'},
-    TinhChat:{req:false,note:'Tính chất dòng: 1=Hàng hóa/DV (mặc định nếu trống), 2=Khuyến mại, 3=Chiết khấu TM, 4=Ghi chú (KHÔNG tính vào tổng).'},
-    TgTCThue:{req:false,note:'Tổng tiền chưa thuế. Để TRỐNG -> tự tính = Σ ThanhTien (bỏ dòng Ghi chú).'},
-    TgTThue:{req:false,note:'Tổng tiền thuế. Để TRỐNG -> tự tính = Σ TienThueGTGT_Dong.'},
-    TTCKTMai:{req:false,note:'Tổng chiết khấu thương mại. Để TRỐNG -> tự tính = Σ SoTienChietKhau.'},
-    TgTTTBSo:{req:false,note:'Tổng tiền thanh toán. Để TRỐNG -> tự tính = TgTCThue + TgTThue - TTCKTMai.'},
-    TgTTTBChu:{req:false,note:'Tổng tiền thanh toán bằng chữ (tùy chọn). Chỉ gửi khi ô có giá trị; để trống -> không gửi (máy chủ tự sinh).'}
+    STT:{req:true,note:'Số thứ tự hóa đơn. Để TRỐNG ở các dòng sản phẩm tiếp theo của cùng một hóa đơn.',sample:1},
+    NgayHoaDon:{req:true,note:'Ngày hóa đơn (yyyy-MM-dd).',sample:'@today'},
+    HinhThucThanhToan:{req:true,note:'Hình thức thanh toán (TM/CK).',sample:'CK'},
+    LoaiTienTe:{req:true,note:'Loại tiền tệ.',sample:'VND'},
+    TyGia:{req:false,note:'Tỷ giá (bỏ trống nếu là VND).',sample:null},
+    MaKhachHang:{req:false,note:'Mã khách hàng.',sample:'KH600402'},
+    TenDonVi:{req:false,note:'Tên đơn vị mua. Đi kèm Mã số thuế: nếu nhập ô này thì phải nhập MaSoThue (và ngược lại). Khách lẻ: để trống cả hai và nhập HoTenNguoiMuaHang.',sample:'Công ty TNHH Thương mại ABC'},
+    HoTenNguoiMuaHang:{req:false,note:'Họ tên người mua hàng. Bắt buộc nếu không nhập TenDonVi/MaSoThue (khách lẻ).',sample:'Nguyễn Văn A'},
+    MaSoThue:{req:false,note:'Mã số thuế người mua. Đi kèm TenDonVi (cả hai cùng nhập hoặc cùng trống).',sample:'0123456789'},
+    DiaChi:{req:false,note:'Địa chỉ người mua. Bắt buộc khi có cả TenDonVi và MaSoThue; để trống vẫn xuất <CusAddress></CusAddress> rỗng.',sample:'123 Đường ABC, Phường X, Quận 1, TP.HCM'},
+    SoDienThoai:{req:false,note:'Số điện thoại người mua.',sample:'0900000000'},
+    Email:{req:false,note:'Email nhận hóa đơn.',sample:'buyer@example.com'},
+    MaDVQHNSach:{req:false,note:'Mã đơn vị quan hệ ngân sách người mua.',sample:null},
+    SoHoChieu:{req:false,note:'Số hộ chiếu người mua. Có thể bổ sung các cột thông tin liên quan NgayCapHoChieu, NgayHetHanHoChieu, QuocTich.',sample:null},
+    CCCD:{req:false,note:'Căn cước công dân người mua.',sample:null},
+    MaHang:{req:false,note:'Mã hàng hóa/dịch vụ.',sample:'SP001'},
+    TenSanPham:{req:true,note:'Tên hàng hóa/dịch vụ.',sample:'Dịch vụ tư vấn triển khai'},
+    DVT:{req:false,note:'Đơn vị tính.',sample:'Gói'},
+    SoLuong:{req:false,note:'Số lượng.',sample:1},
+    DonGia:{req:false,note:'Đơn giá (chưa thuế).',sample:1000000},
+    TyLeChietKhau:{req:false,note:'Tỷ lệ chiết khấu dòng (%).',sample:null},
+    SoTienChietKhau:{req:false,note:'Số tiền chiết khấu dòng.',sample:null},
+    GTKCThue:{req:false,note:'Giảm trừ không chịu thuế (tùy chọn). Chỉ gửi khi ô có giá trị.',sample:null},
+    ThanhTien:{req:false,note:'Thành tiền dòng (chưa thuế).',sample:null},
+    ThueSuat_Dong:{req:false,note:'Thuế suất DÒNG: 0/5/8/10 hoặc KCT (không chịu thuế) / KKKNT (không kê khai nộp thuế).',sample:10},
+    TienThueGTGT_Dong:{req:false,note:'Tiền thuế GTGT của DÒNG (để trống -> tự tính = ThanhTien × ThueSuat).',sample:null},
+    Cong_Dong:{req:false,note:'Cộng dòng đã gồm thuế (HHDVu/TSThue). Để TRỐNG -> tự tính = ThanhTien + TienThueGTGT_Dong; có giá trị -> dùng đúng giá trị.',sample:null},
+    TinhChat:{req:false,note:'Tính chất dòng: 1=Hàng hóa/DV (mặc định nếu trống), 2=Khuyến mại, 3=Chiết khấu TM, 4=Ghi chú (KHÔNG tính vào tổng).',sample:1},
+    TgTCThue:{req:false,note:'Tổng tiền chưa thuế. Để TRỐNG -> tự tính = Σ ThanhTien (bỏ dòng Ghi chú).',sample:null},
+    TgTThue:{req:false,note:'Tổng tiền thuế. Để TRỐNG -> tự tính = Σ TienThueGTGT_Dong.',sample:null},
+    TTCKTMai:{req:false,note:'Tổng chiết khấu thương mại. Để TRỐNG -> tự tính = Σ SoTienChietKhau.',sample:null},
+    TgTTTBSo:{req:false,note:'Tổng tiền thanh toán. Để TRỐNG -> tự tính = TgTCThue + TgTThue - TTCKTMai.',sample:null},
+    TgTTTBChu:{req:false,note:'Tổng tiền thanh toán bằng chữ (tùy chọn). Chỉ gửi khi ô có giá trị; để trống -> không gửi (máy chủ tự sinh).',sample:null}
   },
   PXK:{
-    STT:{req:true,note:'Số thứ tự phiếu. Để TRỐNG ở các dòng sản phẩm tiếp theo của cùng một phiếu.'},
-    NgayLap:{req:true,note:'Ngày lập phiếu, định dạng yyyy-MM-dd.'},
-    LenhDieuDong:{req:true,note:'Số lệnh điều động nội bộ.'},
-    PhuongTienVanChuyen:{req:true,note:'Phương tiện vận chuyển (biển số xe).'},
-    NguoiXuatHang:{req:false,note:'Họ và tên người xuất hàng.'},
-    NguoiVanChuyen:{req:false,note:'Tên người vận chuyển.'},
-    DonViNhan:{req:true,note:'Kho/đơn vị nhận hàng.'},
-    MaSoThue:{req:false,note:'Mã số thuế đơn vị nhận.'},
-    DiaChiNhan:{req:true,note:'Địa chỉ nơi nhận.'},
-    NguoiNhanHang:{req:false,note:'Họ và tên người nhận hàng.'},
-    MaHang:{req:false,note:'Mã hàng.'},
-    TenHang:{req:true,note:'Tên hàng.'},
-    DonViTinh:{req:false,note:'Quy cách/đơn vị tính.'},
-    SoLuong:{req:false,note:'Số lượng.'},
-    DonGia:{req:false,note:'Đơn giá.'},
-    ThanhTien:{req:false,note:'Thành tiền.'},
-    TongTien:{req:true,note:'Tổng tiền.'},
-    LoaiTienTe:{req:false,note:'Loại tiền tệ (không có cột => VND).'},
-    TyGia:{req:false,note:'Tỷ giá (bỏ trống nếu là VND).'},
-    HinhThucThanhToan:{req:false,note:'Hình thức thanh toán (TM/CK).'}
+    STT:{req:true,note:'Số thứ tự phiếu. Để TRỐNG ở các dòng sản phẩm tiếp theo của cùng một phiếu.',sample:1},
+    NgayLap:{req:true,note:'Ngày lập phiếu, định dạng yyyy-MM-dd.',sample:'@today'},
+    LenhDieuDong:{req:true,note:'Số lệnh điều động nội bộ.',sample:'IJ945954'},
+    PhuongTienVanChuyen:{req:true,note:'Phương tiện vận chuyển (biển số xe).',sample:'61C-13852'},
+    NguoiXuatHang:{req:false,note:'Họ và tên người xuất hàng.',sample:'Nguyễn Văn X'},
+    NguoiVanChuyen:{req:false,note:'Tên người vận chuyển.',sample:'Trần Văn V'},
+    DonViNhan:{req:true,note:'Kho/đơn vị nhận hàng.',sample:'Kho Tây Ninh'},
+    MaSoThue:{req:false,note:'Mã số thuế đơn vị nhận.',sample:'3701642642-006'},
+    DiaChiNhan:{req:true,note:'Địa chỉ nơi nhận.',sample:'Tây Ninh'},
+    NguoiNhanHang:{req:false,note:'Họ và tên người nhận hàng.',sample:'Lê Văn N'},
+    MaHang:{req:false,note:'Mã hàng.',sample:'9204'},
+    TenHang:{req:true,note:'Tên hàng.',sample:'Cám gà'},
+    DonViTinh:{req:false,note:'Quy cách/đơn vị tính.',sample:'40kg'},
+    SoLuong:{req:false,note:'Số lượng.',sample:200},
+    DonGia:{req:false,note:'Đơn giá.',sample:430000},
+    ThanhTien:{req:false,note:'Thành tiền.',sample:86000000},
+    TongTien:{req:true,note:'Tổng tiền.',sample:86000000},
+    LoaiTienTe:{req:false,note:'Loại tiền tệ (không có cột => VND).',sample:null},
+    TyGia:{req:false,note:'Tỷ giá (bỏ trống nếu là VND).',sample:null},
+    HinhThucThanhToan:{req:false,note:'Hình thức thanh toán (TM/CK).',sample:null}
   },
   CTT:{
-    STT:{req:false,note:'Số thứ tự (mỗi dòng là một chứng từ).'},
-    NLap:{req:true,note:'Ngày lập chứng từ, định dạng yyyy-MM-dd.'},
-    MaKhachHang:{req:false,note:'Mã khách hàng.'},
-    DDanh:{req:false,note:'Địa danh (trường mở rộng).'},
-    Ten:{req:true,note:'Họ và tên người nộp thuế.'},
-    MST:{req:false,note:'Mã số thuế (bắt buộc nếu không có CMND).'},
-    DChi:{req:true,note:'Địa chỉ.'},
-    SDThoai:{req:true,note:'Số điện thoại.'},
-    QTich:{req:false,note:'Quốc tịch.'},
-    CNCTru:{req:true,note:'Cá nhân cư trú: 1 = cư trú, 0 = không cư trú.'},
-    Email:{req:false,note:'Email.'},
-    CMND:{req:false,note:'Số CMND/CCCD (bắt buộc nếu không có MST).'},
-    KTNhap:{req:true,note:'Khoản thu nhập.'},
-    BHiem:{req:true,note:'Khoản đóng bảo hiểm bắt buộc.'},
-    TThang:{req:true,note:'Từ tháng.'},
-    DThang:{req:true,note:'Đến tháng.'},
-    Nam:{req:true,note:'Năm.'},
-    TThien:{req:true,note:'Khoản đóng từ thiện, nhân đạo, khuyến học.'},
-    SThue:{req:true,note:'Số thuế TNCN đã khấu trừ.'},
-    TTNTThue:{req:true,note:'Tổng thu nhập tính thuế.'},
-    TTNCThue:{req:true,note:'Tổng thu nhập chịu thuế.'},
-    GChu:{req:false,note:'Ghi chú.'}
+    STT:{req:false,note:'Số thứ tự (mỗi dòng là một chứng từ).',sample:1},
+    NLap:{req:true,note:'Ngày lập chứng từ, định dạng yyyy-MM-dd.',sample:'@today'},
+    MaKhachHang:{req:false,note:'Mã khách hàng.',sample:'KH001'},
+    DDanh:{req:false,note:'Địa danh (trường mở rộng).',sample:'Hà Nội'},
+    Ten:{req:true,note:'Họ và tên người nộp thuế.',sample:'Nguyễn Văn A'},
+    MST:{req:false,note:'Mã số thuế (bắt buộc nếu không có CMND).',sample:'8050449571'},
+    DChi:{req:true,note:'Địa chỉ.',sample:'Hà Nội'},
+    SDThoai:{req:true,note:'Số điện thoại.',sample:'0900000000'},
+    QTich:{req:false,note:'Quốc tịch.',sample:'VN'},
+    CNCTru:{req:true,note:'Cá nhân cư trú: 1 = cư trú, 0 = không cư trú.',sample:1},
+    Email:{req:false,note:'Email.',sample:'buyer@example.com'},
+    CMND:{req:false,note:'Số CMND/CCCD (bắt buộc nếu không có MST).',sample:'012345678'},
+    KTNhap:{req:true,note:'Khoản thu nhập.',sample:'TL'},
+    BHiem:{req:true,note:'Khoản đóng bảo hiểm bắt buộc.',sample:0},
+    TThang:{req:true,note:'Từ tháng.',sample:1},
+    DThang:{req:true,note:'Đến tháng.',sample:2},
+    Nam:{req:true,note:'Năm.',sample:2026},
+    TThien:{req:true,note:'Khoản đóng từ thiện, nhân đạo, khuyến học.',sample:0},
+    SThue:{req:true,note:'Số thuế TNCN đã khấu trừ.',sample:10000},
+    TTNTThue:{req:true,note:'Tổng thu nhập tính thuế.',sample:10000},
+    TTNCThue:{req:true,note:'Tổng thu nhập chịu thuế.',sample:100000},
+    GChu:{req:false,note:'Ghi chú.',sample:null}
   }
+};
+// Dòng demo bổ sung của mẫu (TemplateColumns.ExtraSampleRows bên add-in): chỉ GTGT.
+const EXTRA_SAMPLE_ROWS = {
+  GTGT: [
+    {MaHang:'SP002',TenSanPham:'Phần mềm kế toán ABC',DVT:'Bản quyền',SoLuong:2,DonGia:500000,ThueSuat_Dong:8},
+    {MaHang:'SP003',TenSanPham:'Ghi chú: giá chưa gồm phí vận chuyển',TinhChat:4}
+  ]
 };
 // State kéo-thả hiện tại theo từng kết nối: columnOrderState[connId][docType] = [header,...].
 const columnOrderState = {};
@@ -1403,7 +1426,7 @@ document.addEventListener('keydown', e=>{
   if(e.key==='Escape' && !document.getElementById('add-menu').hidden){ toggleAddMenu(false); document.getElementById('btn-add').focus(); }
 });
 
-// ---------- BETA: bảng cột kiểu Excel (bố cục v2) ----------
+// ---------- BETA: bảng cột kiểu Excel (bố cục v3) ----------
 // Trong form chỉ có thẻ xem trước; việc sửa làm trong trình sửa toàn màn hình (1 DOM dùng chung, mở cho 1 kết nối).
 // Dữ liệu vẫn nằm ở ul.co-list (ẩn) + .defs + .row.ext + mappingState như bản chính. Mọi thao tác ghi ngược vào các
 // phần tử đó (altChanged / columnOrderState / .defs / .exts) rồi gọi formToJson, nên JSON xuất ra không đổi.
@@ -1412,7 +1435,7 @@ const COLUMN_INFO_LC = {};
 for(const t of Object.keys(COLUMN_INFO)){ COLUMN_INFO_LC[t]={}; for(const h of Object.keys(COLUMN_INFO[t])) COLUMN_INFO_LC[t][h.toLowerCase()]=COLUMN_INFO[t][h]; }
 const sheetState = {}; // connId -> {sel: header|null, edit: {h,orig,t,kind}|null}
 function shSt(id){ return sheetState[id] || (sheetState[id]={sel:null, edit:null}); }
-const ov = {id:null, open:false, filter:false, q:'', mi:-1, inspOpen:false, el:null};
+const ov = {id:null, open:false, q:'', mi:-1, inspOpen:false, el:null, snap:'', focusSec:null, pend:null, dlg:false};
 function shSheet(id){ return (ov.open && ov.id===id && ov.el) ? ov.el.querySelector('.sheet') : null; }
 function shType(id){ return document.getElementById(id).querySelector('.m-type').value; }
 function shIsSmall(){ return window.innerWidth<=1100; }
@@ -1420,7 +1443,7 @@ function shIsSmall(){ return window.innerWidth<=1100; }
 // Mô hình các cột của loại đang chọn, đọc từ DOM ẩn.
 function shModel(id){
   const conn=document.getElementById(id), type=shType(id);
-  const nat=naturalOrder(id,type), natIdx=new Map(nat.map((h,i)=>[h.toLowerCase(),i]));
+  const nat=naturalOrder(id,type);
   const extBy=new Map(extInfo(id,type).map(x=>[x.header.toLowerCase(),x]));
   const info=COLUMN_INFO_LC[type]||{};
   const defs=new Map();
@@ -1431,10 +1454,8 @@ function shModel(id){
     const def=ext?ext.slot:h, ci=ext?null:info[def.toLowerCase()];
     let note=ci?ci.note:'';
     if(ext){ const r=conn.querySelector('.row.ext[data-k="'+ext.k+'"]'); note=r?val(r,'.e-note'):''; }
-    const ni=natIdx.get(h.toLowerCase());
-    const c={i, h, def, alt, fx, fxErr:fx?formulaError(alt):'', ext:!!ext, k:ext?ext.k:null,
-      shown:(!fx&&alt)?alt:def, req:!!(ci&&ci.req), note, moved:ni!==i, from:ni==null?'':colLetter(ni), defVal:defs.get(def.toLowerCase())||''};
-    c.changed=!!(c.alt||c.ext||c.moved||c.defVal);
+    const c={i, h, def, alt, fx, fxErr:fx?formulaError(alt):'', ext:!!ext, k:ext?ext.k:null, slot:ext?ext.slot:'',
+      shown:(!fx&&alt)?alt:def, req:!!(ci&&ci.req), note, defVal:defs.get(def.toLowerCase())||''};
     return c;
   });
   const by=new Map();
@@ -1446,7 +1467,6 @@ function shModel(id){
 // Cột của loại t bất kỳ (dùng cho chip xem trước, không cần DOM của loại đó).
 function shTypeCols(id,t){
   if(t===shType(id)) return shModel(id).cols;
-  const natIdx=new Map(naturalOrder(id,t).map((h,i)=>[h.toLowerCase(),i]));
   const st=(mappingState[id]||{})[t]||{maps:[],fx:[]};
   const altFor={};
   (st.fx||[]).forEach(([k,f])=>{ altFor[(k||'').toLowerCase()]=f; });
@@ -1455,26 +1475,24 @@ function shTypeCols(id,t){
   return orderFor(id,t).map((h,i)=>{
     const ext=extBy.get(h.toLowerCase()), a=altFor[h.toLowerCase()]||'', fx=isFormula(a);
     const alt=ext?((fx?a:'')||ext.rename):a, def=ext?ext.slot:h;
-    return {i,h,def,alt,fx,ext:!!ext,shown:(!fx&&alt)?alt:def,moved:natIdx.get(h.toLowerCase())!==i};
+    return {i,h,def,alt,fx,ext:!!ext,shown:(!fx&&alt)?alt:def};
   });
 }
 function shTypeStats(id,t){
   const conn=document.getElementById(id), cur=t===shType(id);
-  let n,ren,fxn,defs,reord;
+  let n,ren,fxn,defs;
   if(cur){
     const m=shModel(id);
     n=m.cols.length; ren=m.cols.filter(c=>c.alt&&!c.fx).length; fxn=m.cols.filter(c=>c.fx).length;
     defs=[...conn.querySelectorAll('.defs .row.map')].filter(r=>val(r,'.m-a')&&val(r,'.m-b')).length;
-    reord=JSON.stringify(m.cols.map(c=>c.h))!==JSON.stringify(m.nat);
   } else {
     const st=(mappingState[id]||{})[t]||{maps:[],fx:[],defs:[]};
     n=orderFor(id,t).length; ren=st.maps.length+extInfo(id,t).filter(x=>x.rename).length; fxn=st.fx.length; defs=st.defs.length;
-    reord=JSON.stringify(orderFor(id,t))!==JSON.stringify(naturalOrder(id,t));
   }
-  return {n,ren,fx:fxn,defs,reord,changed:!!(ren||fxn||defs||reord)};
+  return {n,ren,fx:fxn,defs,changed:!!(ren||fxn||defs)};
 }
 function shStatParts(s){
-  const p=[s.n+' cột']; if(s.ren) p.push(s.ren+' đổi tên'); if(s.fx) p.push(s.fx+' công thức'); if(s.defs) p.push(s.defs+' giá trị khi trống'); if(s.reord) p.push('đã đổi thứ tự');
+  const p=[s.n+' cột']; if(s.ren) p.push(s.ren+' đổi tên'); if(s.fx) p.push(s.fx+' công thức'); if(s.defs) p.push(s.defs+' giá trị');
   return p.join(', ');
 }
 
@@ -1488,9 +1506,9 @@ function renderSheetPreview(id){
   const conn=document.getElementById(id), box=conn&&conn.querySelector('.sh-sum-text'); if(!box) return;
   const lines=[]; let first=null;
   for(const t of DOC_TYPES){ const s=shTypeStats(id,t); if(!s.changed) continue; if(!first) first=t; lines.push(TYPE_NAMES[t]+': '+shStatParts(s)); }
-  box.innerHTML=lines.length ? lines.map(l=>'<div>'+esc(l)+'</div>').join('') : '<div class="mut">Dùng tên và thứ tự cột mặc định</div>';
+  box.innerHTML=lines.length ? lines.map(l=>'<div>'+esc(l)+'</div>').join('') : '<div class="mut">Dùng tên cột mặc định</div>';
   const chips=conn.querySelector('.sh-chips');
-  chips.innerHTML=first ? shTypeCols(id,first).map(c=>`<button type="button" role="listitem" class="sh-chip ${c.alt&&!c.fx?'renamed':''} ${c.fx?'hasfx':''} ${c.ext?'is-ext':''} ${c.moved?'moved':''}" data-t="${first}" data-h="${esc(c.h)}" title="Mở bảng cột"><b>${colLetter(c.i)}</b>${c.fx?'fx ':''}${esc(c.shown)}</button>`).join('') : '';
+  chips.innerHTML=first ? shTypeCols(id,first).map(c=>`<button type="button" role="listitem" class="sh-chip ${c.alt&&!c.fx?'renamed':''} ${c.fx?'hasfx':''} ${c.ext?'is-ext':''}" data-t="${first}" data-h="${esc(c.h)}" title="Mở bảng cột"><b>${colLetter(c.i)}</b>${c.fx?'fx ':''}${esc(c.shown)}</button>`).join('') : '';
 }
 function shTypeChanged(id,t){ return shTypeStats(id,t).changed; }
 
@@ -1502,7 +1520,6 @@ function shEnsureOverlay(){
   el.innerHTML=`
   <div class="sheet" role="dialog" aria-modal="true" aria-label="Bảng cột">
     <div class="sh-top">
-      <button class="primary mini sh-done" type="button">Xong</button>
       <div class="sh-title"></div>
       <div class="sh-seg" role="tablist" aria-label="Loại chứng từ"></div>
       <select class="sh-typesel" aria-label="Loại chứng từ">${DOC_TYPES.map(t=>`<option value="${t}">${TYPE_NAMES[t]}</option>`).join('')}</select>
@@ -1510,14 +1527,14 @@ function shEnsureOverlay(){
       <button class="mini icon sh-searchbtn" type="button" aria-label="Tìm cột">${SV('<circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/>')}</button>
       <input class="sh-search" type="search" placeholder="Tìm cột" aria-label="Tìm cột" spellcheck="false">
       <button class="mini sh-more" type="button" aria-label="Thêm tùy chọn">...</button>
+      <button class="mini sh-exit" type="button">Thoát</button>
+      <button class="primary mini sh-done" type="button">Lưu</button>
     </div>
     <div class="sh-bar2">
       <label>Dòng tiêu đề</label><input class="sh-hrow" type="number" min="1" aria-label="Dòng tiêu đề">
       <label title="Dấu thập phân của số lưu dạng chữ trong file (VD &quot;1.15&quot;). Mặc định dấu chấm; chỉ đổi khi file ghi kiểu 1.234,56">Thập phân</label><select class="sh-dec" aria-label="Thập phân"><option value="">. (mặc định)</option><option value=",">, (dấu phẩy)</option></select>
       <button class="mini sh-addext" type="button">+ Cột mở rộng</button>
-      <button class="mini sh-reset" type="button" aria-haspopup="menu">Khôi phục v</button>
-      <span class="spacer"></span>
-      <div class="sh-filter" role="group" aria-label="Lọc cột"><button type="button" data-f="0" class="on">Tất cả</button><button type="button" data-f="1">Đã đổi</button></div>
+      <button class="mini sh-reset" type="button" aria-haspopup="menu">Khôi phục ${SV('<polyline points="6 9 12 15 18 9"/>')}</button>
     </div>
     <div class="sh-main">
       <div class="sh-left">
@@ -1534,9 +1551,8 @@ function shEnsureOverlay(){
             <span><i style="background:#dff3e4"></i>Công thức</span>
             <span><i style="background:#ece3fa"></i>Cột mở rộng</span>
             <span><b style="color:var(--req)">*</b>Bắt buộc</span>
-            <span><i style="background:#fff;border-top:3px solid #f59e0b"></i>Đã dời khỏi vị trí mặc định</span>
           </div>
-          <span class="sh-filtnote"></span>
+          <span class="sh-notice" aria-live="polite"></span>
           <span class="spacer"></span>
           <span class="sh-foot-sum"></span>
         </div>
@@ -1545,9 +1561,9 @@ function shEnsureOverlay(){
         <div class="sh-insp-head"><b class="in-title">Chi tiết cột</b><button class="mini in-close" type="button">Đóng</button></div>
         <div class="in-empty"><div>Bấm 1 cột để xem và sửa</div><div>Kéo chữ cột để đổi vị trí</div><div>Chuột phải để xem thêm thao tác</div></div>
         <div class="in-body" hidden>
-          <div class="in-sec"><label>Tên mặc định</label><div class="in-def-name"></div><div class="in-badges"></div><div class="in-note"></div></div>
-          <div class="in-sec"><label for="in-alt">Tên trong file</label><input id="in-alt" class="in-alt alt-in" data-kind="alt" spellcheck="false" placeholder="Để trống = dùng tên mặc định"><div class="in-hint">Gõ = để nhập công thức</div><button class="mini in-alt-reset" type="button">Về mặc định</button></div>
-          <div class="in-sec"><label for="in-dv">Giá trị khi trống</label><input id="in-dv" class="in-dv" data-kind="dv" spellcheck="false" placeholder="VD: VND"><div class="in-hint">Điền khi ô trong file để trống, vd VND</div></div>
+          <div class="in-sec" data-sec="orig"><label>Tên mặc định</label><div class="in-def-name"></div><div class="in-badges"></div><div class="in-note"></div></div>
+          <div class="in-sec" data-sec="alt"><label for="in-alt">Tên thay thế</label><input id="in-alt" class="in-alt alt-in" data-kind="alt" spellcheck="false" placeholder="Để trống = dùng tên mặc định"><div class="in-hint">Điền tên cột thay thế. Để trống = dùng tên mặc định. Gõ = để nhập công thức.</div><button class="mini in-alt-reset" type="button">Về mặc định</button></div>
+          <div class="in-sec" data-sec="dv"><label for="in-dv">Giá trị</label><input id="in-dv" class="in-dv" data-kind="dv" spellcheck="false" placeholder="VD: VND"><div class="in-hint">Giá trị mặc định khi ô trong file để trống, ví dụ: VND.</div></div>
           <div class="in-sec"><label>Vị trí</label>
             <div class="in-pos">
               <button class="mini" type="button" data-act="first" title="Về đầu" aria-label="Về đầu">${SV('<polyline points="14 6 8 12 14 18"/><line x1="5" y1="5" x2="5" y2="19"/>')}</button>
@@ -1555,7 +1571,6 @@ function shEnsureOverlay(){
               <button class="mini" type="button" data-act="right" title="Sang phải" aria-label="Sang phải">${SV('<polyline points="9 6 15 12 9 18"/>')}</button>
               <button class="mini" type="button" data-act="last" title="Về cuối" aria-label="Về cuối">${SV('<polyline points="10 6 16 12 10 18"/><line x1="19" y1="5" x2="19" y2="19"/>')}</button>
             </div>
-            <button class="mini in-restorepos" type="button">Khôi phục vị trí</button>
           </div>
           <div class="in-sec in-ext" hidden>
             <label for="in-slot">Thẻ</label><select id="in-slot" class="in-slot"></select>
@@ -1566,6 +1581,11 @@ function shEnsureOverlay(){
         </div>
       </aside>
     </div>
+    <div class="sh-dlg" hidden role="alertdialog" aria-label="Lưu thay đổi">
+      <div class="sh-dlg-box"><p>Lưu thay đổi bảng cột?</p>
+        <div class="sh-dlg-btns"><button class="primary mini dlg-save" type="button">Lưu</button><button class="mini dlg-discard" type="button">Không lưu</button><button class="mini dlg-cancel" type="button">Hủy</button></div>
+      </div>
+    </div>
   </div>`;
   document.body.appendChild(el);
   ov.el=el;
@@ -1573,80 +1593,123 @@ function shEnsureOverlay(){
   return el;
 }
 
-// ---- mở / đóng ----
-function sheetOpen(id,h,type){
+// ---- mở / lưu / thoát ----
+function sheetOpen(id,h,type,sec){
   const conn=document.getElementById(id); if(!conn) return;
+  if(ov.open && ov.id!==id) sheetSave();
   if(type && type!==shType(id)){ conn.querySelector('.m-type').value=type; switchMappingType(id); }
   shEnsureOverlay();
-  if(ov.open && ov.id!==id) sheetClose();
-  ov.id=id; ov.open=true; ov.q=''; ov.mi=-1; ov.filter=false; ov.inspOpen=false;
+  ov.id=id; ov.open=true; ov.q=''; ov.mi=-1; ov.inspOpen=false; ov.focusSec=null; ov.dlg=false;
+  ov.snap=JSON.stringify(collect(),null,2); // để Thoát không lưu khôi phục lại đúng như lúc mở
   ov.el.querySelector('.sh-search').value='';
+  ov.el.querySelector('.sh-dlg').hidden=true;
   ov.el.hidden=false; document.body.style.overflow='hidden';
   renderEditor(id);
-  if(h) shSelect(id,h); else ov.el.querySelector('.sh-scroll').focus({preventScroll:true});
+  if(h) shSelect(id,h,sec||null); else ov.el.querySelector('.sh-scroll').focus({preventScroll:true});
 }
-function sheetClose(){
+function shCloseUi(){
+  shCloseMenu(); shHideTip(); shCancelDrag();
+  if(ov.id) shSt(ov.id).edit=null;
+  ov.open=false; ov.dlg=false; ov.el.hidden=true; ov.el.querySelector('.sh-dlg').hidden=true; document.body.style.overflow='';
+}
+function sheetSave(){
   if(!ov.open) return;
-  const id=ov.id;
-  shFlush(id); shCloseMenu(); shHideTip(); shCancelDrag();
-  shSt(id).edit=null;
-  ov.open=false; ov.el.hidden=true; document.body.style.overflow='';
-  renderSheetPreview(id);
+  const id=ov.id; shFlush(id); shCloseUi(); renderSheetPreview(id);
 }
-
-function shVisible(m){ return ov.filter ? m.cols.filter(c=>c.changed) : m.cols; }
+function sheetClose(){ sheetSave(); }
+function shDirty(){ return JSON.stringify(collect(),null,2)!==ov.snap; }
+function sheetExit(){
+  if(!ov.open) return;
+  const id=ov.id; shFlush(id); shCloseMenu(); shHideTip();
+  if(!shDirty()){ shCloseUi(); renderSheetPreview(id); return; }
+  ov.dlg=true; const d=ov.el.querySelector('.sh-dlg'); d.hidden=false; d.querySelector('.dlg-save').focus();
+}
+function sheetDiscard(){
+  const snap=ov.snap;
+  shCloseUi();
+  document.getElementById('json').value=snap;
+  jsonToForm(); formToJson();
+}
+function shNotice(text){
+  const n=ov.el&&ov.el.querySelector('.sh-notice'); if(!n) return;
+  n.textContent=text; clearTimeout(shNotice.t); shNotice.t=setTimeout(()=>{ n.textContent=''; },4500);
+}
+function shVisible(m){ return m.cols; }
 
 // Vẽ lại trình sửa cho kết nối id.
+function shToday(){ const d=new Date(), p=n=>String(n).padStart(2,'0'); return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
+// Dòng demo giống file mẫu add-in: dòng sample của từng cột + dòng bổ sung (chỉ GTGT). Cột mở rộng/cột ngoài mẫu để trống.
+function shDemoRows(m){
+  const info=COLUMN_INFO_LC[m.type]||{}, rows=[];
+  rows.push(m.cols.map(c=>{ const ci=c.ext?null:info[c.def.toLowerCase()]; if(!ci||ci.sample==null) return ''; return ci.sample==='@today'?shToday():ci.sample; }));
+  (EXTRA_SAMPLE_ROWS[m.type]||[]).forEach(r=>rows.push(m.cols.map(c=>{ if(c.ext) return ''; const k=Object.keys(r).find(x=>x.toLowerCase()===c.def.toLowerCase()); return k?r[k]:''; })));
+  return rows;
+}
+const SH_X='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
 function renderEditor(id){
   const conn=document.getElementById(id), sh=shSheet(id); if(!sh) return;
   const st=shSt(id), m=shModel(id);
   if(st.sel && !m.cols.some(c=>c.h===st.sel)) st.sel=null;
   const q=ov.q.trim().toLowerCase();
   m.cols.forEach(c=>{ c.hit=!!q && (c.def.toLowerCase().includes(q)||c.shown.toLowerCase().includes(q)||c.alt.toLowerCase().includes(q)); });
-  const vis=shVisible(m), hrow=m.hrow;
+  const vis=m.cols, hrow=m.hrow;
   // thanh trên
   const nm=conn.querySelector('.f-name').value.trim(), idx=[...document.querySelectorAll('.conn')].indexOf(conn)+1;
-  sh.querySelector('.sh-title').textContent='Bảng cột - '+(nm||'Kết nối '+idx);
+  sh.querySelector('.sh-title').textContent=nm||('Kết nối '+idx);
   sh.querySelector('.sh-seg').innerHTML=DOC_TYPES.map(t=>`<button type="button" role="tab" aria-selected="${t===m.type?'true':'false'}" class="${t===m.type?'on':''}" data-t="${t}">${TYPE_NAMES[t]}${shTypeChanged(id,t)?'<span class="dot" title="Có thay đổi so với mặc định"></span>':''}</button>`).join('');
   sh.querySelector('.sh-typesel').value=m.type;
   const hr=sh.querySelector('.sh-hrow'); if(document.activeElement!==hr) hr.value=conn.querySelector('.m-hrow').value||1;
   sh.querySelector('.sh-dec').value=conn.querySelector('.m-dec').value;
   const ae=sh.querySelector('.sh-addext'); ae.hidden=!(m.type!=='CTT' && shFreeSlots(id,m.type).length);
-  sh.querySelectorAll('.sh-filter button').forEach(b=>b.classList.toggle('on',(b.dataset.f==='1')===ov.filter));
   sh.querySelector('.sh-search').classList.toggle('hit-none',!!q && !m.cols.some(c=>c.hit));
   // bảng
-  const cell=(cls,c,inner,extra)=>`<td class="${cls}" role="${extra&&extra.role||'gridcell'}" data-i="${c.i}" ${extra&&extra.attr||''}><div class="sh-cell ${extra&&extra.ccls||''}">${inner}</div></td>`;
-  let h='<table class="sh-table" role="grid" aria-label="Cột mẫu Excel"><thead><tr role="row"><th class="sh-corner" role="presentation"></th>';
-  vis.forEach(c=>{ h+=`<th class="sh-letter ${c.moved?'moved':''} ${c.hit?'hit':''} ${st.sel===c.h?'sel':''}" role="presentation" data-i="${c.i}">${colLetter(c.i)}</th>`; });
-  h+='</tr></thead><tbody>';
-  h+='<tr role="row"><th class="sh-rn sh-mau-l" role="rowheader">Mẫu</th>';
-  vis.forEach(c=>{ h+=`<td class="sh-mau ${c.hit?'hit':''}" role="gridcell" data-i="${c.i}" title="Tên mặc định (chỉ đọc)"><div class="sh-cell">${esc(c.def)}${c.req?'<b class="sh-req">*</b>':''}</div></td>`; });
-  h+='</tr>';
-  const blank=(rn,cls,title)=>{ let r=`<tr role="row"><th class="sh-rn" role="rowheader">${rn}</th>`; vis.forEach(c=>{ r+=`<td class="${cls}" role="gridcell" data-i="${c.i}" ${title?`title="${esc(title)}"`:''}><div class="sh-cell"></div></td>`; }); return r+'</tr>'; };
-  for(let r=1;r<hrow;r++) h+=blank(r,'sh-above','Dòng trên tiêu đề (add-in bỏ qua)');
-  h+=`<tr role="row"><th class="sh-rn ${st.sel?'hl':''}" role="rowheader">${hrow}</th>`;
+  const cs=c=>(st.sel===c.h?' colsel':'')+(c.hit?' hit':'');
+  let h='<table class="sh-table" role="grid" aria-label="Cột mẫu Excel"><tbody>';
+  // phần sửa: Cột gốc / Đổi tên / Giá trị
+  h+='<tr role="row" class="sh-r-orig"><th class="sh-rn sh-lbl" role="rowheader">Cột gốc</th>';
   vis.forEach(c=>{
-    const stat=[]; if(c.fx) stat.push('công thức'); else if(c.alt) stat.push('đã đổi tên'); if(c.req) stat.push('bắt buộc'); if(c.moved) stat.push('đã dời'); if(c.ext) stat.push('cột mở rộng');
+    if(c.ext){
+      const name=(!c.fx&&c.alt)?c.alt:'';
+      h+=`<td class="sh-orig is-ext${cs(c)}" role="gridcell" data-i="${c.i}"><div class="sh-cell">${name?esc(name):'<span class="ph">'+esc(c.slot)+'</span>'}<button type="button" class="sh-x" tabindex="-1" aria-label="Xóa cột" title="Xóa cột">${SH_X}</button></div></td>`;
+    } else h+=`<td class="sh-orig${cs(c)}" role="gridcell" data-i="${c.i}"><div class="sh-cell">${esc(c.def)}${c.req?'<b class="sh-req">*</b>':''}</div></td>`;
+  });
+  h+='</tr><tr role="row" class="sh-r-alt"><th class="sh-rn sh-lbl" role="rowheader">Đổi tên</th>';
+  vis.forEach(c=>{
+    const inner=c.fx?'<i class="sh-fxi">fx</i><span class="sh-fxtxt">'+esc(c.alt)+'</span>':(c.ext?'':esc(c.alt));
+    h+=`<td class="sh-alt${c.fx?' hasfx':''}${c.fx&&c.fxErr?' bad':''}${c.dup?' dup':''}${cs(c)}" role="gridcell" data-i="${c.i}"><div class="sh-cell">${inner}</div></td>`;
+  });
+  h+='</tr><tr role="row" class="sh-r-val"><th class="sh-rn sh-lbl" role="rowheader">Giá trị</th>';
+  vis.forEach(c=>{ h+=`<td class="sh-val${cs(c)}" role="gridcell" data-i="${c.i}"><div class="sh-cell">${esc(c.defVal)}</div></td>`; });
+  h+='</tr>';
+  // phần xem trước (giống file mẫu Tạo mẫu)
+  const blank=(rn,cls,title)=>{ let r=`<tr role="row"><th class="sh-rn" role="rowheader">${rn}</th>`; vis.forEach(c=>{ r+=`<td class="${cls}${cs(c)}" role="gridcell" data-i="${c.i}" ${title?`title="${esc(title)}"`:''}><div class="sh-cell"></div></td>`; }); return r+'</tr>'; };
+  h+='<tr role="row" class="sh-split"><th class="sh-rn sh-corner" role="presentation"></th>';
+  vis.forEach(c=>{ h+=`<th class="sh-letter${cs(c)}${c.letterSel?'':''}" role="presentation" data-i="${c.i}">${colLetter(c.i)}</th>`; });
+  h+='</tr>';
+  for(let r=1;r<hrow;r++) h+=blank(r,'sh-above','Dòng trên tiêu đề (add-in bỏ qua)');
+  h+=`<tr role="row"><th class="sh-rn" role="rowheader">${hrow}</th>`;
+  vis.forEach(c=>{
+    const stat=[]; if(c.fx) stat.push('công thức'); else if(c.alt) stat.push('đã đổi tên'); if(c.req) stat.push('bắt buộc'); if(c.ext) stat.push('cột mở rộng');
     const aria='Cột '+colLetter(c.i)+', tên hiển thị '+c.shown+', tên mặc định '+c.def+(stat.length?', '+stat.join(', '):'');
-    const inner=c.fx?'<i class="sh-fxi">fx</i><span class="sh-fxtxt">'+esc(c.alt)+'</span>':esc(c.shown);
-    h+=`<td class="sh-th ${!c.alt?'plain':''} ${c.alt&&!c.fx?'renamed':''} ${c.fx?'hasfx':''} ${c.ext?'is-ext':''} ${c.fx&&c.fxErr?'bad':''} ${c.dup?'dup':''} ${c.hit?'hit':''} ${st.sel===c.h?'sel':''}" role="columnheader" data-i="${c.i}" aria-selected="${st.sel===c.h?'true':'false'}" aria-label="${esc(aria)}"><div class="sh-cell">${inner}${c.ext?'<small class="sh-ext">mở rộng</small>':''}</div></td>`;
+    const inner=esc(c.fx?c.def:c.shown)+(c.fx?'<i class="sh-fxi sh-fxr">fx</i>':'');
+    h+=`<td class="sh-th${c.alt&&!c.fx?' renamed':''}${c.fx?' hasfx':''}${c.ext?' is-ext':''}${c.req?' isreq':''}${c.fx&&c.fxErr?' bad':''}${c.dup?' dup':''}${cs(c)}" role="columnheader" data-i="${c.i}" aria-label="${esc(aria)}"><div class="sh-cell">${inner}</div></td>`;
   });
   h+='</tr>';
-  h+=`<tr role="row"><th class="sh-rn" role="rowheader">${hrow+1}</th>`;
-  vis.forEach(c=>{ h+=`<td class="sh-dv ${st.sel===c.h?'sel':''}" role="gridcell" data-i="${c.i}" title="Giá trị khi trống (nháy đúp để sửa)"><div class="sh-cell">${esc(c.defVal)}</div></td>`; });
-  h+='</tr>';
-  h+=blank(hrow+2,'sh-blank')+blank(hrow+3,'sh-blank');
+  const demo=shDemoRows(m);
+  demo.forEach((row,ri)=>{
+    h+=`<tr role="row"><th class="sh-rn" role="rowheader">${hrow+1+ri}</th>`;
+    vis.forEach(c=>{ const v=row[c.i]; h+=`<td class="sh-demo${cs(c)}" role="gridcell" data-i="${c.i}"><div class="sh-cell">${v===''||v==null?'':esc(v)}</div></td>`; });
+    h+='</tr>';
+  });
   h+='</tbody></table>';
-  if(!vis.length) h+='<div class="sh-empty">Chưa có cột nào đã đổi.</div>';
+  if(!vis.length) h+='<div class="sh-empty">Chưa có cột nào.</div>';
   const wrap=sh.querySelector('.sh-tablewrap'), sc=sh.querySelector('.sh-scroll');
-  wrap.innerHTML=h;
+  ov.rendering=true; wrap.innerHTML=h; ov.rendering=false;
   // lấp đầy chiều cao còn lại bằng dòng trống kẻ ô
   const table=wrap.querySelector('table'), need=Math.ceil((sc.clientHeight-table.offsetHeight)/24);
-  if(need>0 && vis.length){ let rows=''; for(let k=1;k<=Math.min(need,80);k++) rows+=blank(hrow+3+k,'sh-blank'); table.tBodies[0].insertAdjacentHTML('beforeend',rows); }
+  if(need>0 && vis.length){ let rows=''; const base=hrow+demo.length; for(let k=1;k<=Math.min(need,80);k++) rows+=blank(base+k,'sh-blank'); table.tBodies[0].insertAdjacentHTML('beforeend',rows); }
   // chân bảng
-  const s=shTypeStats(id,m.type);
-  sh.querySelector('.sh-foot-sum').textContent=shStatParts(s);
-  sh.querySelector('.sh-filtnote').textContent=ov.filter?'Tắt lọc để kéo đổi vị trí':'';
+  sh.querySelector('.sh-foot-sum').textContent=shStatParts(shTypeStats(id,m.type));
   shRefreshFields(id,false);
 }
 function shRefreshFields(id,force){ shUpdateFxbar(id,force); shUpdateInsp(id,force); }
@@ -1668,9 +1731,10 @@ function shUpdateInsp(id,force){
   sh.querySelector('.sh-main').classList.toggle('insp-open',open && window.innerWidth<=1100);
   ins.querySelector('.in-empty').hidden=!!c; ins.querySelector('.in-body').hidden=!c;
   ins.querySelector('.in-title').textContent=c?'Cột '+colLetter(c.i):'Chi tiết cột';
+  ins.querySelectorAll('.in-sec[data-sec]').forEach(e=>e.classList.toggle('focus',!!c && e.dataset.sec===ov.focusSec));
   if(!c) return;
   ins.querySelector('.in-def-name').textContent=c.def;
-  ins.querySelector('.in-badges').innerHTML=(c.req?'<span class="in-badge req">Bắt buộc</span>':'')+(c.moved?'<span class="in-badge mv">Đã dời từ cột '+esc(c.from)+'</span>':'')+(c.ext?'<span class="in-badge ex">Cột mở rộng</span>':'');
+  ins.querySelector('.in-badges').innerHTML=(c.req?'<span class="in-badge req">Bắt buộc</span>':'')+(c.ext?'<span class="in-badge ex">Cột mở rộng</span>':'');
   const nt=ins.querySelector('.in-note'); nt.textContent=c.ext?'':c.note; nt.hidden=c.ext||!c.note;
   const setf=(el,v)=>{ el.dataset.h=c.h; el.dataset.t=m.type; if(force||document.activeElement!==el){ el.value=v; el.dataset.orig=v; } };
   const alt=ins.querySelector('.in-alt'); setf(alt,c.alt);
@@ -1678,10 +1742,9 @@ function shUpdateInsp(id,force){
   alt.classList.toggle('is-fx',isFormula(alt.value)); alt.classList.toggle('bad',isFormula(alt.value)&&!!formulaError(alt.value));
   ins.querySelector('.in-alt-reset').hidden=!c.alt;
   setf(ins.querySelector('.in-dv'),c.defVal);
-  const n=m.cols.length, f=ov.filter;
+  const n=m.cols.length;
   const dis=(a,v)=>{ ins.querySelector('.in-pos [data-act="'+a+'"]').disabled=v; };
-  dis('first',f||c.i===0); dis('left',f||c.i===0); dis('right',f||c.i===n-1); dis('last',f||c.i===n-1);
-  ins.querySelector('.in-restorepos').hidden=!(c.moved && !f);
+  dis('first',c.i===0); dis('left',c.i===0); dis('right',c.i===n-1); dis('last',c.i===n-1);
   const ex=ins.querySelector('.in-ext'); ex.hidden=!c.ext;
   if(c.ext){
     const row=document.getElementById(id).querySelector('.row.ext[data-k="'+c.k+'"]');
@@ -1693,14 +1756,14 @@ function shUpdateInsp(id,force){
   }
 }
 
-// ---- chọn cột ----
-function shSelect(id,h){
+// ---- chọn cột (sec: phần khung chi tiết được làm nổi: 'orig' | 'alt' | 'dv') ----
+function shSelect(id,h,sec){
   const sh=shSheet(id); if(!sh) return;
   const st=shSt(id), m=shModel(id);
   const c=m.cols.find(x=>x.h===h); st.sel=c?c.h:null;
+  if(sec!==undefined) ov.focusSec=sec;
   if(c) ov.inspOpen=true;
-  sh.querySelectorAll('.sh-letter,.sh-th,.sh-dv').forEach(el=>{ const on=!!c && +el.dataset.i===c.i; el.classList.toggle('sel',on); if(el.classList.contains('sh-th')) el.setAttribute('aria-selected',on?'true':'false'); });
-  const th=sh.querySelector('.sh-th'); if(th){ const rn=th.parentNode.querySelector('.sh-rn'); if(rn) rn.classList.toggle('hl',!!c); }
+  sh.querySelectorAll('[data-i]').forEach(el=>{ const on=!!c && +el.dataset.i===c.i; el.classList.toggle('colsel',on); });
   shRefreshFields(id,true);
   if(c){ const cell=[...sh.querySelectorAll('.sh-th')].find(el=>+el.dataset.i===c.i); if(cell) cell.scrollIntoView({block:'nearest',inline:'nearest'}); }
 }
@@ -1710,7 +1773,7 @@ function shCell(id,h,cls){
   return c ? [...sh.querySelectorAll(cls||'.sh-th')].find(el=>+el.dataset.i===c.i) : null;
 }
 function shMoveSel(id,delta){
-  const m=shModel(id), st=shSt(id), vis=shVisible(m); if(!vis.length) return;
+  const m=shModel(id), st=shSt(id), vis=m.cols; if(!vis.length) return;
   let i=st.sel==null?-1:vis.findIndex(c=>c.h===st.sel);
   i=Math.max(0,Math.min(vis.length-1,i+delta));
   shSelect(id,vis[i].h);
@@ -1757,17 +1820,10 @@ function shSetOrder(id,headers){
   formToJson();
 }
 function shMoveCol(id,i,to){
-  if(ov.filter) return;
   const m=shModel(id), hs=m.cols.map(c=>c.h);
   if(i<0||i>=hs.length) return;
   to=Math.max(0,Math.min(hs.length-1,to)); if(to===i) return;
   const h=hs.splice(i,1)[0]; hs.splice(to,0,h);
-  shSetOrder(id,hs); shSelect(id,h);
-}
-function shRestorePos(id,h){
-  const m=shModel(id), hs=m.cols.map(c=>c.h), i=hs.indexOf(h); if(i<0) return;
-  const k=m.nat.indexOf(h); if(k<0) return;
-  hs.splice(i,1); hs.splice(Math.min(k,hs.length),0,h);
   shSetOrder(id,hs); shSelect(id,h);
 }
 function shUsedSlots(id,t){ const used=new Set(); document.getElementById(id).querySelectorAll('.exts .row.ext').forEach(r=>{ if((val(r,'.e-type')||'GTGT')===t) used.add(val(r,'.e-slot')); }); return used; }
@@ -1782,7 +1838,7 @@ function shInsertExt(id,h,side){
   hs.splice(i<0?hs.length:(side==='left'?i:i+1),0,slot);
   shSetOrder(id,hs);
   shSelect(id,slot);
-  shStartEdit(id,slot);
+  shStartEdit(id,slot,undefined,'orig');
 }
 function shDeleteExt(id,h){
   const m=shModel(id), c=m.cols.find(x=>x.h===h); if(!c||!c.ext) return;
@@ -1815,28 +1871,31 @@ function shResetNames(id){
   syncMappingFromDom(id); renderColumnOrderList(id); formToJson();
 }
 
-// ---- sửa tại ô (kind: 'name' = tên trong file, 'def' = giá trị khi trống) ----
+// ---- sửa tại ô. kind: 'name' = ô Đổi tên, 'orig' = ô Cột gốc của cột mở rộng (tên cột), 'def' = ô Giá trị ----
+const SH_KIND_CELL={name:'.sh-alt', orig:'.sh-orig', def:'.sh-val'};
 function shStartEdit(id,h,init,kind){
   kind=kind||'name';
   shFlush(id);
   const sh=shSheet(id), st=shSt(id), m=shModel(id), c=m.cols.find(x=>x.h===h); if(!sh||!c) return;
+  if(kind==='orig' && !c.ext) kind='name';
   st.sel=h;
   renderSheet(id);
   shSelect(id,h);
-  const cell=shCell(id,h,kind==='def'?'.sh-dv':'.sh-th'); if(!cell) return;
+  const cell=shCell(id,h,SH_KIND_CELL[kind]); if(!cell) return;
   const box=cell.querySelector('.sh-cell');
-  st.edit={h, orig:kind==='def'?c.defVal:c.alt, t:m.type, kind};
+  const orig=kind==='def'?c.defVal:(c.ext?(c.fx?(kind==='name'?c.alt:''):(kind==='orig'?c.alt:'')):c.alt);
+  st.edit={h, orig, t:m.type, kind};
   cell.classList.add('editing');
-  box.innerHTML='<input class="sh-editor'+(kind==='name'?' alt-in':'')+'" spellcheck="false" aria-label="'+(kind==='def'?'Giá trị khi trống của cột ':'Sửa tên cột ')+esc(c.def)+'">';
+  box.innerHTML='<input class="sh-editor'+(kind==='def'?'':' alt-in')+'" spellcheck="false" aria-label="'+(kind==='def'?'Giá trị của cột ':'Sửa tên cột ')+esc(c.def)+'">';
   const inp=box.firstChild;
-  inp.placeholder=kind==='def'?'Giá trị khi trống':((c.def==='STT'&&m.type!=='CTT')?'Trống = tự động (cả file 1 hóa đơn)':'Tên mặc định: '+c.def);
-  inp.value=init===undefined?st.edit.orig:init;
+  inp.placeholder=kind==='def'?'Giá trị':(kind==='orig'?'Tên cột: '+c.slot:((c.def==='STT'&&m.type!=='CTT')?'Trống = tự động (cả file 1 hóa đơn)':'Tên mặc định: '+c.def));
+  inp.value=init===undefined?orig:init;
   inp.focus();
   if(init===undefined) inp.select(); else inp.setSelectionRange(inp.value.length,inp.value.length);
-  if(kind==='name'){ shEditorState(id,inp); updateFxTip(inp); }
+  if(kind!=='def'){ shEditorState(id,inp); updateFxTip(inp); }
 }
 function shEditorState(id,inp){
-  const st=shSt(id), ed=st.edit; if(!ed||ed.kind!=='name') return;
+  const st=shSt(id), ed=st.edit; if(!ed||ed.kind==='def') return;
   const v=inp.value.trim(), fx=isFormula(v);
   inp.classList.toggle('is-fx',fx); inp.classList.toggle('bad',fx&&!!formulaError(v));
   const m=shModel(id), me=m.cols.find(x=>x.h===ed.h);
@@ -1846,16 +1905,29 @@ function shEditorState(id,inp){
   inp.classList.toggle('dup',dup);
   inp.title=dup?'Trùng tên với cột '+other.map(x=>colLetter(x.i)).join(', '):'';
 }
-function shApplyEdit(id,ed,value){ if(ed.kind==='def') shSetDefault(id,ed.h,value); else shCommit(id,ed.h,value); }
-// Kết thúc sửa: save=true thì ghi, false thì hủy. move: dịch ô chọn sau khi lưu (Enter/Tab).
+function shApplyEdit(id,ed,value){
+  if(ed.kind==='def'){ shSetDefault(id,ed.h,value); return; }
+  const m=shModel(id), c=m.cols.find(x=>x.h===ed.h), v=String(value).trim();
+  if(c && c.ext){
+    if(ed.kind==='name'){
+      if(isFormula(v)) shCommit(id,ed.h,v);
+      else if(v===''){ if(c.fx) shCommit(id,ed.h,''); else renderSheet(id); }
+      else { shNotice('Cột mở rộng: gõ tên ở dòng Cột gốc, dòng Đổi tên chỉ nhận công thức'); renderSheet(id); }
+      return;
+    }
+    if(v==='' && c.fx){ renderSheet(id); return; }
+  }
+  shCommit(id,ed.h,value);
+}
+// Kết thúc sửa: save=true thì ghi, false thì hủy. move: sang cột kế (Enter/Tab) và nhập tiếp ô cùng dòng.
 function shEndEdit(id,save,move){
   const st=shSt(id), ed=st.edit; if(!ed) return;
   const sh=shSheet(id), inp=sh.querySelector('.sh-editor'), value=inp?inp.value:ed.orig;
   st.edit=null;
-  const m=shModel(id), vis=shVisible(m), i=vis.findIndex(c=>c.h===ed.h);
-  const nextH=(move && i>=0 && vis[i+move]) ? vis[i+move].h : null;
+  const m=shModel(id), vis=m.cols; let i=vis.findIndex(c=>c.h===ed.h), nextH=null;
+  if(move && i>=0){ for(let j=i+move;j>=0&&j<vis.length;j+=move){ if(ed.kind!=='orig'||vis[j].ext){ nextH=vis[j].h; break; } } }
   if(save) shApplyEdit(id,ed,value); else renderSheet(id);
-  if(nextH) shSelect(id,nextH);
+  if(nextH){ shStartEdit(id,nextH,undefined,ed.kind); return; }
   sh.querySelector('.sh-scroll').focus({preventScroll:true});
 }
 // Ghi dở thay đổi đang gõ (ô đang sửa, thanh công thức, khung chi tiết) trước khi làm việc khác.
@@ -1880,14 +1952,23 @@ function shShowTip(id,cell){
   const st=shSt(id); if(st.edit || shDrag || (shMenuEl && !shMenuEl.hidden)) return;
   const m=shModel(id), c=m.cols[+cell.dataset.i]; if(!c) return;
   const li=[];
-  li.push('<li>'+(c.ext?'Thẻ: ':'Mặc định: ')+'<code>'+esc(c.def)+'</code></li>');
-  if(c.fx) li.push('<li>Công thức: <code>'+esc(c.alt)+'</code></li>'); else if(c.alt) li.push('<li>Đổi tên thành <code>'+esc(c.alt)+'</code></li>');
-  if(c.fx && c.fxErr) li.push('<li class="err">'+esc(c.fxErr)+'</li>');
-  if(c.ext) li.push('<li>Cột mở rộng</li>');
-  if(c.req) li.push('<li>Bắt buộc</li>');
-  if(c.moved) li.push('<li>Đã dời từ cột '+esc(c.from)+'</li>');
-  if(c.dup) li.push('<li class="err">Trùng tên với cột '+esc(c.dup)+'</li>');
-  if(c.note) li.push('<li class="mut">'+esc(c.note)+'</li>');
+  if(cell.classList.contains('sh-orig')){
+    if(c.ext){ li.push('<li>Cột mở rộng, thẻ <code>'+esc(c.slot)+'</code></li><li>Bấm để gõ tên cột bất kỳ</li>'); if(c.note) li.push('<li class="mut">'+esc(c.note)+'</li>'); }
+    else { if(c.req) li.push('<li>Bắt buộc</li>'); li.push('<li class="mut">'+esc(c.note||c.def)+'</li>'); }
+  } else if(cell.classList.contains('sh-alt')){
+    li.push(c.ext?'<li>Cột mở rộng: gõ tên ở dòng Cột gốc, dòng này chỉ nhận công thức</li>':'<li>Điền tên cột thay thế</li>');
+    if(c.fx && c.fxErr) li.push('<li class="err">'+esc(c.fxErr)+'</li>');
+    if(c.dup) li.push('<li class="err">Trùng tên với cột '+esc(c.dup)+'</li>');
+  } else if(cell.classList.contains('sh-val')){
+    li.push('<li>Giá trị mặc định khi ô trống</li>');
+  } else {
+    li.push('<li>'+(c.ext?'Thẻ: ':'Mặc định: ')+'<code>'+esc(c.def)+'</code></li>');
+    if(c.fx) li.push('<li>Công thức: <code>'+esc(c.alt)+'</code></li>'); else if(c.alt) li.push('<li>Đổi tên thành <code>'+esc(c.alt)+'</code></li>');
+    if(c.fx && c.fxErr) li.push('<li class="err">'+esc(c.fxErr)+'</li>');
+    if(c.req) li.push('<li>Bắt buộc</li>');
+    if(c.dup) li.push('<li class="err">Trùng tên với cột '+esc(c.dup)+'</li>');
+    if(c.note) li.push('<li class="mut">'+esc(c.note)+'</li>');
+  }
   const tip=shTip();
   tip.innerHTML='<ul class="tip-list">'+li.join('')+'</ul>';
   tip.hidden=false;
@@ -1945,14 +2026,11 @@ function shMenuItems(id,h,sub){
     free.forEach(s=>items.push({label:s, act:()=>shSwapSlot(id,h,s)}));
     return items;
   }
-  items.push({label:'Đổi tên', act:()=>shStartEdit(id,h)});
-  items.push({label:'Nhập công thức', act:()=>shStartEdit(id,h,c.fx?c.alt:'=')});
+  items.push({label:'Đổi tên', act:()=>shStartEdit(id,h,undefined,c.ext?'orig':'name')});
+  items.push({label:'Nhập công thức', act:()=>shStartEdit(id,h,c.fx?c.alt:'=',c.ext?'orig':'name')});
   if(c.alt) items.push({label:'Khôi phục tên mặc định', act:()=>shCommit(id,h,'')});
-  if(!ov.filter){
-    if(c.moved) items.push({label:'Khôi phục vị trí', act:()=>shRestorePos(id,h)});
-    if(c.i>0) items.push({label:'Đưa về đầu', act:()=>shMoveCol(id,c.i,0)});
-    if(c.i<n-1) items.push({label:'Đưa về cuối', act:()=>shMoveCol(id,c.i,n-1)});
-  }
+  if(c.i>0) items.push({label:'Đưa về đầu', act:()=>shMoveCol(id,c.i,0)});
+  if(c.i<n-1) items.push({label:'Đưa về cuối', act:()=>shMoveCol(id,c.i,n-1)});
   if(m.type!=='CTT' && free.length){
     items.push({sep:true});
     items.push({label:'Chèn cột mở rộng bên trái', act:()=>shInsertExt(id,h,'left')});
@@ -2027,17 +2105,29 @@ function shPointerUp(e){
   if(was && k>=0) shMoveCol(id,i,k>i?k-1:k);
 }
 function shPointerCancel(e){ if(shDrag && e.pointerId===shDrag.pid) shCancelDrag(); }
+function shPendUp(e){
+  window.removeEventListener('pointerup',shPendUp);
+  const p=ov.pend; ov.pend=null;
+  if(!p||e.pointerId!==p.pid||!ov.open) return;
+  if(Math.hypot(e.clientX-p.x,e.clientY-p.y)<6) shStartEdit(p.id,p.h,undefined,p.kind);
+}
 function shPointerDown(e){
   const id=ov.id; if(!id) return;
-  if(e.target.closest('.sh-editor,.sh-fxin,.in-alt,.in-dv,.in-note-in,.in-slot,.in-dtype')) return;
-  shFlush(id); shHideTip();
+  if(e.target.closest('.sh-editor,.sh-fxin,.in-alt,.in-dv,.in-note-in,.in-slot,.in-dtype,.sh-dlg')) return;
+  const xb=e.target.closest('.sh-x'), xi=xb?+xb.closest('[data-i]').dataset.i:-1;
+  shFlush(id); shHideTip(); ov.pend=null;
+  if(xi>=0){ e.preventDefault(); const c0=shModel(id).cols[xi]; if(c0) shDeleteExt(id,c0.h); return; }
   if(!e.target.closest('.sh-scroll')) return;
   const cell=e.target.closest('[data-i]');
   if(!cell){ if(shIsSmall()){ ov.inspOpen=false; shUpdateInsp(id,false); } return; }
   const m=shModel(id), c=m.cols[+cell.dataset.i]; if(!c) return;
-  shSelect(id,c.h);
-  if(e.button!==0 || ov.filter) return;
-  if(!cell.matches('.sh-th,.sh-letter')) return;
+  const isAlt=cell.classList.contains('sh-alt'), isVal=cell.classList.contains('sh-val'), isOrig=cell.classList.contains('sh-orig');
+  const kind=isAlt?'name':isVal?'def':(isOrig&&c.ext)?'orig':null;
+  const sec=isAlt?'alt':isVal?'dv':isOrig?(c.ext?'alt':'orig'):null;
+  shSelect(id,c.h,sec);
+  if(e.button!==0) return;
+  if(kind){ ov.pend={id,h:c.h,kind,x:e.clientX,y:e.clientY,pid:e.pointerId}; window.addEventListener('pointerup',shPendUp); return; }
+  if(!cell.matches('.sh-th,.sh-letter,.sh-orig')) return;
   shCancelDrag();
   const touch=e.pointerType!=='mouse';
   const d=shDrag={id,i:c.i,x0:e.clientX,y0:e.clientY,x:e.clientX,y:e.clientY,touch,active:false,armed:false,pid:e.pointerId,name:c.shown,timer:null,menuTimer:null};
@@ -2059,10 +2149,13 @@ function shWireOverlay(root){
   const sh=root.querySelector('.sheet'), sc=sh.querySelector('.sh-scroll'), q=s=>sh.querySelector(s);
   const conn=()=>document.getElementById(ov.id);
   sh.addEventListener('pointerdown',shPointerDown);
-  q('.sh-done').addEventListener('click',sheetClose);
+  q('.sh-done').addEventListener('click',sheetSave);
+  q('.sh-exit').addEventListener('click',sheetExit);
+  q('.dlg-save').addEventListener('click',sheetSave);
+  q('.dlg-discard').addEventListener('click',sheetDiscard);
+  q('.dlg-cancel').addEventListener('click',()=>{ ov.dlg=false; q('.sh-dlg').hidden=true; sc.focus({preventScroll:true}); });
   q('.sh-seg').addEventListener('click',e=>{ const b=e.target.closest('button[data-t]'); if(b) shSwitchType(ov.id,b.dataset.t); });
   q('.sh-typesel').addEventListener('change',e=>shSwitchType(ov.id,e.target.value));
-  q('.sh-filter').addEventListener('click',e=>{ const b=e.target.closest('button[data-f]'); if(!b) return; shFlush(ov.id); ov.filter=b.dataset.f==='1'; renderEditor(ov.id); });
   q('.sh-hrow').addEventListener('input',e=>{ const h=conn().querySelector('.m-hrow'); h.value=e.target.value; h.dispatchEvent(new Event('input',{bubbles:true})); });
   q('.sh-dec').addEventListener('change',e=>{ const d=conn().querySelector('.m-dec'); d.value=e.target.value; formToJson(); renderSheet(ov.id); });
   q('.sh-addext').addEventListener('click',()=>{ const id=ov.id; shFlush(id); const m=shModel(id), h=shSt(id).sel||(m.cols.length?m.cols[m.cols.length-1].h:null); if(h) shInsertExt(id,h,'right'); });
@@ -2087,29 +2180,25 @@ function shWireOverlay(root){
       const hits=m.cols.filter(c=>c.def.toLowerCase().includes(ql)||c.shown.toLowerCase().includes(ql)||c.alt.toLowerCase().includes(ql));
       if(!hits.length) return;
       ov.mi=(ov.mi+1)%hits.length;
-      const hh=hits[ov.mi]; if(ov.filter && !hh.changed){ ov.filter=false; renderEditor(ov.id); }
+      const hh=hits[ov.mi];
       shSelect(ov.id,hh.h);
     } else if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); if(search.value){ search.value=''; ov.q=''; ov.mi=-1; renderEditor(ov.id); } else search.blur(); }
   });
   // thao tác trên bảng
-  sh.addEventListener('dblclick',e=>{
-    if(e.target.closest('.sh-editor')) return;
-    const cell=e.target.closest('.sh-th,.sh-dv'); if(!cell) return;
-    const c=shModel(ov.id).cols[+cell.dataset.i]; if(c) shStartEdit(ov.id,c.h,undefined,cell.classList.contains('sh-dv')?'def':'name');
-  });
   sh.addEventListener('contextmenu',e=>{
-    const cell=e.target.closest('.sh-th,.sh-letter,.sh-dv,.sh-mau'); if(!cell) return;
+    if(e.target.closest('.sh-editor')) return;
+    const cell=e.target.closest('.sh-th,.sh-letter,.sh-orig,.sh-alt,.sh-val'); if(!cell) return;
     e.preventDefault(); shFlush(ov.id);
     const c=shModel(ov.id).cols[+cell.dataset.i]; if(!c) return;
     shCancelDrag(); shSelect(ov.id,c.h); shOpenMenu(ov.id,c.h,e.clientX,e.clientY);
   });
   sh.addEventListener('mouseover',e=>{
-    const cell=e.target.closest('.sh-th'); if(cell===shTipCur) return;
+    const cell=e.target.closest('.sh-th,.sh-orig,.sh-alt,.sh-val'); if(cell===shTipCur) return;
     shHideTip();
     if(!cell || e.target.closest('.sh-editor')) return;
     shTipCur=cell; shTipTimer=setTimeout(()=>shShowTip(ov.id,cell),300);
   });
-  sh.addEventListener('mouseout',e=>{ const cell=e.target.closest('.sh-th'); if(cell && !(e.relatedTarget && cell.contains(e.relatedTarget))) shHideTip(); });
+  sh.addEventListener('mouseout',e=>{ const cell=e.target.closest('.sh-th,.sh-orig,.sh-alt,.sh-val'); if(cell && !(e.relatedTarget && cell.contains(e.relatedTarget))) shHideTip(); });
   sc.addEventListener('scroll',shHideTip,{passive:true});
   sh.addEventListener('keydown',e=>{
     const id=ov.id;
@@ -2125,26 +2214,26 @@ function shWireOverlay(root){
       return;
     }
     if(e.target!==sc) return;
-    const st=shSt(id), m=shModel(id), vis=shVisible(m), i=st.sel==null?-1:m.cols.findIndex(c=>c.h===st.sel);
+    const st=shSt(id), m=shModel(id), vis=m.cols, i=st.sel==null?-1:m.cols.findIndex(c=>c.h===st.sel);
     if(e.key==='ArrowLeft'||e.key==='ArrowRight'){
       e.preventDefault();
       const dx=e.key==='ArrowLeft'?-1:1;
       if(e.altKey){ if(i>=0) shMoveCol(id,i,i+dx); } else shMoveSel(id,i<0?(dx>0?1:0):dx);
     } else if(e.key==='Home'||e.key==='End'){ e.preventDefault(); if(vis.length) shSelect(id,vis[e.key==='Home'?0:vis.length-1].h); }
-    else if(i>=0 && (e.key==='F2'||e.key==='Enter')){ e.preventDefault(); shStartEdit(id,m.cols[i].h); }
+    else if(i>=0 && (e.key==='F2'||e.key==='Enter')){ e.preventDefault(); shStartEdit(id,m.cols[i].h,undefined,m.cols[i].ext?'orig':'name'); }
     else if(i>=0 && (e.key==='ContextMenu'||(e.key==='F10'&&e.shiftKey))){
       e.preventDefault();
       const cell=shCell(id,m.cols[i].h), r=cell.getBoundingClientRect();
       shOpenMenu(id,m.cols[i].h,r.left+8,r.bottom);
     }
-    else if(i>=0 && e.key.length===1 && !e.ctrlKey && !e.metaKey && !e.altKey){ e.preventDefault(); shStartEdit(id,m.cols[i].h,e.key); }
+    else if(i>=0 && e.key.length===1 && !e.ctrlKey && !e.metaKey && !e.altKey){ e.preventDefault(); shStartEdit(id,m.cols[i].h,e.key,m.cols[i].ext?'orig':'name'); }
   });
   sh.addEventListener('input',e=>{
     const ed=e.target.closest('.sh-editor'); if(ed){ shEditorState(ov.id,ed); return; }
     const a=e.target.closest('.sh-fxin,.in-alt'); if(a){ const v=a.value.trim(), fx=isFormula(v); a.classList.toggle('is-fx',fx); a.classList.toggle('bad',fx&&!!formulaError(v)); }
   });
   sh.addEventListener('focusout',e=>{
-    const ed=e.target.closest('.sh-editor'); if(!ed) return;
+    const ed=e.target.closest('.sh-editor'); if(!ed||ov.rendering) return;
     const st=shSt(ov.id); if(!st.edit) return;
     const edit=st.edit; st.edit=null; shApplyEdit(ov.id,edit,ed.value);
   });
@@ -2160,7 +2249,6 @@ function shWireOverlay(root){
     const m=shModel(id), c=m.cols.find(x=>x.h===h); if(!c) return;
     if(e.target.closest('.in-close')){ ov.inspOpen=false; shUpdateInsp(id,false); return; }
     if(e.target.closest('.in-alt-reset')){ shCommit(id,h,''); return; }
-    if(e.target.closest('.in-restorepos')){ shRestorePos(id,h); return; }
     if(e.target.closest('.in-del')){ shDeleteExt(id,h); return; }
     const b=e.target.closest('.in-pos button[data-act]'); if(!b||b.disabled) return;
     const n=m.cols.length, a=b.dataset.act;
@@ -2172,8 +2260,9 @@ function shWireConn(id){
   conn.querySelector('.sh-chips').addEventListener('click',e=>{ const b=e.target.closest('.sh-chip'); if(b) sheetOpen(id,b.dataset.h,b.dataset.t); });
   conn.querySelector('.m-hrow').addEventListener('input',()=>renderSheet(id));
   const defs=conn.querySelector('.defs');
-  defs.addEventListener('input',()=>renderSheet(id));
-  new MutationObserver(()=>renderSheet(id)).observe(defs,{childList:true});
+  const onDefs=()=>{ if(shSheet(id)) return; renderSheet(id); }; // khi trình sửa đang mở, các hàm sửa tự vẽ lại
+  defs.addEventListener('input',onDefs);
+  new MutationObserver(onDefs).observe(defs,{childList:true});
   renderSheet(id);
 }
 document.addEventListener('pointerdown',e=>{
@@ -2184,7 +2273,8 @@ document.addEventListener('keydown',e=>{
   if(e.key!=='Escape' || !ov.open) return;
   if(shMenuEl && !shMenuEl.hidden) return;
   if(e.target.closest && e.target.closest('.sh-editor,.sh-fxin,.in-alt,.in-dv,.in-note-in,.sh-search')) return;
-  sheetClose();
+  if(ov.dlg){ ov.dlg=false; ov.el.querySelector('.sh-dlg').hidden=true; return; }
+  sheetExit();
 });
 
 // khởi tạo: khôi phục từ localStorage nếu có, không thì 1 kết nối mẫu
