@@ -177,20 +177,40 @@ const authPopCtl = makePop(loginBtn, authPop, () => authEmail.value ? authPassco
 function openAuth(){ authPopCtl.open(); }
 function closeAuth(){ authPopCtl.close(); }
 
-authPop.addEventListener('submit', e => {
+// Đăng nhập = gọi doGet kiểm tra Email/Passcode; chỉ lưu và chuyển trạng thái khi server trả success.
+const loginSubmit = authPop.querySelector('button[type=submit]');
+authPop.addEventListener('submit', async e => {
   e.preventDefault();
   if (!isLoggedIn()) {
     resetMsg.className = 'msg err';
     resetMsg.textContent = 'Nhập Email và Passcode.';
     return;
   }
-  localStorage.setItem('lic_email', authEmail.value.trim());
-  localStorage.setItem('lic_passcode', authPasscode.value.trim());
+  const email = authEmail.value.trim();
+  const passcode = authPasscode.value.trim();
   resetMsg.className = 'msg';
   resetMsg.textContent = '';
-  updateLoginLabel();
-  closeAuth();
-  loadRecords();
+  loginSubmit.disabled = true;
+  loginSubmit.textContent = 'Đang kiểm tra...';
+  try {
+    const json = await fetchRecords(email, passcode);
+    if (json.status !== 'success') {
+      resetMsg.className = 'msg err';
+      resetMsg.textContent = json.message || 'Sai email hoặc passcode';
+      return;
+    }
+    localStorage.setItem('lic_email', email);
+    localStorage.setItem('lic_passcode', passcode);
+    updateLoginLabel();
+    closeAuth();
+    showRecords(json.data);
+  } catch (ex) {
+    resetMsg.className = 'msg err';
+    resetMsg.textContent = 'Không kết nối được, thử lại.';
+  } finally {
+    loginSubmit.disabled = false;
+    loginSubmit.textContent = 'Đăng nhập';
+  }
 });
 logoutBtn.addEventListener('click', () => {
   localStorage.removeItem('lic_passcode');
@@ -243,8 +263,8 @@ form.addEventListener('submit', async e => {
   err.className = 'msg';
   err.textContent = '';
 
-  const email = authEmail.value.trim();
-  const passcode = authPasscode.value.trim();
+  const email = localStorage.getItem('lic_email') || '';
+  const passcode = localStorage.getItem('lic_passcode') || '';
   if (!email || !passcode) {
     err.className = 'msg err';
     err.textContent = 'Đăng nhập trước.';
@@ -292,9 +312,22 @@ const fetchBtn = document.getElementById('fetchBtn');
 fetchBtn.addEventListener('click', loadRecords);
 filterInput.addEventListener('input', () => { currentPage = 1; renderList(); });
 
+async function fetchRecords(email, passcode){
+  const url = WEB_APP_URL + '?email=' + encodeURIComponent(email) + '&passcode=' + encodeURIComponent(passcode);
+  const res = await fetch(url);
+  return res.json();
+}
+
+function showRecords(data){
+  allRecords = data || [];
+  currentPage = 1;
+  renderList();
+}
+
+// Tải lại bằng thông tin đã lưu. Server từ chối (đổi passcode, bị khóa) -> về trạng thái chưa đăng nhập.
 async function loadRecords(){
-  const email = authEmail.value.trim();
-  const passcode = authPasscode.value.trim();
+  const email = localStorage.getItem('lic_email') || '';
+  const passcode = localStorage.getItem('lic_passcode') || '';
   if (!email || !passcode) {
     listArea.innerHTML = '<div class="list-empty">Đăng nhập để xem danh sách yêu cầu.</div>';
     openAuth();
@@ -303,22 +336,22 @@ async function loadRecords(){
   fetchBtn.disabled = true;
   fetchBtn.classList.add('loading');
   try {
-    const url = WEB_APP_URL + '?email=' + encodeURIComponent(email) + '&passcode=' + encodeURIComponent(passcode);
-    const res = await fetch(url);
-    const json = await res.json();
+    const json = await fetchRecords(email, passcode);
     if (json.status !== 'success') {
-      listArea.innerHTML = '<div class="list-empty">' + (json.message || 'Lỗi không rõ') + '</div>';
       allRecords = [];
+      listArea.innerHTML = '<div class="list-empty">' + esc_(json.message || 'Lỗi không rõ') + '</div>';
+      if (json.message === 'Sai email hoặc passcode' || json.message === 'Tài khoản đã bị khóa') {
+        localStorage.removeItem('lic_passcode');
+        authPasscode.value = '';
+      }
       return;
     }
-    allRecords = json.data || [];
-    currentPage = 1;
-    renderList();
+    showRecords(json.data);
   } catch (ex) {
-    listArea.innerHTML = '<div class="list-empty">Không tải được danh sách - kiểm tra lại Email/Passcode hoặc thử lại.</div>';
+    listArea.innerHTML = '<div class="list-empty">Không tải được danh sách, thử lại.</div>';
   } finally {
-    fetchBtn.disabled = false;
     fetchBtn.classList.remove('loading');
+    updateLoginLabel();
   }
 }
 

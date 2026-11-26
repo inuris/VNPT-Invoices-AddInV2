@@ -130,7 +130,10 @@ nhận passcode mới." No extra inputs.
   the button is hidden and the header shows the email + "Đăng xuất" link.
   Credentials persist in `localStorage` (`lic_email`, `lic_passcode`,
   passcode included, per explicit decision); the list auto-loads on page
-  open when both are saved. Đăng xuất clears the passcode.
+  open when both are saved. Đăng xuất clears the passcode. Login submit
+  calls `doGet` first and only saves credentials / switches state on
+  `status:'success'`; a saved passcode the server later rejects ("Sai email
+  hoặc passcode" / "Tài khoản đã bị khóa") is cleared, back to logged out.
 - One full-width card "Danh sách yêu cầu": refresh ("Tải") icon button,
   MST filter, "+ Tạo license" button that opens a popover with the request
   form (MST, ValidRange dropdown, Note, submit). Results table (Ngày yêu cầu,
