@@ -23,7 +23,9 @@
   #loginBtn svg{width:16px;height:16px;flex:none}
   #loginBtn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .pop{position:absolute;right:0;top:calc(100% + 8px);width:320px;max-width:calc(100vw - 28px);z-index:20;text-align:left}
-  .pop[hidden],#logoutBtn[hidden]{display:none}
+  .pop[hidden],#userBox[hidden],#loginBtn[hidden]{display:none}
+  .user-box{display:flex;align-items:center;gap:12px}
+  .user-email{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
   #fetchBtn:disabled:not(.loading),#createBtn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;transform:none}
   header.site{position:relative;z-index:30}
   .list-card{position:relative;z-index:20}
@@ -65,9 +67,13 @@
       <h1>License Generator</h1>
     </div>
     <div class="auth-wrap pop-wrap">
-      <button class="sec" type="button" id="loginBtn" aria-haspopup="true" aria-expanded="false">
+      <div id="userBox" class="user-box" hidden>
+        <span id="userEmail" class="user-email"></span>
+        <button class="link" type="button" id="logoutBtn">Đăng xuất</button>
+      </div>
+      <button class="primary" type="button" id="loginBtn" aria-haspopup="true" aria-expanded="false">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        <span id="loginLabel">Đăng nhập</span>
+        <span>Đăng nhập</span>
       </button>
       <form class="card pop" id="authPop" hidden>
         <div class="field">
@@ -81,7 +87,6 @@
         <div class="auth-actions">
           <button class="link" type="button" id="resetLink">Reset passcode</button>
           <span class="spacer"></span>
-          <button class="link" type="button" id="logoutBtn">Đăng xuất</button>
           <button class="primary mini" type="submit">Đăng nhập</button>
         </div>
         <div id="resetMsg" class="msg"></div>
@@ -137,7 +142,6 @@ const PAGE_SIZE = 20;
 const authEmail = document.getElementById('auth-email');
 const authPasscode = document.getElementById('auth-passcode');
 const loginBtn = document.getElementById('loginBtn');
-const loginLabel = document.getElementById('loginLabel');
 const authPop = document.getElementById('authPop');
 const logoutBtn = document.getElementById('logoutBtn');
 authEmail.value = localStorage.getItem('lic_email') || '';
@@ -147,11 +151,11 @@ function isLoggedIn(){ return !!(authEmail.value.trim() && authPasscode.value.tr
 function updateLoginLabel(){
   const saved = localStorage.getItem('lic_email') || '';
   const on = !!(saved && localStorage.getItem('lic_passcode'));
-  loginLabel.textContent = on ? saved : 'Đăng nhập';
-  logoutBtn.hidden = !on;
-  // Chưa đăng nhập: nút Đăng nhập nổi bật (primary), khóa Tải và Tạo license.
-  loginBtn.classList.toggle('primary', !on);
-  loginBtn.classList.toggle('sec', on);
+  // Đã đăng nhập: ẩn nút Đăng nhập, chỉ hiện email + Đăng xuất.
+  loginBtn.hidden = on;
+  document.getElementById('userBox').hidden = !on;
+  document.getElementById('userEmail').textContent = saved;
+  // Chưa đăng nhập: khóa Tải và Tạo license.
   document.getElementById('fetchBtn').disabled = !on;
   document.getElementById('createBtn').disabled = !on;
   if (!on) createPop.close();
@@ -194,7 +198,6 @@ logoutBtn.addEventListener('click', () => {
   allRecords = [];
   listArea.innerHTML = '<div class="list-empty">Đăng nhập để xem danh sách yêu cầu.</div>';
   updateLoginLabel();
-  authPasscode.focus();
 });
 
 // ---- Reset passcode ----

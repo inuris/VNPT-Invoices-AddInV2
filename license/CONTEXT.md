@@ -124,11 +124,13 @@ nhận passcode mới." No extra inputs.
 
 ## Front end (`license/index.html`)
 
-- Minimal layout (2026-11-26): header has a "Đăng nhập" button (top right)
-  that opens a popover with Email + Passcode, Reset passcode, Đăng xuất.
+- Minimal layout (2026-11-26): logged out, header shows a primary
+  "Đăng nhập" button (top right) that opens a popover with Email + Passcode,
+  Reset passcode, submit; Tải and "+ Tạo license" are disabled. Logged in,
+  the button is hidden and the header shows the email + "Đăng xuất" link.
   Credentials persist in `localStorage` (`lic_email`, `lic_passcode`,
-  passcode included, per explicit decision); once saved the button shows the
-  email and the list auto-loads on page open. Đăng xuất clears the passcode.
+  passcode included, per explicit decision); the list auto-loads on page
+  open when both are saved. Đăng xuất clears the passcode.
 - One full-width card "Danh sách yêu cầu": refresh ("Tải") icon button,
   MST filter, "+ Tạo license" button that opens a popover with the request
   form (MST, ValidRange dropdown, Note, submit). Results table (Ngày yêu cầu,
