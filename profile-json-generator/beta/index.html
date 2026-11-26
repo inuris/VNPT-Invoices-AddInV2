@@ -175,6 +175,7 @@
   .sh-table th,.sh-table td{border-right:1px solid var(--sh-line);border-bottom:1px solid var(--sh-line);padding:0;height:24px;background:#fff;font-weight:400;text-align:left}
   .sh-table .sh-letter{background:var(--sh-head);text-align:center;font-weight:600;color:var(--muted);font-size:12px;cursor:grab;user-select:none;touch-action:pan-x pan-y;height:22px}
   .sh-table .sh-corner{background:var(--sh-head)}
+  .sh-table .sh-th{scroll-margin-left:70px;scroll-margin-right:8px}
   .sh-table .sh-rn{position:sticky;left:0;z-index:2;background:var(--sh-head);text-align:center;color:var(--muted);font-size:11.5px;min-width:64px;padding:0 6px;user-select:none;white-space:nowrap}
   .sh-cell{position:relative;min-width:120px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:3px 8px;line-height:18px}
   .sh-table .sh-lbl{font-size:11px;font-weight:700;text-align:left;padding:0 8px;color:var(--text)}
@@ -206,7 +207,7 @@
   .sh-exit{min-height:0}
   .sh-reset svg{width:12px;height:12px;vertical-align:-1px;margin-left:4px}
   .sh-notice{color:var(--danger-text);font-weight:600}
-  .in-sec.focus{box-shadow:0 0 0 2px var(--accent);border-radius:8px;padding:8px;margin:-8px}
+  .in-sec.focus input{border-color:var(--accent)}
   .sh-dlg{position:absolute;inset:0;z-index:60;background:rgba(16,16,24,.35);display:flex;align-items:center;justify-content:center;padding:16px}
   .sh-dlg[hidden]{display:none}
   .sh-dlg-box{background:#fff;border-radius:14px;padding:20px 22px;width:100%;max-width:360px;box-shadow:0 20px 50px -16px rgba(16,16,24,.5)}
@@ -244,6 +245,9 @@
   .sheet .in-close{display:none}
   .in-empty{color:var(--muted);font-size:13px;line-height:1.9}
   .in-body{display:flex;flex-direction:column;gap:14px}
+  .sheet [hidden]{display:none!important}
+  .in-sec[data-sec="alt"]{position:relative}
+  .in-sec[data-sec="alt"] .in-alt-reset{position:absolute;right:0;top:-8px;margin:0;padding:5px 8px;min-height:0;font-size:11.5px}
   .in-sec label{display:block;margin:0 0 4px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
   .in-def-name{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;font-weight:700;word-break:break-all}
   .in-badges{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
@@ -252,7 +256,6 @@
   .in-badge.ex{background:#ece3fa;color:#6d28d9}
   .in-note{margin-top:6px;font-size:12px;color:var(--muted);line-height:1.55}
   .in-sec input,.in-sec select{padding:8px 10px;min-height:0}
-  .in-hint{margin-top:4px;font-size:11.5px;color:var(--muted)}
   .in-sec .mini{margin-top:6px}
   .in-pos{display:flex;gap:6px}
   .in-pos button{flex:1;min-height:0;padding:7px 0;display:flex;align-items:center;justify-content:center}
@@ -279,6 +282,7 @@
     .sh-top{gap:8px;padding:8px 10px}
     .sh-title,.sh-seg{display:none}
     .sh-table .sh-rn{min-width:58px;padding:0 4px}
+    .sh-table .sh-th{scroll-margin-left:62px}
     .sh-table .sh-lbl{font-size:10px;padding:0 4px}
     .sh-typesel{display:block}
     .sh-top .sh-exit{order:-2}
@@ -1561,9 +1565,9 @@ function shEnsureOverlay(){
         <div class="sh-insp-head"><b class="in-title">Chi tiết cột</b><button class="mini in-close" type="button">Đóng</button></div>
         <div class="in-empty"><div>Bấm 1 cột để xem và sửa</div><div>Kéo chữ cột để đổi vị trí</div><div>Chuột phải để xem thêm thao tác</div></div>
         <div class="in-body" hidden>
-          <div class="in-sec" data-sec="orig"><label>Tên mặc định</label><div class="in-def-name"></div><div class="in-badges"></div><div class="in-note"></div></div>
-          <div class="in-sec" data-sec="alt"><label for="in-alt">Tên thay thế</label><input id="in-alt" class="in-alt alt-in" data-kind="alt" spellcheck="false" placeholder="Để trống = dùng tên mặc định"><div class="in-hint">Điền tên cột thay thế. Để trống = dùng tên mặc định. Gõ = để nhập công thức.</div><button class="mini in-alt-reset" type="button">Về mặc định</button></div>
-          <div class="in-sec" data-sec="dv"><label for="in-dv">Giá trị</label><input id="in-dv" class="in-dv" data-kind="dv" spellcheck="false" placeholder="VD: VND"><div class="in-hint">Giá trị mặc định khi ô trong file để trống, ví dụ: VND.</div></div>
+          <div class="in-sec" data-sec="orig"><div class="in-def-name"></div><div class="in-badges"></div><div class="in-note"></div></div>
+          <div class="in-sec" data-sec="alt"><label for="in-alt">Tên thay thế</label><input id="in-alt" class="in-alt alt-in" data-kind="alt" spellcheck="false" placeholder="Trống = tên mặc định" title="Điền tên cột thay thế. Để trống = dùng tên mặc định. Gõ = để nhập công thức."><button class="mini in-alt-reset" type="button">Về mặc định</button></div>
+          <div class="in-sec" data-sec="dv"><label for="in-dv">Giá trị</label><input id="in-dv" class="in-dv" data-kind="dv" spellcheck="false" placeholder="VD: VND" title="Giá trị mặc định khi ô trong file để trống"></div>
           <div class="in-sec"><label>Vị trí</label>
             <div class="in-pos">
               <button class="mini" type="button" data-act="first" title="Về đầu" aria-label="Về đầu">${SV('<polyline points="14 6 8 12 14 18"/><line x1="5" y1="5" x2="5" y2="19"/>')}</button>
@@ -1738,7 +1742,7 @@ function shUpdateInsp(id,force){
   const nt=ins.querySelector('.in-note'); nt.textContent=c.ext?'':c.note; nt.hidden=c.ext||!c.note;
   const setf=(el,v)=>{ el.dataset.h=c.h; el.dataset.t=m.type; if(force||document.activeElement!==el){ el.value=v; el.dataset.orig=v; } };
   const alt=ins.querySelector('.in-alt'); setf(alt,c.alt);
-  alt.placeholder=(c.def==='STT'&&m.type!=='CTT')?'Trống = tự động (cả file 1 hóa đơn)':'Để trống = dùng tên mặc định';
+  alt.placeholder=(c.def==='STT'&&m.type!=='CTT')?'Trống = tự động (cả file 1 hóa đơn)':'Trống = tên mặc định';
   alt.classList.toggle('is-fx',isFormula(alt.value)); alt.classList.toggle('bad',isFormula(alt.value)&&!!formulaError(alt.value));
   ins.querySelector('.in-alt-reset').hidden=!c.alt;
   setf(ins.querySelector('.in-dv'),c.defVal);
@@ -1969,6 +1973,8 @@ function shShowTip(id,cell){
     if(c.dup) li.push('<li class="err">Trùng tên với cột '+esc(c.dup)+'</li>');
     if(c.note) li.push('<li class="mut">'+esc(c.note)+'</li>');
   }
+  // cột đang chọn: khung chi tiết đã có đủ thông tin, chỉ giữ cảnh báo lỗi
+  if(st.sel===c.h){ const errs=li.filter(x=>x.indexOf('class="err"')>=0); li.length=0; li.push(...errs); if(!li.length) return; }
   const tip=shTip();
   tip.innerHTML='<ul class="tip-list">'+li.join('')+'</ul>';
   tip.hidden=false;
@@ -2274,6 +2280,7 @@ document.addEventListener('keydown',e=>{
   if(shMenuEl && !shMenuEl.hidden) return;
   if(e.target.closest && e.target.closest('.sh-editor,.sh-fxin,.in-alt,.in-dv,.in-note-in,.sh-search')) return;
   if(ov.dlg){ ov.dlg=false; ov.el.querySelector('.sh-dlg').hidden=true; return; }
+  if(shSt(ov.id).sel){ ov.inspOpen=false; shSelect(ov.id,null,null); return; } // Esc lần 1: bỏ chọn cột, lần 2: thoát
   sheetExit();
 });
 
