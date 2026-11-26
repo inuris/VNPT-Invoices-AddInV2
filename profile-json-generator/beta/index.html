@@ -2121,19 +2121,22 @@ function shPointerDown(e){
   const id=ov.id; if(!id) return;
   if(e.target.closest('.sh-editor,.sh-fxin,.in-alt,.in-dv,.in-note-in,.in-slot,.in-dtype,.sh-dlg')) return;
   const xb=e.target.closest('.sh-x'), xi=xb?+xb.closest('[data-i]').dataset.i:-1;
+  // chụp thông tin ô trước khi shFlush (shFlush vẽ lại bảng, ô cũ bị gỡ khỏi DOM)
+  const inScroll=!!e.target.closest('.sh-scroll'), cell0=e.target.closest('[data-i]');
+  const cellIdx=cell0?+cell0.dataset.i:-1, cellCls=cell0?cell0.className:'';
   shFlush(id); shHideTip(); ov.pend=null;
   if(xi>=0){ e.preventDefault(); const c0=shModel(id).cols[xi]; if(c0) shDeleteExt(id,c0.h); return; }
-  if(!e.target.closest('.sh-scroll')) return;
-  const cell=e.target.closest('[data-i]');
-  if(!cell){ if(shIsSmall()){ ov.inspOpen=false; shUpdateInsp(id,false); } return; }
-  const m=shModel(id), c=m.cols[+cell.dataset.i]; if(!c) return;
-  const isAlt=cell.classList.contains('sh-alt'), isVal=cell.classList.contains('sh-val'), isOrig=cell.classList.contains('sh-orig');
+  if(!inScroll) return;
+  if(cellIdx<0){ if(shIsSmall()){ ov.inspOpen=false; shUpdateInsp(id,false); } return; }
+  const cl=new Set(cellCls.split(/\s+/));
+  const m=shModel(id), c=m.cols[cellIdx]; if(!c) return;
+  const isAlt=cl.has('sh-alt'), isVal=cl.has('sh-val'), isOrig=cl.has('sh-orig');
   const kind=isAlt?'name':isVal?'def':(isOrig&&c.ext)?'orig':null;
   const sec=isAlt?'alt':isVal?'dv':isOrig?(c.ext?'alt':'orig'):null;
   shSelect(id,c.h,sec);
   if(e.button!==0) return;
   if(kind){ ov.pend={id,h:c.h,kind,x:e.clientX,y:e.clientY,pid:e.pointerId}; window.addEventListener('pointerup',shPendUp); return; }
-  if(!cell.matches('.sh-th,.sh-letter,.sh-orig')) return;
+  if(!(cl.has('sh-th')||cl.has('sh-letter')||cl.has('sh-orig'))) return;
   shCancelDrag();
   const touch=e.pointerType!=='mouse';
   const d=shDrag={id,i:c.i,x0:e.clientX,y0:e.clientY,x:e.clientX,y:e.clientY,touch,active:false,armed:false,pid:e.pointerId,name:c.shown,timer:null,menuTimer:null};
