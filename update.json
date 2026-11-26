@@ -1,6 +1,6 @@
 {
-  "latestVersion": "2.15",
+  "latestVersion": "2.16",
   "downloadUrl": "https://inuris.github.io/VNPT-Invoices-AddInV2/",
-  "notes": "Hiển thị chi tiết nội dung lỗi trả về từ máy chủ. Lỗi gửi hóa đơn khách lẻ khi máy chủ yêu cầu thẻ CusName, CusTaxCode.",
+  "notes": "Thông tin người mua hóa đơn (TenDonVi, HoTenNguoiMuaHang, MaSoThue) bỏ bắt buộc.",
   "mandatory": false
 }

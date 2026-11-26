@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [2.16] - 2026-11-26
+
+### Changed
+- Thông tin người mua hóa đơn (TenDonVi, HoTenNguoiMuaHang, MaSoThue) bỏ bắt buộc
+
 ## [2.15] - 2026-11-26
 
 ### Fixed
