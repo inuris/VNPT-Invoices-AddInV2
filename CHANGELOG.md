@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+## [2.14] - 2026-11-26
+
+### Changed
+- Chuẩn hóa ký tự trong thông báo và ghi chú cột
+- Bổ sung thông báo chi tiết cho các mã lỗi hàng hóa đặc trưng (ERR:1524-1551)
+
+### Fixed
+- Lỗi gửi hóa đơn khách lẻ khi mẫu không có cột MaKhachHang, TenDonVi
+
 ## [2.13] - 2026-11-19
 
 ### Changed

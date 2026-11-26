@@ -1,6 +1,6 @@
 {
-  "latestVersion": "2.13",
+  "latestVersion": "2.14",
   "downloadUrl": "https://inuris.github.io/VNPT-Invoices-AddInV2/",
-  "notes": "Tối ưu cấu trúc và bảo mật cấu hình. Lỗi tên loại chứng từ trong thông báo sau khi gửi.",
+  "notes": "Bổ sung thông báo chi tiết mã lỗi hàng hóa đặc trưng. Lỗi gửi hóa đơn khách lẻ khi mẫu không có cột MaKhachHang, TenDonVi.",
   "mandatory": false
 }
