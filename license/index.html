@@ -24,6 +24,7 @@
   #loginBtn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .pop{position:absolute;right:0;top:calc(100% + 8px);width:320px;max-width:calc(100vw - 28px);z-index:20;text-align:left}
   .pop[hidden],#logoutBtn[hidden]{display:none}
+  #fetchBtn:disabled:not(.loading),#createBtn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;transform:none}
   header.site{position:relative;z-index:30}
   .list-card{position:relative;z-index:20}
   @media(max-width:600px){.pop-wrap{position:static}.pop{left:0;right:0;width:auto;max-width:none}}
@@ -148,6 +149,12 @@ function updateLoginLabel(){
   const on = !!(saved && localStorage.getItem('lic_passcode'));
   loginLabel.textContent = on ? saved : 'Đăng nhập';
   logoutBtn.hidden = !on;
+  // Chưa đăng nhập: nút Đăng nhập nổi bật (primary), khóa Tải và Tạo license.
+  loginBtn.classList.toggle('primary', !on);
+  loginBtn.classList.toggle('sec', on);
+  document.getElementById('fetchBtn').disabled = !on;
+  document.getElementById('createBtn').disabled = !on;
+  if (!on) createPop.close();
 }
 // ---- Popover: Đăng nhập / Tạo license (mở 1 cái thì đóng cái kia) ----
 const pops = [];
