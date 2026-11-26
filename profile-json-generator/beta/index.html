@@ -297,9 +297,10 @@
     .sh-insp{top:auto;left:0;right:0;width:auto;height:52%;border-left:0;border-top:1px solid var(--sh-line);border-radius:16px 16px 0 0;transform:translateY(105%);box-shadow:0 -14px 30px -14px rgba(16,16,24,.35)}
     .sh-insp.open{transform:none}
     .sh-main.insp-open .sh-left{padding-right:0;padding-bottom:52%}
-    .sh-foot{padding:6px 10px}
+    .sh-foot{padding:6px 10px;position:relative;z-index:25}
+    .sh-insp{bottom:38px}
     .sh-legend{display:none;width:100%}
-    .sh-legend.open{display:flex}
+    .sh-legend.open{display:flex;position:absolute;left:10px;bottom:100%;width:auto;padding:8px 12px;background:#fff;border:1px solid var(--sh-line);border-radius:10px;box-shadow:0 6px 18px -8px rgba(16,16,24,.35)}
   }
 </style>
 </head>
@@ -1902,6 +1903,7 @@ function shEditorState(id,inp){
   const st=shSt(id), ed=st.edit; if(!ed||ed.kind==='def') return;
   const v=inp.value.trim(), fx=isFormula(v);
   inp.classList.toggle('is-fx',fx); inp.classList.toggle('bad',fx&&!!formulaError(v));
+  const fxb=ov.el.querySelector('.sh-fxin'); if(ed.kind==='name' && fxb){ fxb.value=inp.value; fxb.classList.toggle('is-fx',fx); fxb.classList.toggle('bad',fx&&!!formulaError(v)); }
   const m=shModel(id), me=m.cols.find(x=>x.h===ed.h);
   const name=(!fx&&v)?v:(me?me.def:'');
   const other=m.cols.filter(x=>x.h!==ed.h && x.shown.toLowerCase()===name.toLowerCase());
