@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [2.15] - 2026-11-26
+
+### Fixed
+- Hiển thị chi tiết nội dung lỗi trả về từ máy chủ
+- Lỗi gửi hóa đơn khách lẻ khi máy chủ yêu cầu thẻ CusName, CusTaxCode
+
 ## [2.14] - 2026-11-26
 
 ### Changed

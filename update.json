@@ -1,6 +1,6 @@
 {
-  "latestVersion": "2.14",
+  "latestVersion": "2.15",
   "downloadUrl": "https://inuris.github.io/VNPT-Invoices-AddInV2/",
-  "notes": "Bổ sung thông báo chi tiết mã lỗi hàng hóa đặc trưng. Lỗi gửi hóa đơn khách lẻ khi mẫu không có cột MaKhachHang, TenDonVi.",
+  "notes": "Hiển thị chi tiết nội dung lỗi trả về từ máy chủ. Lỗi gửi hóa đơn khách lẻ khi máy chủ yêu cầu thẻ CusName, CusTaxCode.",
   "mandatory": false
 }
