@@ -45,7 +45,7 @@
     text-transform:uppercase;letter-spacing:.08em;padding:0 8px 8px;border-bottom:1px solid var(--line)}
   table.lic-table td{padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
   table.lic-table tr:last-child td{border-bottom:0}
-  .lic-trunc{display:inline-block;max-width:150px;overflow:hidden;text-overflow:ellipsis;
+  .lic-trunc{display:inline-block;overflow:hidden;text-overflow:ellipsis;
     white-space:nowrap;vertical-align:middle;font-family:Consolas,Menlo,monospace;font-size:11px}
   .copy-btn{padding:0;width:28px;height:28px;min-height:28px;border-radius:999px;margin-left:4px}
   .copy-btn svg{width:13px;height:13px}
@@ -378,7 +378,7 @@ function renderList(){
     html += '<tr>' +
       '<td>' + esc_(r.date) + '</td>' +
       '<td>' + esc_(r.mst) + '</td>' +
-      '<td><span class="lic-trunc" title="' + esc_(lic) + '">' + esc_(lic) + '</span>' +
+      '<td><span class="lic-trunc" title="' + esc_(lic) + '">' + esc_(licShort_(lic)) + '</span>' +
       '<button class="mini icon copy-btn" type="button" data-idx="' + (start + i) + '" title="Sao chép">' +
       '<svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>' +
       '</button></td>' +
@@ -411,6 +411,11 @@ function renderList(){
       setTimeout(() => { btn.innerHTML = original; }, 1200);
     });
   });
+}
+
+// License mã hóa có đoạn đầu gần giống nhau -> hiện 8 ký tự đầu + 8 ký tự cuối để phân biệt.
+function licShort_(lic){
+  return lic.length > 20 ? lic.slice(0, 8) + '...' + lic.slice(-8) : lic;
 }
 
 function esc_(s){

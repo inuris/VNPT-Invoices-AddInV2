@@ -137,7 +137,7 @@ nhận passcode mới." No extra inputs.
 - One full-width card "Danh sách yêu cầu": refresh ("Tải") icon button,
   MST filter, "+ Tạo license" button that opens a popover with the request
   form (MST, ValidRange dropdown, Note, submit). Results table (Ngày yêu cầu,
-  MST, License w/ truncation + copy button, Thời hạn, Ghi chú), pagination
+  MST, License shown as first 8 + '...' + last 8 chars (full key in tooltip) + copy button, Thời hạn, Ghi chú), pagination
   (20/page). Only one popover open at a time; click outside / Esc closes.
 - `WEB_APP_URL` and `PAGE_SIZE=20` are the two config constants in the
   inline `<script>`.
