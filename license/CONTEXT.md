@@ -124,15 +124,16 @@ nhận passcode mới." No extra inputs.
 
 ## Front end (`license/index.html`)
 
-- Shared auth block (Email + Passcode) at top, persisted to `localStorage`
-  (`lic_email`, `lic_passcode` - passcode included, per explicit decision).
-- 2-column layout (`grid-template-columns:3fr 7fr`, stacks under 860px):
-  - Left card "Tạo license": the request form (MST, ValidRange dropdown,
-    Note, submit).
-  - Right card "Danh sách yêu cầu": icon-only "Tải" button next to the
-    heading (not far-right), MST filter input (far right, ~20 chars wide),
-    results table (Ngày yêu cầu, MST, License w/ truncation + copy button,
-    Thời hạn, Ghi chú), pagination (20/page).
+- Minimal layout (2026-11-26): header has a "Đăng nhập" button (top right)
+  that opens a popover with Email + Passcode, Reset passcode, Đăng xuất.
+  Credentials persist in `localStorage` (`lic_email`, `lic_passcode`,
+  passcode included, per explicit decision); once saved the button shows the
+  email and the list auto-loads on page open. Đăng xuất clears the passcode.
+- One full-width card "Danh sách yêu cầu": refresh ("Tải") icon button,
+  MST filter, "+ Tạo license" button that opens a popover with the request
+  form (MST, ValidRange dropdown, Note, submit). Results table (Ngày yêu cầu,
+  MST, License w/ truncation + copy button, Thời hạn, Ghi chú), pagination
+  (20/page). Only one popover open at a time; click outside / Esc closes.
 - `WEB_APP_URL` and `PAGE_SIZE=20` are the two config constants in the
   inline `<script>`.
 

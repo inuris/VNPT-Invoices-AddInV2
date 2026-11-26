@@ -12,15 +12,23 @@
 <style>
   .wrap{max-width:1200px;margin:0 auto;padding:24px 20px 60px}
   header.site{margin-bottom:20px}
-  .cols{display:grid;grid-template-columns:3fr 7fr;gap:18px}
-  @media(max-width:860px){.wrap{padding:16px 14px 48px}.cols{grid-template-columns:1fr}}
+  @media(max-width:860px){.wrap{padding:16px 14px 48px}}
   .field{margin-bottom:14px}
   .grid-two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   @media(max-width:480px){.grid-two{grid-template-columns:1fr}}
 
-  .auth-card{margin-bottom:18px}
-  .auth-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  @media(max-width:600px){.auth-row{grid-template-columns:1fr}}
+  .auth-wrap{margin-left:auto}
+  .pop-wrap{position:relative}
+  #loginBtn{display:inline-flex;align-items:center;gap:8px;max-width:260px}
+  #loginBtn svg{width:16px;height:16px;flex:none}
+  #loginBtn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pop{position:absolute;right:0;top:calc(100% + 8px);width:320px;max-width:calc(100vw - 28px);z-index:20;text-align:left}
+  .pop[hidden],#logoutBtn[hidden]{display:none}
+  header.site{position:relative;z-index:30}
+  .list-card{position:relative;z-index:20}
+  @media(max-width:600px){.pop-wrap{position:static}.pop{left:0;right:0;width:auto;max-width:none}}
+  .auth-actions{display:flex;align-items:center;gap:10px;margin-top:4px}
+  .auth-actions .spacer{flex:1}
 
   .list-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
   .filter-short{width:140px;flex:none}
@@ -55,30 +63,42 @@
     <div>
       <h1>License Generator</h1>
     </div>
+    <div class="auth-wrap pop-wrap">
+      <button class="sec" type="button" id="loginBtn" aria-haspopup="true" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span id="loginLabel">Đăng nhập</span>
+      </button>
+      <form class="card pop" id="authPop" hidden>
+        <div class="field">
+          <label>Email <span class="req">*</span></label>
+          <input type="email" id="auth-email" placeholder="ten.nv@vnpt.vn" autocomplete="username">
+        </div>
+        <div class="field">
+          <label>Passcode <span class="req">*</span></label>
+          <input type="password" id="auth-passcode" placeholder="passcode" autocomplete="current-password">
+        </div>
+        <div class="auth-actions">
+          <button class="link" type="button" id="resetLink">Reset passcode</button>
+          <span class="spacer"></span>
+          <button class="link" type="button" id="logoutBtn">Đăng xuất</button>
+          <button class="primary mini" type="submit">Đăng nhập</button>
+        </div>
+        <div id="resetMsg" class="msg"></div>
+      </form>
+    </div>
   </header>
 
-  <div class="card auth-card reveal">
-    <div class="auth-row">
-      <div class="field" style="margin-bottom:0">
-        <label>Email <span class="req">*</span></label>
-        <input type="email" id="auth-email" placeholder="ten.nv@vnpt.vn">
-      </div>
-      <div class="field" style="margin-bottom:0">
-        <label>Passcode <span class="req">*</span></label>
-        <input type="password" id="auth-passcode" placeholder="passcode">
-      </div>
-    </div>
-    <button class="link" type="button" id="resetLink" style="margin-top:10px">Reset passcode</button>
-    <div id="resetMsg" class="msg"></div>
-  </div>
-
-  <div class="cols">
-    <div class="left">
-      <div class="card reveal">
-        <div class="list-toolbar">
-          <h3 style="margin:0;font-size:14px;flex:none">Tạo license</h3>
-        </div>
-        <form id="licForm">
+  <div class="card list-card reveal">
+    <div class="list-toolbar">
+      <h3 style="margin:0;font-size:14px;flex:none">Danh sách yêu cầu</h3>
+      <button class="primary icon" id="fetchBtn" title="Tải" aria-label="Tải">
+        <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      </button>
+      <span class="spacer" style="flex:1"></span>
+      <input type="text" id="f-filter" placeholder="Lọc MST..." class="filter-short">
+      <div class="pop-wrap">
+        <button class="primary mini" type="button" id="createBtn" aria-haspopup="true" aria-expanded="false">+ Tạo license</button>
+        <form class="card pop" id="licForm" hidden>
           <div class="field">
             <label>MST khách hàng <span class="req">*</span></label>
             <input type="text" id="f-mst" placeholder="VD: 0315890356" required>
@@ -99,25 +119,13 @@
             <input type="text" id="f-note" placeholder="Ghi chú thêm, nhập tùy ý">
           </div>
           <button class="primary" type="submit" id="submitBtn" style="width:100%">Gửi yêu cầu</button>
-          <div id="err" class="msg"></div>
         </form>
       </div>
     </div>
-
-    <div>
-      <div class="card reveal">
-        <div class="list-toolbar">
-          <h3 style="margin:0;font-size:14px;flex:none">Danh sách yêu cầu</h3>
-          <button class="primary icon" id="fetchBtn" title="Tải" aria-label="Tải">
-            <svg data-icon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-          </button>
-          <span class="spacer" style="flex:1"></span>
-          <input type="text" id="f-filter" placeholder="Lọc MST..." class="filter-short">
-        </div>
-        <div id="listArea"></div>
-      </div>
-    </div>
+    <div id="err" class="msg"></div>
+    <div id="listArea"></div>
   </div>
+</div>
 </div>
 
 <script>
@@ -127,10 +135,60 @@ const PAGE_SIZE = 20;
 // ---- Đăng nhập chung, nhớ qua localStorage ----
 const authEmail = document.getElementById('auth-email');
 const authPasscode = document.getElementById('auth-passcode');
+const loginBtn = document.getElementById('loginBtn');
+const loginLabel = document.getElementById('loginLabel');
+const authPop = document.getElementById('authPop');
+const logoutBtn = document.getElementById('logoutBtn');
 authEmail.value = localStorage.getItem('lic_email') || '';
 authPasscode.value = localStorage.getItem('lic_passcode') || '';
-authEmail.addEventListener('input', () => localStorage.setItem('lic_email', authEmail.value.trim()));
-authPasscode.addEventListener('input', () => localStorage.setItem('lic_passcode', authPasscode.value.trim()));
+
+function isLoggedIn(){ return !!(authEmail.value.trim() && authPasscode.value.trim()); }
+function updateLoginLabel(){
+  const saved = localStorage.getItem('lic_email') || '';
+  const on = !!(saved && localStorage.getItem('lic_passcode'));
+  loginLabel.textContent = on ? saved : 'Đăng nhập';
+  logoutBtn.hidden = !on;
+}
+// ---- Popover: Đăng nhập / Tạo license (mở 1 cái thì đóng cái kia) ----
+const pops = [];
+function makePop(btn, pop, focusEl){
+  const p = {
+    open(){ pops.forEach(o => o !== p && o.close()); pop.hidden = false; btn.setAttribute('aria-expanded', 'true'); focusEl().focus(); },
+    close(){ pop.hidden = true; btn.setAttribute('aria-expanded', 'false'); }
+  };
+  btn.addEventListener('click', () => pop.hidden ? p.open() : p.close());
+  document.addEventListener('click', e => { if (!pop.hidden && !pop.contains(e.target) && !btn.contains(e.target)) p.close(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !pop.hidden) p.close(); });
+  pops.push(p);
+  return p;
+}
+const authPopCtl = makePop(loginBtn, authPop, () => authEmail.value ? authPasscode : authEmail);
+function openAuth(){ authPopCtl.open(); }
+function closeAuth(){ authPopCtl.close(); }
+
+authPop.addEventListener('submit', e => {
+  e.preventDefault();
+  if (!isLoggedIn()) {
+    resetMsg.className = 'msg err';
+    resetMsg.textContent = 'Nhập Email và Passcode.';
+    return;
+  }
+  localStorage.setItem('lic_email', authEmail.value.trim());
+  localStorage.setItem('lic_passcode', authPasscode.value.trim());
+  resetMsg.className = 'msg';
+  resetMsg.textContent = '';
+  updateLoginLabel();
+  closeAuth();
+  loadRecords();
+});
+logoutBtn.addEventListener('click', () => {
+  localStorage.removeItem('lic_passcode');
+  authPasscode.value = '';
+  allRecords = [];
+  listArea.innerHTML = '<div class="list-empty">Đăng nhập để xem danh sách yêu cầu.</div>';
+  updateLoginLabel();
+  authPasscode.focus();
+});
 
 // ---- Reset passcode ----
 const resetLink = document.getElementById('resetLink');
@@ -142,7 +200,7 @@ resetLink.addEventListener('click', async () => {
   resetMsg.textContent = '';
   if (!email) {
     resetMsg.className = 'msg err';
-    resetMsg.textContent = 'Nhập Email ở trên trước.';
+    resetMsg.textContent = 'Nhập Email trước.';
     return;
   }
   if (!confirm('Gửi passcode mới về ' + email + '?')) return;
@@ -168,6 +226,7 @@ resetLink.addEventListener('click', async () => {
 const form = document.getElementById('licForm');
 const submitBtn = document.getElementById('submitBtn');
 const err = document.getElementById('err');
+const createPop = makePop(document.getElementById('createBtn'), form, () => document.getElementById('f-mst'));
 
 form.addEventListener('submit', async e => {
   e.preventDefault();
@@ -178,7 +237,9 @@ form.addEventListener('submit', async e => {
   const passcode = authPasscode.value.trim();
   if (!email || !passcode) {
     err.className = 'msg err';
-    err.textContent = 'Nhập Email và Passcode ở trên trước.';
+    err.textContent = 'Đăng nhập trước.';
+    createPop.close();
+    openAuth();
     return;
   }
 
@@ -200,6 +261,7 @@ form.addEventListener('submit', async e => {
     err.textContent = 'Đã nhận yêu cầu, bấm Tải lại sau vài phút để nhận license.';
     document.getElementById('f-mst').value = '';
     document.getElementById('f-note').value = '';
+    createPop.close();
   } catch (ex) {
     err.className = 'msg err';
     err.textContent = 'Gửi thất bại, kiểm tra kết nối mạng và thử lại.';
@@ -224,7 +286,8 @@ async function loadRecords(){
   const email = authEmail.value.trim();
   const passcode = authPasscode.value.trim();
   if (!email || !passcode) {
-    listArea.innerHTML = '<div class="list-empty">Nhập Email và Passcode ở trên trước.</div>';
+    listArea.innerHTML = '<div class="list-empty">Đăng nhập để xem danh sách yêu cầu.</div>';
+    openAuth();
     return;
   }
   fetchBtn.disabled = true;
@@ -311,7 +374,12 @@ function esc_(s){
   return (s == null ? '' : String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
 }
 
-listArea.innerHTML = '<div class="list-empty">Bấm Tải để tải danh sách yêu cầu của bạn.</div>';
+updateLoginLabel();
+if (localStorage.getItem('lic_email') && localStorage.getItem('lic_passcode')) {
+  loadRecords();
+} else {
+  listArea.innerHTML = '<div class="list-empty">Đăng nhập để xem danh sách yêu cầu.</div>';
+}
 
 const io = new IntersectionObserver(entries => {
   entries.forEach(e => { if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
